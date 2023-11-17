@@ -1,3 +1,6 @@
 [submodule "Bicorn-RX"]
 	path = Bicorn-RX
 	url = https://github.com/tokamak-network/Bicorn-RX.git
+[submodule "Raffle-Bicorn-RX"]
+	path = Raffle-Bicorn-RX
+	url = https://github.com/tokamak-network/Raffle-Bicorn-RX.git
