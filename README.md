@@ -4,7 +4,7 @@ Commit-Reveal-Recover RNG (Random Number Generator) is a random number generatio
 For secure and safe random number generation, we use the commit-reveal-recover scheme.
 As a detailed mechanism, we use Bicorn-RX from the Bicorn article.
 The big difference is we used the Pietrzak VDF.
-Also, we support Commit-Recover option.
+Also, we support Commit-Recover option. (described later)
 
 
 ## Table of Contents
