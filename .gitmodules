@@ -1,0 +1,3 @@
+[submodule "Bicorn-RX"]
+	path = Bicorn-RX
+	url = https://github.com/tokamak-network/Bicorn-RX.git
