@@ -7,6 +7,24 @@ The big difference is we used the Pietrzak VDF.
 Also, we support Commit-Recover option. (described later)
 
 
+# To-do list
+
+## Prover
+
+- ~~Data retrieval automation using web3~~
+- Manual/automation mode selection function
+- Auto Setup/Recover function
+- Secure parameter default
+
+## Verifier
+
+- ...
+
+## Front-end
+
+- ...
+
+
 ## Table of Contents
   - [Commit-Reveal-Recover](#commit-reveal-recover)
   - [VDF-Prover](#VDF-Prover)
