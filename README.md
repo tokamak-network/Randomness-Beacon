@@ -18,10 +18,15 @@ Also, we support Commit-Recover option. (described later)
 
 ## Verifier
 
-- ...
+- big number modexp
+- big number mult
 
 ## Front-end
 
+- connect wallet
+- lottery event check
+- deadline check
+- betting
 - ...
 
 
