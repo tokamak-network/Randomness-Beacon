@@ -12,9 +12,9 @@ def get_web3(rpc_url):
     """Initialize and return a Web3 instance with the given RPC URL."""
     return Web3(Web3.HTTPProvider(rpc_url))
 
-def select_network(networks):
+def select_network(networks, contract_details):
     """Prompt the user to select a network and return the corresponding Web3 instance."""
-    print("Select a network:")
+    print(f"Select a network for the contract address {contract_details['address']}:")
     print("1. Ethereum Mainnet")
     print("2. Goerli Testnet")
     print("3. Titan (Layer 2) Mainnet")
@@ -89,7 +89,11 @@ def parse_value_at_round(value_at_round):
         "isAllRevealed": value_at_round[8]
     }
 
-def get_contract_values(contract):
+def get_contract_values():
+    networks, contract_details = read_config()
+    web3 = select_network(networks, contract_details)
+    contract = setup_contract(web3, contract_details)
+
     """Read and return specific values from the smart contract."""
     round_info = contract.functions.round().call()
     stage = get_stage(contract.functions.stage().call())
@@ -104,7 +108,7 @@ def get_contract_values(contract):
 
     # 결과 출력
     print(f"Round: {round_info}, Stage: {stage}")
-    print(f"Base n: {value_at_round['n']}")
+    print(f"Divisor n: {value_at_round['n']}")
     print(f"Generator g: {value_at_round['g']}")
     print(f"Value h: {value_at_round['h']}")
     print(f"Time delay T: {value_at_round['T']}")
@@ -118,7 +122,5 @@ def get_contract_values(contract):
 
 
 if __name__ == "__main__":
-    networks, contract_details = read_config()
-    web3 = select_network(networks)
-    contract = setup_contract(web3, contract_details)
-    get_contract_values(contract)
+
+    get_contract_values()

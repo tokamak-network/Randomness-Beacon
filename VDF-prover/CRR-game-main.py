@@ -7,7 +7,7 @@ import sys
 import logging as log
 from web3 import Web3
 
-from 
+from Web3_util import  get_contract_values
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
@@ -72,73 +72,132 @@ def construct_claim(exp_list, N, g, y, T):
 
 
 # Returns N=p*q where p and q are primes
-def generate_base(bitsize):
+def generate_divisor(bitsize):
     p=libnum.generate_prime(bitsize)
     q=libnum.generate_prime(bitsize)
     N=p*q
-print ("\nPrime*Prime (N): %d. Length: %d bits, Digits: %d" % (N,libnum.len_in_bits(N), len(str(N)) ))
+    print ("\nPrime*Prime (N): %d. Length: %d bits, Digits: %d" % (N,libnum.len_in_bits(N), len(str(N)) ))
     return N
+ 
+
+def select_automatic_mode():
+    round_info, stage, value_at_round, commits = get_contract_values()
+     
+    if stage == "Finished":
     
+        print('There is no active round found')
+        print()
+        ans = input('Do you want to set up a new round? (y or n):')
+        
+        if ans.lower() == 'y':            
+            bitsize = int(input("Input bit size (2048 is recommended): "))
+            N = generate_divisor(bitsize)
+            g = GGen(N)	
+            T = int(input("Input time delay (Over 100000 is recommended): "))
+            
+            return {
+                "mode": "auto-setup",
+                "N": N,
+                "g": g,
+                "T": T,
+            }
+            
+        elif ans.lower() == 'n':
+            print('There is nothing to run. This script terminates.') 
+            exit()
+            
+        else:
+            print("Invalid selection. Please try again.")
+            select_automatic_mode()
+    
+    elif stage == "Reveal":
+
+        print(f'Round {round_info} is active with Stage {stage}')
+        ans = input(f'Do you want to recover RANDOM for Round {round_info+1}? (y or n):')
+        
+        if ans.lower() == 'y':
+            N = value_at_round['n']
+            g = value_at_round['g']
+            T = value_at_round['T']
+            bstar = value_at_round['bStar']
+            commits = commits
+            
+            return {
+                "mode": "auto-recover",
+                "N": N,
+                "g": g,
+                "T": T,
+                "bstar": bstar,
+                "commits": commits
+            }
+            
+            
+        elif ans.lower() == 'n':
+            print('There is nothing to run. This script terminates.') 
+            exit()
+            
+        else:
+            print("Invalid selection. Please try again.")
+            select_automatic_mode()
+    
+    else:
+        print('The contract is on the Commit phase. There is nothing to run. This script terminates.')
+        exit()
+        
+    return 
     
 def select_mode():
     print("Select a mode (1 or 2):")
-    print("1. Manual mode: A user manually inputs numbers")
-    print("2. Automatic Input: This program gets inputs from the smart contract on the Ethereum compatible network")
+    print("1. Manual: A user manually inputs numbers")
+    print("2. Automatic (Recommended): This program gets inputs from the smart contract on the Ethereum compatible network")
     print("3. Use the default test option (2048RSA, 10s delay)")
     choice = input("Choose: ")
+    print()
 
     if choice == "1":
-        N = int(input("Input bit size (2048 is recommended): "))
-        T = int(input("Input time delay (10000000 is recommended): "))
-        return N, T
+        bitsize = int(input("Input bit size (2048 is recommended): "))
+        N = generate_divisor(bitsize)
+        g = GGen(N)
+        T = int(input("Input time delay (Over 10000000 is recommended): "))
+        member = int(input("Input number of members: "))
+        return {
+                "mode": "Manual",
+                "N": N,
+                "g": g,
+                "T": T,
+                "member": member
+            }
+        
     elif choice == "2":
-        # get 
-        return N, T
+        return select_automatic_mode()
+        
     elif choice == "3":
-        N = 2048
-        T = 100000
-        return N, T
+        N = generate_divisor(2048)
+        g = GGen(N)
+        T = 1000
+        member = 3
+        return {
+                "mode": "Test",
+                "N": N,
+                "g": g,
+                "T": T,
+                "member": member
+            }
+        
     else:
         print("Invalid selection. Please try again.")
         select_mode()
+        
+        
+def setup(N, g, T):
 
-
-
-if __name__=='__main__':
-
-
-    ### Setup(l, t)
-    
-    # Run (G, g, A, B) <-sampling- GGen(l)
-    
-    a = []
-    c = []
-    
-    T = 100000 # VDF를 위한 파라미터. 사전 연산을 예방하며 t에 비례한 시간이 소모됨
-    
-    bitsize = 512
-    # 군(group) 연산을 위한 base 생성
-    N = generate_base(bitsize)
-    member = 3  # 참여자 수
-
-
-    print('Commit-Reveal-Recover Game Demo')
-    #print('### Bicorn-RX Proof-of-Concept ###')
-    print('-- Version 0.7\n\n')
-    
-    # mode ???
-    select_mode()    
-    
-    
     print('\n------------------------------------------------\n')
     print('Setup Phase')
     print('\n------------------------------------------------\n')
     
-    print('[+] PoC environment:')
+    print('[+] Setup environment:')
     print('\t - Description of QR+ Group: ', N)
     print('\t - Time Delay for VDF (T): ', T)
-    
-    g = GGen(N)	
     print('\t - Group generator (g): ', g)
     
     # Compute h <- g^(2^t), optionally with PoE
@@ -156,7 +215,7 @@ if __name__=='__main__':
     proof_list_setup = gen_recursive_halving_proof(claim)
     end = time.time()    
     print(f'[+] The PoE Proof List is generated in {end - start:.5f} sec')    
-    print(f"[+] Prover submits the VDF proof:")
+    print(f"[+] The generated VDF proof for h:")
     print(*proof_list_setup, sep='\n')    
     
     start = time.time()  
@@ -171,8 +230,20 @@ if __name__=='__main__':
     print('')
     
     # Output (G, g, h, (pi_h), A, B)
+
+    return h, proof_list_setup
     
-    ### Prepare()
+def commit(N, g, member):
+
+    print('\n------------------------------------------------\n')
+    print('Commit Phase')
+    print('\n------------------------------------------------\n')
+    
+    
+    a = []
+    c = []
+
+    ### Prepare
     
     # a_i <-sampling- B (uniform distribution)
     print('[+] Number of participants: ', member, '\n')
@@ -212,12 +283,13 @@ if __name__=='__main__':
     # For all j, Verify c_j = g^(a'_j) - else go to Recover
     # Omega = PI for i (h^H(c_i||b*))^(a'_i)
     
-    print('\n------------------------------------------------\n')
-    print('Commit Phase')
-    print('\n------------------------------------------------\n')
-    
+
     print('[+] Commit list: ', c)
+
+    return a, c, b_star
     
+def reveal(N, h, a, c, b_star):
+
     print('\n------------------------------------------------\n')
     print('Reveal Phase')
     print('\n------------------------------------------------\n')
@@ -229,11 +301,15 @@ if __name__=='__main__':
     # initialization
     omega = 1
     
-    for i in range(member):
+    for i in range(len(a)):
         omega = ( omega*pow(pow(h, mod_hash_eth(N, c[i], b_star), N), a[i], N) ) % N
         
     print('[+] Revealed Random: ', omega, '\n')
+
+    return omega
     
+def recover(N, g, T, commits, b_star):
+
     ##### recovery scenario #####
     
     # Suppose None of Members Revealed Pessimistically
@@ -306,3 +382,47 @@ if __name__=='__main__':
     print('(', end='')
     print(N, g, h, T, proof_list_setup, a, c, omega, omega_recov, proof_list_recovery, sep=',', end='')
     print(')')
+
+    return omega_recov
+
+
+
+if __name__=='__main__':
+
+
+    ### Setup(l, t)
+    
+    # Run (G, g, A, B) <-sampling- GGen(l)
+    
+    
+    print('Commit-Reveal-Recover Game Demo')
+    #print('### Bicorn-RX Proof-of-Concept ###')
+    print('-- Version 0.8\n\n')
+    
+    # User chooses a mode here
+    mode_info = select_mode()    
+    
+    if mode_info["mode"] == "manual" or mode_info["mode"] == "test":
+        N, g, T, member = mode_info['N'], mode_info['g'], mode_info['T'], mode_info['member']
+        h, proof_list_setup = setup(N, g, T)
+        a, c, b_star = commit(N, g, member)
+        omega = reveal(N, h, a, c, b_star)
+        recovered_omega = recover(N, g, T, c, b_star)
+        
+    elif mode_info["mode"] == "auto-setup":
+        N, g, T = mode_info['N'], mode_info['g'], mode_info['T']
+        h, proof_list_setup = setup(N, g, T)
+        
+        
+    elif mode_info["mode"] == "auto-recover":
+        N, g, T, commits, b_star = mode_info['N'], mode_info['g'], mode_info['T'], mode_info['commits'], mode_info['b_star']
+        recovered_omega = recover(N, g, T, commits, b_star)
+    
+    
+    
+    
+
+    
+    
+    
+    
