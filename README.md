@@ -18,8 +18,9 @@ Also, we support Commit-Recover option. (described later)
 
 ## Verifier
 
-- big number modexp
-- big number mult
+- ~~big number modexp~~
+- big number mult (almost done)
+- apply to Bicorn-RX (WIP)
 
 ## Front-end
 
