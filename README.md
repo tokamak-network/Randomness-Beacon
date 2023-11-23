@@ -12,8 +12,8 @@ Also, we support Commit-Recover option. (described later)
 ## Prover
 
 - ~~Data retrieval automation using web3~~
-- Manual/automation mode selection function
-- Auto Setup/Recover function
+- ~~Manual/automation mode selection function~~
+- ~~Auto Setup/Recover function~~
 - Secure parameter default
 
 ## Verifier
