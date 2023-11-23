@@ -108,7 +108,7 @@ def get_contract_values():
 
     # 결과 출력
     print(f"Round: {round_info}, Stage: {stage}")
-    print(f"Divisor n: {value_at_round['n']}")
+    print(f"Divisor  n: {value_at_round['n']}")
     print(f"Generator g: {value_at_round['g']}")
     print(f"Value h: {value_at_round['h']}")
     print(f"Time delay T: {value_at_round['T']}")
