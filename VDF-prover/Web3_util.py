@@ -2,6 +2,18 @@ from web3 import Web3
 import configparser
 import json
 
+
+# keccack hash function outputs int for strings 
+def mod_hash_eth(n, *strings): 
+    # concatenate integer strings as even bytes
+    # for example, [10, 17] -> 0x0a, 0x11 -> 0x0a11
+    input = ''.join([format(int(x), '02x') for x in strings])
+    r = Web3.keccak(input.encode('utf-8'))
+    r = int(r.hex(), 16)
+    r=r%n
+    
+    return r
+
 def read_config():
     """Read and return configuration from a file."""
     config = configparser.ConfigParser()
@@ -122,5 +134,8 @@ def get_contract_values():
 
 
 if __name__ == "__main__":
-
-    get_contract_values()
+    c = ['10', '11']
+    # c = even_hex_concat(c)
+    print(c)
+    print(mod_hash_eth(100000, *c))
+    # get_contract_values()

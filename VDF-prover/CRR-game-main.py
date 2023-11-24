@@ -7,21 +7,14 @@ import sys
 import logging as log
 from web3 import Web3
 
-from Web3_util import  get_contract_values
+from Web3_util import  get_contract_values, mod_hash_eth
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
 
 ### Unitility functions
 
-# keccack hash function outputs int for strings 
-def mod_hash_eth(n, *strings): 
-    input = ''.join(map(str, strings))
-    r = Web3.keccak(input.encode('utf-8'))
-    r = int(r.hex(), 16)
-    r=r%n
-    
-    return r
+
     
 def hash(*strings): # utility function for string hash
     r = hashlib.sha3_256()
@@ -273,8 +266,7 @@ def commit(N, g, member):
     ### Finalize({a'_i, c_i, d_i, pi_i)}^n_i=1
     
     # b* <- H(c_1||...||c_n)
-    commits = ''.join(map(str, c))
-    b_star = mod_hash_eth(N, commits)
+    b_star = mod_hash_eth(N, *c)
     
     # print('[+] Input commits: ', commits)
     # b_star = int(b_star, 16)

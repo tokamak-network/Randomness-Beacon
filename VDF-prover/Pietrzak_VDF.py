@@ -6,15 +6,7 @@ import logging as log
 from datetime import datetime
 from web3 import Web3
 
-
-# utility function for number strings keccack hash mod N
-def mod_hash_eth(n, *strings): 
-    input = ''.join(map(str, strings))
-    r = Web3.keccak(input.encode('utf-8'))
-    r = int(r.hex(), 16)
-    r=r%n
-    
-    return r
+from Web3_util import  mod_hash_eth
 
 
 # utility function for number strings hash mod N
