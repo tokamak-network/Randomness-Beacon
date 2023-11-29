@@ -1,0 +1,153 @@
+/* 전역 스타일에 box-sizing을 추가합니다. */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #92d9f7;
+    color: #CCCCCC;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #002244;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.title {
+    font-size: 2rem;
+    color: #FFD700;
+}
+
+#prize {
+    font-size: 1.25rem;
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+#deadline {
+    font-size: 1.25rem;
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+.network-info, .wallet-info {
+    background: #004d99;
+    padding: 10px 15px;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 1rem;
+    color: white;
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+.app-container {
+    background-color: #f2f2f2;
+    color: #333;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    margin-top: 60px;
+}
+
+button, input[type="number"] {
+    padding: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+button {
+    display: block; /* 기본 블록 레벨 요소로 설정 */
+    margin: 5px auto; /* 상하 마진은 5px, 좌우 마진은 자동으로 설정하여 중앙 정렬 */
+    background-color: #4ddb5f;
+    width: calc(100% - 30px); /* Adjusting for padding */
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+input[type="number"] {
+    border: 2px solid #ddd;
+    width: calc(70% - 30px); /* Adjusting for padding and keeping total width 90% with button */
+    margin-right: 0px; /* Space between input and button */
+    background-color: white;
+    color: #333;
+}
+
+input[type="number"]:focus {
+    border-color: #004d99;
+    box-shadow: 0 0 8px rgba(0, 77, 153, 0.5);
+}
+
+input[type="number"]:invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
+}
+
+#prize-collected, #time-left {
+    font-weight: bold;
+    color: #4CAF50; /* 상금과 남은 시간의 색상을 강조 */
+}
+
+
+#betAmount {
+    flex-grow: 1; /* input 요소가 가능한 많은 공간을 차지하도록 함 */
+    margin-right: 0.5em; /* 버튼과의 간격을 적당히 설정 */
+    width: 70%; /* 너비를 auto로 설정하여 flex-grow에 의해 조절되도록 함 */
+}
+
+#placeBet {
+    width: calc(30% - 30px); /* Adjusting for padding and keeping button smaller than input */
+    background-color: #4ddb5f;
+    text-align: center; /* 텍스트를 버튼의 중앙에 위치시킵니다 */
+	flex: 1;
+}
+
+.bet-container {
+    display: flex;
+    justify-content: center; /* 내부 요소들을 가운데로 정렬합니다. */
+    align-items: center; /* 세로축으로도 가운데 정렬합니다. */
+    width: 90%; /* 전체 컨테이너의 너비를 부모의 90%로 설정 */
+    margin: 5px auto; /* 상하 여백 설정 및 좌우 여백을 auto로 하여 가운데 정렬 */
+}
+
+
+.bet-input-container {
+    display: flex;
+    flex: 7; /* input에 더 많은 공간 할당 */
+    margin-right: 5px; /* 버튼과의 간격 조정 */
+}
+
+
+@media (min-width: 768px) {
+    .app-container {
+        padding: 40px;
+        width: auto;
+    }
+
+    .bet-container, button, input[type="number"] {
+        width: calc(100% - 80px); /* Buttons and input fields width adjustment for desktop */
+    }
+}

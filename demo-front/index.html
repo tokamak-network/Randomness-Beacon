@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raffle App (Demo)</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">Raffle App (Demo)</h1>
+        <div class="wallet-info">
+            <span id="network">No network</span> | 
+            <span id="wallet">No wallet connected</span>
+        </div>
+    </div>
+    <div class="app-container">	
+		<div id="prize">Current Winner's Prize: <span id="prize-collected"></span> ETH</div>
+		<div id="deadline">Event Time Left: <span id="time-left"></span></div>
+        <h2>Bet Money and Get Money</h2>
+        <button id="connectWallet">Connect Wallet</button>
+        <button id="disconnectWallet" style="display:none;">Disconnect Wallet</button>
+        <div class="bet-container">
+			<div class="bet-input-container">
+				<input type="number" id="betAmount" min="0.0000000001" step="0.0000000001" placeholder="Bet Amount">
+            </div>
+			<button id="placeBet">Bet</button>
+        </div>
+        <button id="checkWinner">Check Winner</button>
+        <div id="status"> App is working </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
