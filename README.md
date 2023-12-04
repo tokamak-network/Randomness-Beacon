@@ -14,7 +14,7 @@ Also, we support Commit-Recover option. (described later)
 - ~~Data retrieval automation using web3~~
 - ~~Manual/automation mode selection function~~
 - ~~Auto Setup/Recover function~~
-- Secure parameter default
+- ~~Secure parameter default~~
 
 ## Verifier
 
@@ -24,11 +24,14 @@ Also, we support Commit-Recover option. (described later)
 
 ## Front-end
 
-- connect wallet
-- lottery event check
-- deadline check
+~~- connect wallet~~
+~~- disconnect wallet~~
+~~- lottery event info check: total money~~
+~~- lottery event info check: deadline~~
+- lottery event info check: betting unit
+~~- winner check~~
+- withdraw in case of the winner
 - betting
-- ...
 
 
 ## Table of Contents
@@ -60,6 +63,10 @@ VDF Verifier is implemented in Solidity.
 - How to get test tokens (faucets)
 
 ## Deployment
+
+## Future works
+
+- ?
 
 - hardhat instruction (recommended)
 
