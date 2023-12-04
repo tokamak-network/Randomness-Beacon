@@ -31,7 +31,7 @@ Also, we support Commit-Recover option. (described later)
 - lottery event info check: betting unit
 ~~- winner check~~
 - withdraw in case of the winner
-- betting
+- betting with commit 
 
 
 ## Table of Contents
