@@ -24,7 +24,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 1px 10px 1px 10px;
 }
 
 .title {
@@ -63,7 +63,7 @@ body {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 400px;
-    margin-top: 60px;
+    margin-top: 150px;
 }
 
 button, input[type="number"] {
@@ -106,9 +106,22 @@ input[type="number"]:invalid {
     box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
 }
 
-#prize-collected, #time-left {
+#prize-amount {
     font-weight: bold;
-    color: #4CAF50; /* 상금과 남은 시간의 색상을 강조 */
+}
+
+#prize-currency {
+    font-weight: normal;
+}
+
+#deadline {
+    font-size: 1.25rem;
+    color: #000000;
+    margin-bottom: 20px;
+}
+
+#time-left {
+    font-weight: bold;
 }
 
 
@@ -140,10 +153,46 @@ input[type="number"]:invalid {
     margin-right: 5px; /* 버튼과의 간격 조정 */
 }
 
+/* 색상 변경 */
+.winner-info {
+    font-size: 1.25rem;
+    color: #000000; /* 어두운 초록색으로 변경 */
+    margin-bottom: 20px;
+    text-align: center;
+    word-wrap: break-word; /* 경계 내에 텍스트 유지 */
+}
+
+/* 경계 내에 텍스트 유지 */
+.status {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+
+.withdraw-button {
+    background-color: #ff5722; /* 눈에 띄는 색상 */
+    color: white;
+    margin-top: 20px;
+}
+
+#disconnectWallet {
+    background-color: #ff5722; /* 붉은 주황색으로 설정 */
+    color: white; /* 버튼 내 텍스트 색상을 흰색으로 설정 */
+    /* 나머지 스타일링은 기존의 button 스타일을 따르거나 여기에 추가로 정의할 수 있습니다. */
+}
+
+/* 버튼 호버 스타일도 조정할 수 있습니다. */
+#disconnectWallet:hover {
+    background-color: #e64a19; /* 호버 시 좀 더 어두운 색으로 변경 */
+}
+
+
+
 
 @media (min-width: 768px) {
     .app-container {
         padding: 40px;
+		margin-top: 100px;
         width: auto;
     }
 
