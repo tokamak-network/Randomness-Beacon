@@ -30,6 +30,7 @@ def select_automatic_mode():
             bitsize = int(input("Input bit size (2048 is recommended): "))
             N = generate_divisor(bitsize)
             g = GGen(N)	
+            print()
             T = int(input("Input time delay (Over 100000 is recommended): "))
             
             return {
@@ -178,7 +179,7 @@ if __name__=='__main__':
 
         # Format the current time as YYYYMMDD_HHMMSS
         current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_name = f"testedData_{current_time}.json"
+        file_name = f"./testlog/data_{current_time}.json"
 
         # Writing the data to a JSON file
         with open(file_name, 'w') as file:
