@@ -1,11 +1,10 @@
 # Commit-Reveal-Recover-RNG
 
-Commit-Reveal-Recover RNG (Random Number Generator) is a random number generation project for blockchain. 
+Commit-Reveal-Recover RNG (Random Number Generator) is a random number generation project for blockchain.
 For secure and safe random number generation, we use the commit-reveal-recover scheme.
 As a detailed mechanism, we use Bicorn-RX from the Bicorn article.
 The big difference is we used the Pietrzak VDF.
 Also, we support Commit-Recover option. (described later)
-
 
 # To-do list
 
@@ -19,8 +18,8 @@ Also, we support Commit-Recover option. (described later)
 ## Verifier
 
 - ~~big number modexp~~
-- big number mult (almost done)
-- apply to Bicorn-RX (WIP)
+- ~~big number mult (almost done)~~
+- ~~apply to Bicorn-RX (WIP)~~
 
 ## Front-end
 
@@ -28,19 +27,20 @@ Also, we support Commit-Recover option. (described later)
 ~~- disconnect wallet~~
 ~~- lottery event info check: total money~~
 ~~- lottery event info check: deadline~~
-- lottery event info check: betting unit
-~~- winner check~~
-- withdraw in case of the winner
-- betting
 
+- lottery event info check: betting unit
+  ~~- winner check~~
+- withdraw in case of the winner
+- betting with a secret value generation
 
 ## Table of Contents
-  - [Commit-Reveal-Recover](#commit-reveal-recover)
-  - [VDF-Prover](#VDF-Prover)
-  - [VDF-Verifier](#VDF-Verifier)
-  - [Demo app](#demo-app)
-  - [Deployment](#deployment)
-  - [License](#license)
+
+- [Commit-Reveal-Recover](#commit-reveal-recover)
+- [VDF-Prover](#VDF-Prover)
+- [VDF-Verifier](#VDF-Verifier)
+- [Demo app](#demo-app)
+- [Deployment](#deployment)
+- [License](#license)
 
 ## Commit-Reveal-Recover
 
@@ -70,7 +70,6 @@ VDF Verifier is implemented in Solidity.
 
 - hardhat instruction (recommended)
 
-
-
 ## License
+
 The project is available as open source under the terms of the MIT License

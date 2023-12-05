@@ -3,16 +3,22 @@ import configparser
 import json
 
 
+def pad_hex(x):
+    n = (64 - (len(x) % 64)) % 64
+    return ('0' * n) + x
 # keccack hash function outputs int for strings 
-def mod_hash_eth(n, *strings): 
-    # concatenate integer strings as even bytes
-    # for example, [10, 17] -> 0x0a, 0x11 -> 0x0a11
-    input = ''.join([format(int(x), '02x') for x in strings])
-    r = Web3.keccak(input.encode('utf-8'))
-    r = int(r.hex(), 16)
-    r=r%n
-    
-    return r
+def mod_hash_eth(n, *strings):
+  # concatenate integer strings as even bytes
+  # for example, [10, 17] -> 0x0a, 0x11 -> 0x0a11
+  toHex = [format(int(x), '02x') for x in strings]
+  padToEvenLen = [pad_hex(x) for x in toHex]
+  input = ''.join(padToEvenLen)
+  print("input", input)
+  r = Web3.keccak(hexstr=input)
+  print(r.hex())
+  r = int(r.hex(), 16)
+  r = r % n
+  return r
 
 def read_config():
     """Read and return configuration from a file."""
