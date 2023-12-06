@@ -23,10 +23,10 @@ Also, we support Commit-Recover option. (described later)
 
 ## Front-end
 
-~~- connect wallet~~
-~~- disconnect wallet~~
-~~- lottery event info check: total money~~
-~~- lottery event info check: deadline~~
+- ~~connect wallet~~
+- ~~disconnect wallet~~
+- ~~lottery event info check: total money~~
+- ~~lottery event info check: deadline~~
 
 - lottery event info check: betting unit
   ~~- winner check~~
