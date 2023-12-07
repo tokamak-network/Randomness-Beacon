@@ -20,6 +20,8 @@ Also, we support Commit-Recover option. (described later)
 - ~~big number modexp~~
 - ~~big number mult (almost done)~~
 - ~~apply to Bicorn-RX (WIP)~~
+- ~~delete neg boolean~~
+- ~~make rounds executable in Parallel~~
 
 ## Front-end
 
