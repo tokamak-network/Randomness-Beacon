@@ -79,7 +79,7 @@ def gen_single_halving_proof(claim):
         
     n, x, y, T, v = claim
     
-    r = mod_hash_eth(x, y, v) # sha(x, y, v) mod n
+    r = int(mod_hash_eth(x, y, v) / 2) # sha(x, y, v) mod n
     log.info('generated r: ', r)
     
     x_prime = pow(x, r, n) * v % n
@@ -154,7 +154,7 @@ def process_single_halving_proof(VDF_claim):
     else:
         # check if the random value 'r' is well generated
         # r = sha(x, y, v) mod n
-        r = mod_hash_eth(x, y, v)
+        r = int(mod_hash_eth(x, y, v) / 2)
 
         # check if the next proof is well contructed        
         x_prime = pow(x, r, n) * v % n

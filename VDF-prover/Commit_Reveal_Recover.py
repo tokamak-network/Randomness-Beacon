@@ -43,7 +43,7 @@ def simple_VDF(a, N, T):
     return a
     
 
-### Bicorn Mechanism
+### Bicorn-RX Mechanism
 
 def GGen(N): # security parameter lambda can be omitted
     g = random.randint(2, N)
@@ -68,8 +68,8 @@ def construct_claim(exp_list, N, g, y, T):
 
 # Returns N=p*q where p and q are primes
 def generate_divisor(bitsize):
-    p=libnum.generate_prime(bitsize)
-    q=libnum.generate_prime(bitsize)
+    p=libnum.generate_prime(int(bitsize/2))
+    q=libnum.generate_prime(int(bitsize/2))
     N=p*q
     print ("\nPrime*Prime (N): %d. Length: %d bits, Digits: %d" % (N,libnum.len_in_bits(N), len(str(N)) ))
     return N

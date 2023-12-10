@@ -127,7 +127,7 @@ def select_mode():
     elif choice == "4":
         n = generate_divisor(2048)
         g = GGen(n)
-        T = 20000
+        T = 1000
         member = 3
         return {
                 "mode": "test",

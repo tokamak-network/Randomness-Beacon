@@ -3,29 +3,31 @@ from datetime import datetime
 
 # encoder for the custom json-like format
 class NoQuoteEncoder(json.JSONEncoder):
-    def iterencode(self, o, _one_shot=False):
+    def iterencode(self, o, _one_shot=False, indent_level=0):
+        indent_space = '  ' * indent_level
         if isinstance(o, dict):
             yield '{\n'
             first = True
             for key, value in o.items():
                 if not first:
                     yield ',\n'
-                yield '  ' + key + ': '
-                yield from self.iterencode(value)
+                yield indent_space + '  ' + key + ': '
+                yield from self.iterencode(value, indent_level=indent_level + 1)
                 first = False
-            yield '\n}'
+            yield '\n' + indent_space + '}'
         elif isinstance(o, list):
             yield '[\n'
             first = True
             for value in o:
                 if not first:
                     yield ',\n'
-                yield '  ' 
-                yield from self.iterencode(value)
+                yield indent_space + '  '
+                yield from self.iterencode(value, indent_level=indent_level + 1)
                 first = False
-            yield '\n]'
+            yield '\n' + indent_space + ']'
         else:
-            yield from super(NoQuoteEncoder, self).iterencode(o)
+            yield from super(NoQuoteEncoder, self).iterencode(o, _one_shot)
+
 
 # This function converts a demiaml to a padded hex string to make it have 256-bits scale length     
 # for example, 123456789 -> '0x00000000000000000000000000000000000000000000000000000000075bcd15'
