@@ -1,28 +1,29 @@
 import json
 from datetime import datetime
 
-
+# encoder for the custom json-like format
 class NoQuoteEncoder(json.JSONEncoder):
     def iterencode(self, o, _one_shot=False):
         if isinstance(o, dict):
-            yield '{'
+            yield '{\n'
             first = True
             for key, value in o.items():
                 if not first:
-                    yield ', '
-                yield key + ': '
+                    yield ',\n'
+                yield '  ' + key + ': '
                 yield from self.iterencode(value)
                 first = False
-            yield '}'
+            yield '\n}'
         elif isinstance(o, list):
-            yield '['
+            yield '[\n'
             first = True
             for value in o:
                 if not first:
-                    yield ', '
+                    yield ',\n'
+                yield '  ' 
                 yield from self.iterencode(value)
                 first = False
-            yield ']'
+            yield '\n]'
         else:
             yield from super(NoQuoteEncoder, self).iterencode(o)
 
@@ -76,14 +77,12 @@ def log_game_data(gameData):
         else: # key == 'n' or key == 'x' or key == 'y' or key == 'v':
             gameData[key] = decimal_to_padded_hex(gameData[key])
         
-    encoded_data = ''.join(NoQuoteEncoder().iterencode(gameData))
     
     # 1. print data on terminal
-    print('\n\n\n[+] Game Data: ', encoded_data)#json.dumps(gameData, indent=2))
+    print('\n\n\n[+] Game Data: ', json.dumps(gameData, indent=2))
 
     # 2. print data as a JSON-like file
-    #custom_json_string = ", ".join(f"{key}: \"{value}\"" for key, value in gameData.items())
-    #custom_json_string = f"{{ {custom_json_string} }}"
+    encoded_data = ''.join(NoQuoteEncoder().iterencode(gameData))
     
     # Format the current time as YYYYMMDD_HHMMSS
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
