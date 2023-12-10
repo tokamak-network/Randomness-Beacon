@@ -6,14 +6,15 @@ import time
 import sys
 import logging as log
 import json
-from datetime import datetime
-from web3 import Web3
 
 from Web3_util import  get_contract_values, mod_hash_eth
+
+from log_data import log_game_data
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
 from Commit_Reveal_Recover import setup, commit, reveal, recover, generate_divisor, GGen
+
 
 
 
@@ -28,14 +29,14 @@ def select_automatic_mode():
         
         if ans.lower() == 'y':            
             bitsize = int(input("Input bit size (2048 is recommended): "))
-            N = generate_divisor(bitsize)
-            g = GGen(N)	
+            n = generate_divisor(bitsize)
+            g = GGen(n)	
             print()
             T = int(input("Input time delay (Over 100000 is recommended): "))
             
             return {
                 "mode": "auto-setup",
-                "N": N,
+                "n": n,
                 "g": g,
                 "T": T,
             }
@@ -54,7 +55,7 @@ def select_automatic_mode():
         ans = input(f'Do you want to recover RANDOM for Round {round_info+1}? (y or n):')
         
         if ans.lower() == 'y':
-            N = value_at_round['n']
+            n = value_at_round['n']
             g = value_at_round['g']
             T = value_at_round['T']
             bstar = value_at_round['bStar']
@@ -62,7 +63,7 @@ def select_automatic_mode():
             
             return {
                 "mode": "auto-recover",
-                "N": N,
+                "n": n,
                 "g": g,
                 "T": T,
                 "bstar": bstar,
@@ -85,22 +86,23 @@ def select_automatic_mode():
     return 
     
 def select_mode():
-    print("Select a mode (1 or 2):")
+    print("Select a mode (1/2/3/4):")
     print("1. Manual: A user manually inputs numbers")
     print("2. Automatic (Recommended): This program gets inputs from the smart contract on the Ethereum compatible network")
-    print("3. Use the default test option (2048RSA, 10s delay)")
+    print("3. Use the default test option (256RSA, 0.001s delay)")
+    print("4. Use the default test option (Heavy, 2048RSA, 5s delay)")
     choice = input("Choose: ")
     print()
 
     if choice == "1":
         bitsize = int(input("Input bit size (2048 is recommended): "))
-        N = generate_divisor(bitsize)
-        g = GGen(N)
+        n = generate_divisor(bitsize)
+        g = GGen(n)
         T = int(input("Input time delay (Over 10000000 is recommended): "))
         member = int(input("Input number of members: "))
         return {
                 "mode": "manual",
-                "N": N,
+                "n": n,
                 "g": g,
                 "T": T,
                 "member": member
@@ -110,13 +112,26 @@ def select_mode():
         return select_automatic_mode()
         
     elif choice == "3":
-        N = generate_divisor(2048)
-        g = GGen(N)
-        T = 1000
+        n = generate_divisor(256) #256
+        g = GGen(n)
+        T = 100
         member = 3
         return {
                 "mode": "test",
-                "N": N,
+                "n": n,
+                "g": g,
+                "T": T,
+                "member": member
+            }
+            
+    elif choice == "4":
+        n = generate_divisor(2048)
+        g = GGen(n)
+        T = 20000
+        member = 3
+        return {
+                "mode": "test",
+                "n": n,
                 "g": g,
                 "T": T,
                 "member": member
@@ -125,6 +140,8 @@ def select_mode():
     else:
         print("Invalid selection. Please try again.")
         select_mode()
+        
+        
 
 
 
@@ -138,7 +155,7 @@ if __name__=='__main__':
     
     print('Commit-Reveal-Recover Game Demo')
     #print('### Bicorn-RX Proof-of-Concept ###')
-    print('-- Version 0.8\n\n')
+    print('-- Version 0.9\n\n')
     
     # User chooses a mode here
     mode_info = select_mode()   
@@ -147,54 +164,45 @@ if __name__=='__main__':
     print('mode_info[mode]:', mode_info["mode"])
     
     if mode_info["mode"] == "manual" or mode_info["mode"] == "test":
-        N, g, T, member = mode_info['N'], mode_info['g'], mode_info['T'], mode_info['member']
+        n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
         
-        h, proof_list_setup = setup(N, g, T)
+        h, setupProofs = setup(n, g, T)
         print('setup complete')
-        a, c, b_star = commit(N, g, member)
+        randomList, commitList, b_star = commit(n, g, member)
         print('commit complete')
-        omega = reveal(N, h, a, c, b_star)
+        omega = reveal(n, h, randomList, commitList, b_star)
         print('reveal complete')
-        recovered_omega, proof_list_recovery = recover(N, g, T, c, b_star)
+        recoveredOmega, recoveryProofs = recover(n, g, T, commitList, b_star)
         print('recover complete')
         
-        tested_data = {
-            "N": N,
-            "g": g,
-            "h": h,
-            "T": T,
-            "proof_list_setup": proof_list_setup,
-            "a": a,
-            "c": c,
-            "omega": omega,
-            "recovered_omega": recovered_omega,
-            "proof_list_recovery": proof_list_recovery
+        gameData = {
+            'n': n,
+            'g': g,
+            'h': h,
+            'T': T,
+            'setupProofs': setupProofs,
+            'randomList': randomList,
+            'commitList': commitList,
+            'omega': omega,
+            'recoveredOmega': recoveredOmega,
+            'recoveryProofs': recoveryProofs
         }
-
-        # Printing the data as before
-        print('\n\n\n[+] Tested Data:')
-        print('(', end='')
-        print(N, g, h, T, proof_list_setup, a, c, omega, recovered_omega, proof_list_recovery, sep=',', end='')
-        print(')')
-
-        # Format the current time as YYYYMMDD_HHMMSS
-        current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-        file_name = f"./testlog/data_{current_time}.json"
-
-        # Writing the data to a JSON file
-        with open(file_name, 'w') as file:
-            json.dump(tested_data, file, indent=4)
         
-        print(f'[+] Tested Data is saved as {file_name}')
+        # the log is printed in two ways
+        # 1. print on terminal
+        # 2. print as a JSON-like file
+        # i.e. { n : "0x123" }
+        # so it can be imported to js test scripts directly
+        log_game_data(gameData)
         
     elif mode_info["mode"] == "auto-setup":
-        N, g, T = mode_info['N'], mode_info['g'], mode_info['T']
-        h, proof_list_setup = setup(N, g, T)
+        n, g, T = mode_info['n'], mode_info['g'], mode_info['T']
+        h, setupProofs = setup(n, g, T)
         
         
     elif mode_info["mode"] == "auto-recover":
-        N, g, T, commits, b_star = mode_info['N'], mode_info['g'], mode_info['T'], mode_info['commits'], mode_info['b_star']
-        recovered_omega = recover(N, g, T, commits, b_star)
+        n, g, T, commits, b_star = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['commits'], mode_info['b_star']
+        recoveredOmega = recover(n, g, T, commits, b_star)
     
     
     

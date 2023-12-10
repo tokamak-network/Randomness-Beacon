@@ -221,7 +221,6 @@ def VDF_test():
     print(proof_list)
     test = verify_recursive_halving_proof(proof_list)
     print(test)
-    temp=1
     
 
     
