@@ -90,7 +90,7 @@ def select_mode():
     print("1. Manual: A user manually inputs numbers")
     print("2. Automatic (Recommended): This program gets inputs from the smart contract on the Ethereum compatible network")
     print("3. Use the default test option (256RSA, 0.001s delay)")
-    print("4. Use the default test option (Heavy, 2048RSA, 5s delay)")
+    print("4. Use the default test option (For test, 2048RSA, 1s delay)")
     choice = input("Choose: ")
     print()
 

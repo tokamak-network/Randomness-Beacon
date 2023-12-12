@@ -6,7 +6,7 @@ import logging as log
 from datetime import datetime
 from web3 import Web3
 
-from Web3_util import  mod_hash_eth
+from Web3_util import  mod_hash_eth, mod_hash_eth_128
 
 
 # utility function for number strings hash mod N
@@ -79,7 +79,8 @@ def gen_single_halving_proof(claim):
         
     n, x, y, T, v = claim
     
-    r = int(mod_hash_eth(x, y, v) / 2) # sha(x, y, v) mod n
+    # Use security parameter k as 128 bit
+    r = mod_hash_eth_128(x, y, v) 
     log.info('generated r: ', r)
     
     x_prime = pow(x, r, n) * v % n
@@ -154,7 +155,11 @@ def process_single_halving_proof(VDF_claim):
     else:
         # check if the random value 'r' is well generated
         # r = sha(x, y, v) mod n
-        r = int(mod_hash_eth(x, y, v) / 2)
+        # print('mod hash: ', mod_hash_eth(x, y, v))
+        # print('mod hash / 2^128: ', int(mod_hash_eth(x, y, v) % pow(2, 128)))
+        # test = input('stop: ')
+        # Use security parameter k as 128 bit
+        r = mod_hash_eth_128(x, y, v) 
 
         # check if the next proof is well contructed        
         x_prime = pow(x, r, n) * v % n
