@@ -80,7 +80,7 @@ button, input[type="number"] {
 button {
     display: block; /* 기본 블록 레벨 요소로 설정 */
     margin: 5px auto; /* 상하 마진은 5px, 좌우 마진은 자동으로 설정하여 중앙 정렬 */
-    background-color: #4ddb5f;
+    background-color: #a5e697;
     width: calc(100% - 30px); /* Adjusting for padding */
 }
 
@@ -133,7 +133,7 @@ input[type="number"]:invalid {
 
 #placeBet {
     width: calc(30% - 30px); /* Adjusting for padding and keeping button smaller than input */
-    background-color: #4ddb5f;
+    background-color: #a5e697;
     text-align: center; /* 텍스트를 버튼의 중앙에 위치시킵니다 */
 	flex: 1;
 }

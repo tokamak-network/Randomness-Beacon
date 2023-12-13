@@ -5,6 +5,8 @@ import {
 }
 from './contractConfig.js';
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const connectWalletButton = document.getElementById('connectWallet');
     const disconnectWalletButton = document.getElementById('disconnectWallet');
@@ -29,11 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	// 상금 정보 업데이트 주기 (예: 5분)
 	const prizeUpdateInterval = 300000;
 	
+	
 	// 페이지 로드 시 상금 정보 한 번 업데이트
 	updatePrizeInfo();
 
 	// 이후 5분 간격으로 상금 정보 업데이트
 	setInterval(updatePrizeInfo, prizeUpdateInterval);
+	
 	
 	// 상금 정보 업데이트 함수
 	async function updatePrizeInfo() {
@@ -56,27 +60,43 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	// 이벤트 시간 정보 시각적 업데이트
 	function updateEventTime() {
 		const currentTime = Math.floor(Date.now() / 1000);
 		const timeDifference = currentTime - eventStartTime;
 		const isEventOver = timeDifference > 0;
-		
-		let timeString;
-		
+
+		const betContainer = document.querySelector('.bet-container');
+		const checkWinnerButton = document.getElementById('checkWinner');
+
 		if (isEventOver) {
 			// 이벤트가 종료된 경우
 			let days = Math.floor(timeDifference / 86400);
 			let hours = Math.floor((timeDifference % 86400) / 3600);
 			let minutes = Math.floor((timeDifference % 3600) / 60);
 			let seconds = timeDifference % 60;
+
 			deadlineElement.innerHTML = `Time passed: <span id="time-left">${days}d ${hours}h ${minutes}m ${seconds}s</span>`;
+			
+			// 베팅 컨테이너 숨기기
+			// betContainer.style.display = 'none';
+
+			// 버튼 텍스트 변경
+			checkWinnerButton.textContent = 'Check Last Winner';
 		} else {
 			// 이벤트가 진행 중인 경우
 			let days = Math.floor(-timeDifference / 86400);
 			let hours = Math.floor((-timeDifference % 86400) / 3600);
 			let minutes = Math.floor((-timeDifference % 3600) / 60);
 			let seconds = -timeDifference % 60;
+
 			deadlineElement.innerHTML = `Time left: <span id="time-left">${days}d ${hours}h ${minutes}m ${seconds}s</span>`;
+			
+			// 베팅 컨테이너 표시
+			betContainer.style.display = 'block';
+
+			// 버튼 텍스트 원래대로 설정
+			checkWinnerButton.textContent = 'Check Winner';
 		}
 
 		// 1초 후에 다시 업데이트
@@ -84,7 +104,30 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 
-
+	// 페이지 로드 시 entranceFee 값을 가져와서 베팅 금액 입력 필드에 설정
+    fetchEntranceFee();
+	
+	// entranceFee 값을 가져오는 함수
+	async function fetchEntranceFee() {
+		try {
+			const entranceFee = await contractRPC.methods.entranceFee().call();
+			
+			if (entranceFee === 0n) {
+				// 게임이 없을 경우 메시지 표시
+				betAmountInput.placeholder = 'No game to bet';
+				betAmountInput.disabled = false; // 입력 필드 비활성화 -> true 로 수정필요
+				placeBetButton.disabled = false; // 입력 버튼 비활성화 -> true 로 수정필요
+			} else {
+				// 게임이 있을 경우 기본 베팅 금액 설정
+				const entranceFeeInEther = web3PRC.utils.fromWei(entranceFee, 'ether');
+				betAmountInput.value = entranceFeeInEther;
+				betAmountInput.disabled = false; // 입력 필드 활성화
+				placeBetButton.disabled = false; // 입력 버튼 활성화
+			}
+		} catch (error) {
+			console.error(`Error fetching entrance fee: ${error.message}`);
+		}
+	}
 
 
 	// 초기 실행 시 이벤트 시간 정보 가져오기
@@ -134,8 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 4n:
                     networkName = 'Eth Rinkeby';
                     break;
-                case 5n:
-                    networkName = 'Eth Goerli';
+                case 11155111n:
+                    networkName = 'Eth Sepolia';
                     break;
                 case 5050n:
                     networkName = 'Titan-Goerli';
@@ -223,30 +266,47 @@ document.addEventListener('DOMContentLoaded', () => {
         disconnectWalletButton.style.display = 'none';
     });
 
-    // 베팅
-    placeBetButton.addEventListener('click', () => {
-        const betAmount = betAmountInput.value;
-        if (!betAmount || !userAccount || !raffleContract) {
-            statusElement.textContent = 'Please connect to wallet and enter a bet amount.';
-            return;
-        }
+	// 사전에 정의된 금액 전송 (베팅) 및 랜덤값 커밋
+	// placeBet 버튼 이벤트 핸들러
+	placeBetButton.addEventListener('click', async () => {
+		const commitValue = betAmountInput.value;
+		if (!commitValue || !userAccount || !raffleContract) {
+			statusElement.textContent = 'Please connect to wallet and enter a commit value.';
+			return;
+		}
 
-        // betAmount를 BigNumber로 변환
-        const betAmountBN = web3.utils.BN(betAmount);
+		try {
+			const entranceFee = await raffleContract.methods.entranceFee().call();
 
-        raffleContract.methods.enterRafByCommit(betAmountBN)
-        .send({
-            from: userAccount,
-            value: web3.utils.toWei(betAmount, 'ether'),
-            gasPrice: web3.utils.toWei('10', 'gwei')
-        })
-        .then(() => {
-            statusElement.textContent = `Bet placed with ${betAmount} ETH.`;
-        })
-        .catch(err => {
-            statusElement.textContent = `Error placing bet: ${err.message}`;
-        });
-    });
+			// commitValue를 Hex 형태로 변환
+			let commitValueHex = web3.utils.asciiToHex(commitValue);
+
+			// Hex 문자열의 길이를 조정 -> 수정필요 패딩의 길이
+			const requiredLength = 64; // 32바이트 = 64 Hex 문자
+			commitValueHex = commitValueHex.padEnd(requiredLength, '0');
+
+			// Hex 문자열의 비트 길이 계산
+			const bitLength = commitValueHex.length * 4;
+
+			// enterRafByCommit 함수 호출
+			await raffleContract.methods.enterRafByCommit({
+				val: commitValueHex,
+				neg: false, // 항상 false로 설정
+				bitlen: bitLength
+			}).send({
+				from: userAccount,
+				value: entranceFee,
+				gasPrice: web3.utils.toWei('10', 'gwei')
+			});
+
+			statusElement.textContent = `Bet placed with entrance fee.`;
+		} catch (err) {
+			statusElement.textContent = `Error placing bet: ${err.message}`;
+		}
+	});
+
+
+
 
     // 당첨자 확인 및 버튼 생성
 	checkWinnerButton.addEventListener('click', () => {
