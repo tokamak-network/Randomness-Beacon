@@ -2,6 +2,8 @@ from web3 import Web3
 import configparser
 import json
 
+DEFAULT_NETWORK = 'sepolia_testnet'
+
 
 def pad_hex(x):
     n = (64 - (len(x) % 64)) % 64
@@ -41,7 +43,7 @@ def select_network(networks, contract_details):
     """Prompt the user to select a network and return the corresponding Web3 instance."""
     print(f"Select a network for the contract address {contract_details['address']}:")
     print("1. Ethereum Mainnet")
-    print("2. Goerli Testnet")
+    print("2. Ethereum Sepolia Testnet")
     print("3. Titan (Layer 2) Mainnet")
     print("4. Titan (Layer 2) Goerli Testnet")
     choice = input("Choice: ")
@@ -50,7 +52,7 @@ def select_network(networks, contract_details):
     if choice == "1":
         return get_web3(networks['ethereum_mainnet'])
     elif choice == "2":
-        return get_web3(networks['goerli_testnet'])
+        return get_web3(networks['sepolia_testnet'])
     elif choice == "3":
         return get_web3(networks['titan_mainnet'])
     elif choice == "4":
@@ -65,6 +67,7 @@ def setup_contract(web3, contract_details):
         contract_abi = json.load(abi_file)
     contract_address = Web3.to_checksum_address(contract_details['address'])
     return web3.eth.contract(address=contract_address, abi=contract_abi)
+    
 
 def get_commit_reveal_values(contract, round_number):
     """Retrieve all CommitRevealValues for a given round until an empty participant address is found."""
@@ -81,7 +84,7 @@ def get_commit_reveal_values(contract, round_number):
     
 def get_stage(stage_value):
     """Convert stage value to stage name."""
-    stages = ["Commit", "Reveal", "Finished"]
+    stages = ["Finished", "Commit", "Reveal"]
     return stages[stage_value] if stage_value < len(stages) else "Unknown"
     
 def parse_commits(commit_reveal_values):
@@ -100,48 +103,86 @@ def parse_commits(commit_reveal_values):
         parsed_data.append(value[0])
     return parsed_data
     
-def parse_value_at_round(value_at_round):
+    
+def parse_general_values_at_round(values_at_round):
     """Parse a ValueAtRound struct and return as a dictionary."""
     return {
-        "omega": value_at_round[0],
-        "bStar": value_at_round[1],
-        "numOfParticipants": value_at_round[2],
-        "g": value_at_round[3],
-        "h": value_at_round[4],
-        "n": value_at_round[5],
-        "T": value_at_round[6],
-        "isCompleted": value_at_round[7],
-        "isAllRevealed": value_at_round[8]
+        "numOfParticipants": values_at_round[0],
+        "count": values_at_round[1],
+        "bStar": values_at_round[2],
+        "commitsString": values_at_round[3],
+        "omega": values_at_round[4],
+        "stage": values_at_round[5],
+        "isCompleted": values_at_round[6],
+        "isAllRevealed": values_at_round[7]
     }
+    
+def parse_setup_values_at_round(values_at_round):
+    """Parse a ValueAtRound struct and return as a dictionary."""
+    return {
+        "setUpTime": values_at_round[0],
+        "commitDuration": values_at_round[1],
+        "commitRevealDuration": values_at_round[2],
+        "T": values_at_round[3],
+        "n": values_at_round[4],
+        "g": values_at_round[5],
+        "h": values_at_round[6]
+    }
+
+
 
 def get_contract_values():
     networks, contract_details = read_config()
-    web3 = select_network(networks, contract_details)
-    contract = setup_contract(web3, contract_details)
+    
+    print('The default setting:')
+    print('\t Network: ', DEFAULT_NETWORK)
+    print('\t Contract Address: ', contract_details['address'])
+    ans = input('Will you use the default setting? (y or n):')
+    
+    if ans.lower() == 'y':       
+        web3 = Web3(Web3.HTTPProvider(networks[DEFAULT_NETWORK]))
+        contract = setup_contract(web3, contract_details)
+
+    elif ans.lower() == 'n':
+        web3 = select_network(networks, contract_details)
+        address = input('Enter the contract address: ')
+        abi = input('Enter the contract ABI file path: ')
+        contract_details['address'] = address
+        contract_details['abi'] = abi
+        contract = setup_contract(web3, contract_details)
+    
 
     """Read and return specific values from the smart contract."""
-    round_info = contract.functions.round().call()
-    stage = get_stage(contract.functions.stage().call())
+    round_info = contract.functions.raffleRound().call()
 
     # valuesAtRound 정보 가져오기 및 파싱
-    raw_value_at_round = contract.functions.valuesAtRound(round_info).call()
-    value_at_round = parse_value_at_round(raw_value_at_round)
+    raw_general_values_at_round = contract.functions.valuesAtRound(round_info).call()
+    genearl_values_at_round = parse_general_values_at_round(raw_general_values_at_round)
+    stage = get_stage(genearl_values_at_round['stage'])
+    # print('genearl_values_at_round: ', genearl_values_at_round)
+    
+    raw_setup_values_at_round = contract.functions.setUpValuesAtRound(round_info).call()
+    setup_values_at_round = parse_setup_values_at_round(raw_setup_values_at_round)
+    # print('genearl_values_at_round: ', print(setup_values_at_round))
+    
+    genearl_values_at_round.update(setup_values_at_round)
+    values_at_round = genearl_values_at_round
 
     # commitRevealValues 정보 가져오기 및 파싱
     commit_reveal_values = get_commit_reveal_values(contract, round_info)
     commits = parse_commits(commit_reveal_values)
 
     # 결과 출력
-    print(f"Round: {round_info}, Stage: {stage}")
-    print(f"Divisor  n: {value_at_round['n']}")
-    print(f"Generator g: {value_at_round['g']}")
-    print(f"Value h: {value_at_round['h']}")
-    print(f"Time delay T: {value_at_round['T']}")
-    print(f"Commits: {commits}")
+    # print(f"Round: {round_info}, Stage: {stage}")
+    # print(f"Divisor  n: {values_at_round['n']}")
+    #  print(f"Generator g: {values_at_round['g']}")
+    # print(f"Value h: {values_at_round['h']}")
+    # print(f"Time delay T: {values_at_round['T']}")
+    # print(f"Commits: {commits}")
     #for value in parsed_commit_reveal_values:
     #    print(value)
 
-    return round_info, stage, value_at_round, commits
+    return round_info, stage, values_at_round, commits
 
 
 

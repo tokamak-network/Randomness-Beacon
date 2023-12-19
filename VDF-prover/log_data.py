@@ -63,51 +63,53 @@ def val_to_big_number_dictionary(decimal_number):
     return new_dic
 
 
-def log_game_data(gameData):
+def log_session_data(mode, sessionData):
     
     # change the proof list to dictionary
     keys = ['n', 'x', 'y', 'T', 'v']
     
-    for i in range(len(gameData['setupProofs'])):
-        new_element = dict(zip(keys, gameData['setupProofs'][i]))
-        gameData['setupProofs'][i] = new_element
+    if 'setupProofs' in sessionData:
+        for i in range(len(sessionData['setupProofs'])):
+            new_element = dict(zip(keys, sessionData['setupProofs'][i]))
+            sessionData['setupProofs'][i] = new_element
         
-    for i in range(len(gameData['recoveryProofs'])):
-        new_element = dict(zip(keys, gameData['recoveryProofs'][i]))
-        gameData['recoveryProofs'][i] = new_element
+    if 'recoveryProofs' in sessionData:
+        for i in range(len(sessionData['recoveryProofs'])):
+            new_element = dict(zip(keys, sessionData['recoveryProofs'][i]))
+            sessionData['recoveryProofs'][i] = new_element
         
     # change the big decimal numbers as a hex-string 
     # in the nested dictionary except for the key 't'
-    for key in gameData:
+    for key in sessionData:
 
         if key == 'T':
             pass
         elif key == 'setupProofs' or key == 'recoveryProofs':
-            for i in range(len(gameData[key])):
-                for innerKey in gameData[key][i]:
+            for i in range(len(sessionData[key])):
+                for innerKey in sessionData[key][i]:
                     if innerKey != 'T':
-                        gameData[key][i][innerKey] = val_to_big_number_dictionary(gameData[key][i][innerKey])
+                        sessionData[key][i][innerKey] = val_to_big_number_dictionary(sessionData[key][i][innerKey])
                         
         elif key == 'randomList' or key == 'commitList':
-            for i in range(len(gameData[key])):
-                gameData[key][i] = val_to_big_number_dictionary(gameData[key][i])
+            for i in range(len(sessionData[key])):
+                sessionData[key][i] = val_to_big_number_dictionary(sessionData[key][i])
                 
         else: # key == 'n' or key == 'x' or key == 'y' or key == 'v':
-            gameData[key] = val_to_big_number_dictionary(gameData[key])
+            sessionData[key] = val_to_big_number_dictionary(sessionData[key])
         
     
     # 1. print data on terminal
-    print('\n\n\n[+] Game Data: ', json.dumps(gameData, indent=2))
+    print('\n\n\n[+] Game Data: ', json.dumps(sessionData, indent=2))
 
     # 2. print data as a JSON-like file
-    # encoded_data = ''.join(NoQuoteEncoder().iterencode(gameData))
+    # encoded_data = ''.join(NoQuoteEncoder().iterencode(sessionData))
     
     # Format the current time as YYYYMMDD_HHMMSS
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"./testlog/data_{current_time}.json"
+    file_name = f"./testlog/data_{current_time}_{mode}.json"
 
     # Writing the data to a JSON file
     with open(file_name, 'w') as file:
-        file.write(json.dumps(gameData, indent=2))
+        file.write(json.dumps(sessionData, indent=2))
     
-    print(f'[+] Game Data is saved as {file_name}')
+    print(f'[+] Session Data is saved as {file_name}')

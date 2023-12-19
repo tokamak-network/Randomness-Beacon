@@ -6,7 +6,7 @@ import logging as log
 from datetime import datetime
 from web3 import Web3
 
-from Web3_util import  mod_hash_eth, mod_hash_eth_128
+from web3_util import  mod_hash_eth, mod_hash_eth_128
 
 
 # utility function for number strings hash mod N
