@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 
 # encoder for the custom json-like format
+# depreciated!
 class NoQuoteEncoder(json.JSONEncoder):
     def iterencode(self, o, _one_shot=False, indent_level=0):
         indent_space = '  ' * indent_level
@@ -27,7 +28,13 @@ class NoQuoteEncoder(json.JSONEncoder):
             yield '\n' + indent_space + ']'
         else:
             yield from super(NoQuoteEncoder, self).iterencode(o, _one_shot)
-
+            
+            
+            
+# 3 -> b11 -> 2
+# 4 -> b100 -> 3        
+def get_bitlen_from_hex(val):
+    return val.bit_length()
 
 # This function converts a demiaml to a padded hex string to make it have 256-bits scale length     
 # for example, 123456789 -> '0x00000000000000000000000000000000000000000000000000000000075bcd15'
@@ -44,7 +51,16 @@ def decimal_to_padded_hex(decimal_number):
     padded_hex_string = '0x' + '0' * padding_length + hex_string
 
     return padded_hex_string
-    
+ 
+
+# big number structure example
+# {
+#  "val": "0x6c02e134e08a774687da0c8d93cde935b0f7b4f817b876bbc898f0219dc6d965bf3152ceec51a9e19a2138a3a8809ed6a6bd9ce06a66c9909de72bf6bc7c667671abc9a82e953ca5fb919d0d535238dcd8d9562b4bba6b52bae30973d3ede112d5a75a84b23e160744c23d7f9028a7267ca581ab1743e597230605208838d95e07e9552aaea993ff41925489c488d53e2bbbb7970b16bf0cf483789364467513b9178b8eae61ace37524daf96b2fb40880e758240f9a16bc87d1f485d7f815893d12743e987e6da815dad1924b4643925e32ed742a7f7e86ddd30f9d7318a2848c43ce7ee2800564b2d7fe8fb1b7dc82f1f9c8c2e3029c7637a8a80fa1699b7b",
+#  "bitlen": 2047
+# }
+def val_to_big_number_dictionary(decimal_number):
+    new_dic = {"val": decimal_to_padded_hex(decimal_number), "bitlen": get_bitlen_from_hex(decimal_number) }
+    return new_dic
 
 
 def log_game_data(gameData):
@@ -70,21 +86,21 @@ def log_game_data(gameData):
             for i in range(len(gameData[key])):
                 for innerKey in gameData[key][i]:
                     if innerKey != 'T':
-                        gameData[key][i][innerKey] = decimal_to_padded_hex(gameData[key][i][innerKey])
+                        gameData[key][i][innerKey] = val_to_big_number_dictionary(gameData[key][i][innerKey])
                         
         elif key == 'randomList' or key == 'commitList':
             for i in range(len(gameData[key])):
-                gameData[key][i] = decimal_to_padded_hex(gameData[key][i])
+                gameData[key][i] = val_to_big_number_dictionary(gameData[key][i])
                 
         else: # key == 'n' or key == 'x' or key == 'y' or key == 'v':
-            gameData[key] = decimal_to_padded_hex(gameData[key])
+            gameData[key] = val_to_big_number_dictionary(gameData[key])
         
     
     # 1. print data on terminal
     print('\n\n\n[+] Game Data: ', json.dumps(gameData, indent=2))
 
     # 2. print data as a JSON-like file
-    encoded_data = ''.join(NoQuoteEncoder().iterencode(gameData))
+    # encoded_data = ''.join(NoQuoteEncoder().iterencode(gameData))
     
     # Format the current time as YYYYMMDD_HHMMSS
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -92,6 +108,6 @@ def log_game_data(gameData):
 
     # Writing the data to a JSON file
     with open(file_name, 'w') as file:
-        file.write(encoded_data)
+        file.write(json.dumps(gameData, indent=2))
     
     print(f'[+] Game Data is saved as {file_name}')
