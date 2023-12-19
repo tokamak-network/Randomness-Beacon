@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (entranceFee === 0n) {
                 // 게임이 없을 경우 메시지 표시
-                betAmountInput.placeholder = 'No game to bet';
+                betAmountInput.placeholder = 'No active round';
                 betAmountInput.disabled = false; // 입력 필드 비활성화 -> true 로 수정필요
                 placeBetButton.disabled = false; // 입력 버튼 비활성화 -> true 로 수정필요
             } else {
