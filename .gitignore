@@ -1,0 +1,34 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+/demo-front2/.env
+/demo-front2/.encryptedKey.json
+
+# dependencies
+/demo-front2/node_modules
+/demo-front2/.pnp
+/demo-front2/.pnp.js
+
+# testing
+/demo-front2/coverage
+
+# next.js
+/demo-front2/.next/
+/demo-front2/out/
+
+# production
+/demo-front2/build
+
+# misc
+/demo-front2.DS_Store
+/demo-front2*.pem
+
+# debug
+/demo-front2npm-debug.log*
+/demo-front2yarn-debug.log*
+/demo-front2yarn-error.log*
+/demo-front2.pnpm-debug.log*
+
+# local env files
+/demo-front2.env*.local
+
+# vercel
+/demo-front2.vercel
