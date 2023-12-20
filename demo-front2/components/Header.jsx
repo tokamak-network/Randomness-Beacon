@@ -20,7 +20,7 @@ const imageLoader = ({ src, width, quality }) => {
 
 export default function Header() {
     return (
-        <div className="p-5 border-b-2 flex flex-row justify-between items-center">
+        <div className="p-5 border-b-2 flex flex-row justify-between items-center bg-red-800 text-white font-semibold">
             <Link href="/">
                 <a className="flex flex-row items-center">
                     <Image
@@ -30,7 +30,9 @@ export default function Header() {
                         height={35}
                         alt="Picture of the author"
                     />
-                    <h1 className="py-4 px-4 font-bold text-3xl ">Commit-Reveal-Recover Raffle</h1>
+                    <h1 className="py-4 px-4 font-bold text-3xl text-green-400">
+                        Christmas Gift Distribution
+                    </h1>
                 </a>
             </Link>
 

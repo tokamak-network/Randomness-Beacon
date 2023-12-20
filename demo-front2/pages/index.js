@@ -98,9 +98,10 @@ export default function Home() {
         setEntranceFee(result)
     }
     return (
-        <div>
-            <div className="container mx-auto">
+        <div className="bg-[url('../public/christmas_gift_boxes_background.png')] min-h-screen bg-repeat-y bg-contain">
+            <div className="container mx-auto w-7/12 min-h-screen bg-yellow-50">
                 <Round round={round} />
+
                 {raffleAddress ? (
                     <div>
                         <div className="border-dashed border-amber-950 border-2 rounded-lg p-10 m-5 truncate hover:text-clip">
