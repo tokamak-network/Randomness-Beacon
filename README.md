@@ -57,7 +57,7 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
 
 ## Demo app
 
-- Demo app: [Demo App Link](https://raffle-bicorn-rx-front.vercel.app/)
+- Demo app: [Demo App Link]()
 
 ## Contributing
 We welcome contributions to the project. Please refer to our contribution guidelines for more information on how to participate.
