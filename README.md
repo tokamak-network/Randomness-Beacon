@@ -9,13 +9,17 @@ There are two major reasons. Firstly, the hash-to-prime function is too costly o
 
 ## Table of Contents
 
-- [Commit-Reveal-Recover](#commit-reveal-recover)
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
 - [Demo app](#demo-app)
 - [VDF-Prover](#VDF-Prover)
 - [VDF-Verifier](#VDF-Verifier)
+- [Contributing](#contributing)
+- [Contact](#contact)
 - [License](#license)
 
-## Commit-Reveal-Recover
+## Introduction
 
 Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a blockchain requires mechanisms that ensure trustworthiness, fairness, and security. This is where the Commit-Reveal-Recover scheme and Verifiable Delay Functions (VDFs) play a crucial role. 
 
@@ -34,21 +38,32 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
 ### 4. Enhancing Security and Fairness
 - **Summary**: By integrating these mechanisms, blockchain systems can generate random numbers that are secure, tamper-proof, and fair, essential for maintaining the integrity of numerous blockchain-based applications.
 
+
+## Features
+
+- Secure random number generation for blockchain applications.
+- Implementation of the Commit-Reveal-Recover scheme.
+- Integration of Pietrzak's Verifiable Delay Function (VDF) for enhanced efficiency.
+
+## Installation
+
+[Instructions on how to install your project, including any dependencies.]
+
+## Usage
+
+- setup
+- commit
+- recovery
+
 ## Demo app
 
-- Demo app page link: https://raffle-bicorn-rx-front.vercel.app/
-- Demo app prover: 
-- Demo app verifier: 
-- Demo app front: 
+- Demo app: [Demo App Link](https://raffle-bicorn-rx-front.vercel.app/)
 
-## VDF-Prover
+## Contributing
+We welcome contributions to the project. Please refer to our contribution guidelines for more information on how to participate.
 
-You need to use our Python VDF code. But you can use another Pietrzak implementation. Theoretically, it will work for verifiers.
-The Python code not only supports VDF evaluation/verification but also full commit-reveal-recover simulation.
-
-## VDF-Verifier
-
-VDF Verifier is implemented in Solidity.
+## Contact
+[Your Contact Information - for queries, collaborations, or further discussions.]
 
 ## License
 
