@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from web3 import Web3
 
-from Web3_util import  get_contract_values, mod_hash_eth
+from web3_util import  get_contract_values, mod_hash_eth
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
@@ -194,8 +194,12 @@ def reveal(N, h, a, c, b_star):
 
     return omega
     
-def recover(N, g, T, c, b_star):
+def recover(N, g, T, c, b_star=None):
 
+    if b_star == None:
+        # b* <- H(c_1||...||c_n)
+        b_star = mod_hash_eth(N, *c)
+        
     ##### recovery scenario #####
     
     # Suppose None of Members Revealed Pessimistically
