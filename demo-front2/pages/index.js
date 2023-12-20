@@ -11,6 +11,7 @@ import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import { ethers, toBeHex } from "ethers"
 import Moment from "react-moment"
 import { useInterval } from "use-interval"
+import RankOfEachParticipants from "../components/RankOfEachParticipants"
 
 const supportedChains = ["31337", "11155111"]
 
@@ -25,6 +26,7 @@ export default function Home() {
     const [isCommit, setIsCommit] = useState(false)
     const [settedUpValues, setSettedUpValues] = useState({})
     const [started, setStarted] = useState("")
+    const [participatedRounds, setParticipatedRounds] = useState([])
 
     useInterval(() => {
         setNowTime(new Date())
@@ -34,11 +36,20 @@ export default function Home() {
             updateUI()
         }
     }, [isWeb3Enabled, round])
+    useInterval(() => {
+        updateUI()
+    }, 12000)
     const { runContractFunction: setUpValuesAtRound } = useWeb3Contract()
     const { runContractFunction: raffleRound } = useWeb3Contract({
         abi: abi,
         contractAddress: raffleAddress, //,
         functionName: "raffleRound", //,
+        params: {},
+    })
+    const { runContractFunction: getParticipatedRounds } = useWeb3Contract({
+        abi: abi,
+        contractAddress: raffleAddress, //,
+        functionName: "getParticipatedRounds", //,
         params: {},
     })
     const { runContractFunction: entranceFeesAtRound } = useWeb3Contract()
@@ -48,6 +59,14 @@ export default function Home() {
             await raffleRound({ onError: (error) => console.log(error) })
         ).toString()
         setRound(roundFromCall)
+        const participatedRoundsfromCall = await getParticipatedRounds({
+            onError: (error) => console.log(error),
+        })
+        let temp = []
+        for (let i = 0; i < participatedRoundsfromCall.length; i++) {
+            temp.push(participatedRoundsfromCall[i].toString())
+        }
+        setParticipatedRounds(temp)
         await getSetUpValuesAtRound(roundFromCall)
         await getEntranceFee()
         if (settedUpValues.setUpTime !== undefined && settedUpValues.setUpTime != "0") {
@@ -85,21 +104,21 @@ export default function Home() {
         })
     }
     async function getEntranceFee() {
-        const setUpOpions = {
+        const setUpOptions = {
             abi: abi,
             contractAddress: raffleAddress,
             functionName: "entranceFeesAtRound",
             params: { round },
         }
         const result = await entranceFeesAtRound({
-            params: setUpOpions,
+            params: setUpOptions,
             onError: (error) => console.log(error),
         })
         setEntranceFee(result)
     }
     return (
-        <div className="bg-[url('../public/christmas_gift_boxes_background.png')] min-h-screen bg-repeat-y bg-contain">
-            <div className="container mx-auto w-7/12 min-h-screen bg-yellow-50">
+        <div className="bg-[url('../public/christmas_gift_boxes_background.png')] min-h-screen bg-repeat-y bg-cover bg-center">
+            <div className="container mx-auto w-9/12 min-h-screen bg-yellow-50">
                 <Round round={round} />
 
                 {raffleAddress ? (
@@ -176,7 +195,10 @@ export default function Home() {
                     <div>Commit Remaining Time</div>
                 </div> */}
                         <Commit commitIndex="0" entranceFee={entranceFee} />
-                        <GetWinner round={round} />
+                        <GetWinner round={round} participatedRounds={participatedRounds} />
+                        <div>
+                            <RankOfEachParticipants round={round} />
+                        </div>
                     </div>
                 ) : (
                     <div></div>

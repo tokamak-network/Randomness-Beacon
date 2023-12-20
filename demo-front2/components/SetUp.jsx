@@ -149,7 +149,7 @@ export default function SetUp({ updateUI, isSetUp }) {
                 <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr">
                     Set Up
                 </h3>
-                <div className="my-2">
+                <div className="mb-2 mt-5">
                     <Input
                         label="Entrance Fee in ETH (eg. 0.01)"
                         type="number"

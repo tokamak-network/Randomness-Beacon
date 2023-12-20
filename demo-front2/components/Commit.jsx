@@ -24,18 +24,16 @@ import React from "react"
 const ReactJson = dynamic(() => import("react-json-view-with-toggle"), {
     ssr: false,
 })
-export default function Commit({ commitIndex, entranceFee }) {
+export default function Commit({ entranceFee }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
     const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
-    let [round, setRound] = useState(0)
     const [commitCalldata, setCommitCalldata] = useState()
-    const setUpParams = createTestCases2()[0]
     const [commitData, setCommitData] = useState()
     const [commitDataState, setCommitDataState] = useState("initial")
     const { runContractFunction: enterRafByCommit, isLoading, isFetching } = useWeb3Contract()
     const dispatch = useNotification()
-    async function enterRafByCommitFunction(data) {
+    async function enterRafByCommitFunction() {
         const enterRafByCommitOptions = {
             abi: abi,
             contractAddress: raffleAddress,
@@ -85,7 +83,7 @@ export default function Commit({ commitIndex, entranceFee }) {
             <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr">
                 Enter Raffle by Commit
             </h3>
-            <div className="my-2">
+            <div className="mb-2 mt-5">
                 <Input
                     label="Commit Value in Decimal"
                     type="text"
