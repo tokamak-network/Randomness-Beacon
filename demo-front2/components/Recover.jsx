@@ -52,8 +52,6 @@ export default function Recover({ round: currentRound }) {
                     proofs: JSON.parse(recoveryProofs),
                 },
             }
-            console.log(recoveryOptions.params._round)
-            console.log(recoveryOptions.params.proofs)
 
             await recover({
                 params: recoveryOptions,
