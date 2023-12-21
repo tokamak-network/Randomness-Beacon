@@ -37,6 +37,15 @@ export default function Commit() {
         if (commitData == undefined || commitData == "") {
             setCommitDataState("error")
             return false
+        } else if (commitData == "0x" || commitData == "0" || commitData == 0) {
+            dispatch({
+                type: "error",
+                message: "Commit Value cannot be 0",
+                title: "Error Message",
+                position: "topR",
+                icon: "bell",
+            })
+            return false
         }
         return true
     }
