@@ -6,4 +6,4 @@
 [submodule "Raffle-Bicorn-RX"]
 	path = demo-contract/Raffle-Bicorn-RX
 	url = https://github.com/tokamak-network/Raffle-Bicorn-RX.git
-	branch = christmasEvent
+	branch = main
