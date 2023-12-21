@@ -37,6 +37,10 @@ COINMARKETCAP_API_KEY=
 - PRIVATE_KEY
   - The private key of your account (like from [metamask](https://metamask.io/)). **NOTE:** FOR DEVELOPMENT, PLEASE USE A KEY THAT DOESN'T HAVE ANY REAL FUNDS ASSOCIATED WITH IT.
   - You can [learn how to export it here](https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key).
+- ETHERSCAN_API_KEY
+  - Get api key from [Etherscan](https://etherscan.io/myapikey/)
+- COINMARKETCAP_API_KEY
+  - Get api key from [CoinMarketCap](https://pro.coinmarketcap.com/account/)
 
 ## DEPLOY
 ### Hardhat
