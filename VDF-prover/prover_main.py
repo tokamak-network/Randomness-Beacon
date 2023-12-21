@@ -23,7 +23,7 @@ def select_automatic_mode():
      
     if stage == "Finished":
     
-        print('There is no active round found')
+        print('[+] There is no active round found')
         print()
         ans = input('Do you want to set up a new round? (y or n):')
         
@@ -50,8 +50,8 @@ def select_automatic_mode():
             select_automatic_mode()
     
     else: # stage == "Reveal":
-
-        print(f'Round {round_info} is active with Stage {stage}')
+        print()
+        print(f'[+] Round {round_info} is active with Stage {stage}')
         ans = input(f'Do you want to recover RANDOM for Round {round_info+1}? (y or n):')
         
         if ans.lower() == 'y':
