@@ -17,7 +17,7 @@ import { abi, contractAddresses } from "./../constants"
 import { useMoralis } from "react-moralis"
 import { useEffect, useState } from "react"
 import { createTestCases2 } from "./../utils/testFunctions"
-import { Input, useNotification } from "web3uikit"
+import { Input, useNotification, Button } from "web3uikit"
 import { getBitLenth2, getLength } from "../utils/testFunctions"
 import { toBeHex, dataLength, ethers } from "ethers"
 import React from "react"
@@ -96,7 +96,7 @@ export default function Commit() {
             <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr font-bold">
                 Join Christmas Event by Commit
             </h3>
-            <div className="mb-2 mt-5">
+            <div className="mb-2 mt-5 flex flex-row">
                 <Input
                     label="Commit Value in Decimal"
                     type="text"
@@ -116,6 +116,25 @@ export default function Commit() {
                     state={commitDataState}
                     errorMessage="Commit Value is required"
                     width="50%"
+                />
+                <Button
+                    style={{ marginLeft: "10px", fontWeight: "bold" }}
+                    onClick={() => {
+                        let rand = window.crypto.getRandomValues(new Uint8Array(2048 / 8))
+                        const bytesHex = rand.reduce(
+                            (o, v) => o + ("00" + v.toString(16)).slice(-2),
+                            ""
+                        )
+                        setCommitData(BigInt("0x" + bytesHex).toString(10))
+                        let stringVal = BigInt("0x" + bytesHex).toString(10)
+                        if (stringVal.length == 0) stringVal = "0"
+                        setCommitCalldata({
+                            val: toBeHex(stringVal, getLength(dataLength(toBeHex(stringVal)))),
+                            bitlen: getBitLenth2(BigInt(stringVal)),
+                        })
+                    }}
+                    text="Auto Generate"
+                    theme="primary"
                 />
             </div>
             <div
@@ -138,58 +157,12 @@ export default function Commit() {
                     <div>Commit</div>
                 )}
             </button>
-            {/* <Form
-                id="set-up"
-                title="Enter Raffle By Commit"
-                onSubmit={enterRafByCommitFunction}
-                isDisabled={isLoading || isFetching}
-                buttonConfig={{
-                    text: "Set Up",
-                    size: "large",
-                    type: "button",
-                    onClick: function noRefCheck() {},
-                    disabled: isLoading || isFetching,
-                    isLoading: isLoading || isFetching,
-                    loadingProps: {
-                        spinnerType: "loader",
-                        spinnerColor: "black",
-                    },
-                    loadingText: "Setting Up",
-                }}
-                customFooter={
-                    <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto"
-                        disabled={isLoading || isFetching}
-                        type="submit"
-                    >
-                        {isLoading || isFetching ? (
-                            <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
-                        ) : (
-                            <div>Commit</div>
-                        )}
-                    </button>
-                }
-                data={[
-                    {
-                        id: "Commit Value",
-                        inputWidth: "100%",
-                        name: "n value",
-                        type: "box",
-                        value: (
-                            <Input
-                                label="n value"
-                                name="n value"
-                                type="text"
-                                width="100%"
-                                value={JSON.stringify(
-                                    setUpParams.commitList[parseInt(commitIndex)]
-                                )}
-                                state="disabled"
-                            />
-                        ),
-                    },
-                ]}
-            /> */}
+            <div className="mt-2">
+                <div>
+                    Commit your value using the Auto Generate button or Type your number manually.
+                </div>
+                <div>*Auto Generate button uses the window.crypto.getRandomValues function.</div>
+            </div>
         </div>
     )
 }
