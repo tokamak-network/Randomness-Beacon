@@ -38,8 +38,6 @@ export default function SetUp({ updateUI, isSetUp }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [nValue, setNValue] = useState(JSON.stringify(setUpParams.n))
     const [setUpProofs, setSetUpProofs] = useState(JSON.stringify(setUpParams.setupProofs))
-    const [entranceFee, setEntranceFee] = useState()
-    const [entranceFeeState, setEntranceFeeState] = useState("initial")
     const [commitDuration, setCommitDuration] = useState()
     const [commitDurationState, setCommitDurationState] = useState("initial")
     const [revealDuration, setRevealDuration] = useState()
@@ -47,11 +45,7 @@ export default function SetUp({ updateUI, isSetUp }) {
 
     const { runContractFunction: setUp, isLoading, isFetching } = useWeb3Contract()
     function validation() {
-        console.log("entranceFee", entranceFee)
-        if (entranceFee == undefined || entranceFee == "" || entranceFee == 0) {
-            setEntranceFeeState("error")
-            return false
-        } else if (commitDuration == undefined || commitDuration == "" || commitDuration == 0) {
+        if (commitDuration == undefined || commitDuration == "" || commitDuration == 0) {
             setCommitDurationState("error")
             return false
         } else if (revealDuration == undefined || revealDuration == "" || revealDuration == 0) {
@@ -60,6 +54,7 @@ export default function SetUp({ updateUI, isSetUp }) {
         }
         return true
     }
+
     async function setUpFunction() {
         if (validation()) {
             const setUpOptions = {
@@ -67,14 +62,12 @@ export default function SetUp({ updateUI, isSetUp }) {
                 contractAddress: raffleAddress,
                 functionName: "setUp",
                 params: {
-                    _entranceFee: ethers.parseEther(entranceFee.toString()),
                     _commitDuration: parseInt(commitDuration),
                     _commitRevealDuration: parseInt(commitDuration) + parseInt(revealDuration),
                     _n: JSON.parse(nValue),
                     _proofs: JSON.parse(setUpProofs),
                 },
             }
-            console.log(setUpOptions.params)
 
             await setUp({
                 params: setUpOptions,
@@ -90,7 +83,6 @@ export default function SetUp({ updateUI, isSetUp }) {
                     console.log(error)
                 },
             })
-            //setEntranceFee(ethers.parseEther(data.data[0].inputResult.toString()))
             await updateUI()
         }
     }
@@ -137,11 +129,10 @@ export default function SetUp({ updateUI, isSetUp }) {
         setIsModalOpen(false)
     }
 
-    useEffect(() => {
-        if (isWeb3Enabled) {
-            console.log("here")
-        }
-    }, [isWeb3Enabled])
+    // useEffect(() => {
+    //     if (isWeb3Enabled) {
+    //     }
+    // }, [isWeb3Enabled])
 
     return (
         <div className="p-5">
@@ -149,19 +140,6 @@ export default function SetUp({ updateUI, isSetUp }) {
                 <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr">
                     Set Up
                 </h3>
-                <div className="my-2">
-                    <Input
-                        label="Entrance Fee in ETH (eg. 0.01)"
-                        type="number"
-                        placeholder="0.01"
-                        id="EntranceFee"
-                        validation={{ required: true }}
-                        value={entranceFee}
-                        onChange={(e) => setEntranceFee(e.target.value)}
-                        state={entranceFeeState}
-                        errorMessage="Entrance Fee is required"
-                    />
-                </div>
                 <div className="mt-10">
                     <Input
                         label="Commit Duration in Seconds"

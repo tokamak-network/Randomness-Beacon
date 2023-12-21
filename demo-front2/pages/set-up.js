@@ -31,7 +31,6 @@ export default function SetUpPage() {
     useEffect(() => {
         if (isWeb3Enabled) {
             updateUI()
-            //getEntranceFee()
         }
     }, [isWeb3Enabled, round])
 
@@ -43,7 +42,6 @@ export default function SetUpPage() {
         functionName: "raffleRound", //,
         params: {},
     })
-    const { runContractFunction: entranceFeesAtRound } = useWeb3Contract()
 
     async function updateUI() {
         const roundFromCall = (
@@ -86,19 +84,6 @@ export default function SetUpPage() {
             commitRevealDuration: result["commitRevealDuration"].toString(),
             setUpTime: result["setUpTime"].toString(),
         })
-    }
-    async function getEntranceFee() {
-        const setUpOpions = {
-            abi: abi,
-            contractAddress: raffleAddress,
-            functionName: "entranceFeesAtRound",
-            params: { round },
-        }
-        const result = await entranceFeesAtRound({
-            params: setUpOpions,
-            onError: (error) => console.log(error),
-        })
-        setEntranceFee(result)
     }
     return (
         <div>

@@ -22,7 +22,6 @@ export default function Withdraw({ round }) {
     const dispatch = useNotification()
     const { runContractFunction: withdraw, isLoading, isFetching } = useWeb3Contract()
     async function withdrawFunction() {
-        console.log(round)
         const withdrawOpions = {
             abi: abi,
             contractAddress: raffleAddress,

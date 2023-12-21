@@ -10,7 +10,7 @@ function MyApp({ Component, pageProps }) {
         <MoralisProvider initializeOnMount={false}>
             <NotificationProvider>
                 <Head>
-                    <title>Commit-Rover Raffle</title>
+                    <title>Christmas Gift Distribution</title>
                     <meta name="description" content="Raffle using Commit-Recover" />
                     <link rel="icon" href="/favicon.ico" />
                 </Head>

@@ -21,8 +21,8 @@ export default function Round({ round, started }) {
     return (
         <div className="p-5">
             {raffleAddress ? (
-                <h2 className="py-4 px-4 text-2xl">
-                    Current Round: <span className="font-bold">{round}</span> {started}
+                <h2 className="pt-4 px-4 text-2xl subpixel-antialiased font-semibold">
+                    Current Round: <span className="font-extrabold">{round}</span> {started}
                 </h2>
             ) : (
                 <h2 className="py-4 px-4 font-bold text-2xl text-red-600">

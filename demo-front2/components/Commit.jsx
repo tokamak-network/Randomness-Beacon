@@ -19,46 +19,57 @@ import { useEffect, useState } from "react"
 import { createTestCases2 } from "./../utils/testFunctions"
 import { Input, useNotification } from "web3uikit"
 import { getBitLenth2, getLength } from "../utils/testFunctions"
-import { toBeHex, dataLength } from "ethers"
+import { toBeHex, dataLength, ethers } from "ethers"
 import React from "react"
 const ReactJson = dynamic(() => import("react-json-view-with-toggle"), {
     ssr: false,
 })
-export default function Commit({ commitIndex, entranceFee }) {
+export default function Commit() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
     const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
-    let [round, setRound] = useState(0)
     const [commitCalldata, setCommitCalldata] = useState()
-    const setUpParams = createTestCases2()[0]
     const [commitData, setCommitData] = useState()
     const [commitDataState, setCommitDataState] = useState("initial")
     const { runContractFunction: enterRafByCommit, isLoading, isFetching } = useWeb3Contract()
     const dispatch = useNotification()
-    async function enterRafByCommitFunction(data) {
-        const enterRafByCommitOptions = {
-            abi: abi,
-            contractAddress: raffleAddress,
-            functionName: "enterRafByCommit",
-            params: {
-                _c: commitCalldata,
-            },
-            msgValue: entranceFee,
+    function validation() {
+        if (commitData == undefined || commitData == "") {
+            setCommitDataState("error")
+            return false
         }
-        await enterRafByCommit({
-            params: enterRafByCommitOptions,
-            onSuccess: handleSuccess,
-            onError: (error) => {
-                dispatch({
-                    type: "error",
-                    message: error?.data?.message,
-                    title: "Error Message",
-                    position: "topR",
-                    icon: "bell",
-                })
-                console.log(error)
-            },
-        })
+        return true
+    }
+    async function enterRafByCommitFunction() {
+        if (validation()) {
+            const enterRafByCommitOptions = {
+                abi: abi,
+                contractAddress: raffleAddress,
+                functionName: "enterRafByCommit",
+                params: {
+                    _c: commitCalldata,
+                },
+            }
+            await enterRafByCommit({
+                params: enterRafByCommitOptions,
+                onSuccess: handleSuccess,
+                onError: (error) => {
+                    dispatch({
+                        type: "error",
+                        message:
+                            error?.error?.message && error.error.message != "execution reverted"
+                                ? error.error.message
+                                : new ethers.Interface(abi).parseError(
+                                      error.error.data.originalError.data
+                                  ).name,
+                        title: "Error Message",
+                        position: "topR",
+                        icon: "bell",
+                    })
+                    console.log(error)
+                },
+            })
+        }
     }
     const handleSuccess = async function (tx) {
         await tx.wait(1)
@@ -82,10 +93,10 @@ export default function Commit({ commitIndex, entranceFee }) {
     }, [isWeb3Enabled])
     return (
         <div className="border-dashed border-amber-950 border-2 rounded-lg p-10 m-5">
-            <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr">
-                Enter Raffle by Commit
+            <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr font-bold">
+                Join Christmas Event by Commit
             </h3>
-            <div className="my-2">
+            <div className="mb-2 mt-5">
                 <Input
                     label="Commit Value in Decimal"
                     type="text"
@@ -103,11 +114,14 @@ export default function Commit({ commitIndex, entranceFee }) {
                         })
                     }}
                     state={commitDataState}
-                    errorMessage="Entrance Fee is required"
+                    errorMessage="Commit Value is required"
                     width="50%"
                 />
             </div>
-            <div className="mt-7 ml-1 text-lg">
+            <div
+                className="mt-7 ml-1 text-base"
+                style={{ textOverflow: "ellipsis", overflow: "hidden" }}
+            >
                 {/* calldata: {JSON.stringify(commitCalldata)} */}
                 <ReactJson src={commitCalldata} />
             </div>

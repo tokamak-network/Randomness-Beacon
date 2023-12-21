@@ -58,7 +58,6 @@ export interface TestCase {
 }
 
 export interface SetUpParams {
-    entranceFee: BigNumberish
     commitDuration: number
     commitRevealDuration: number
     n: BigNumber

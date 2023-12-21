@@ -14,21 +14,22 @@
 import { useWeb3Contract } from "react-moralis"
 import { abi, contractAddresses } from "./../constants"
 import { useMoralis } from "react-moralis"
+import { useNotification, Input, Table, Avatar, Tag } from "web3uikit"
 import { useState } from "react"
-import { createTestCases2 } from "./../utils/testFunctions"
-import { Input, useNotification } from "web3uikit"
-import Withdraw from "./Withdraw"
-import RankOfEachParticipants from "./RankOfEachParticipants"
-export default function GetWinner({ round: currentRound, participatedRounds }) {
+export default function RankOfEachParticipants({ round: currentRound, participatedRounds }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
-    const setUpParams = createTestCases2()[0]
-    const dispatch = useNotification()
-    const { runContractFunction: getWinnerAddress, isLoading, isFetching } = useWeb3Contract()
     const [roundState, setRoundState] = useState("initial")
-    let [winnerAddress, setWinnerAddress] = useState("0x")
     const [round, setRound] = useState(undefined)
+    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const dispatch = useNotification()
+    const [RankOfEachParticipants, setRankOfEachParticipants] = useState(undefined)
+    const [tableContents, setTableContents] = useState([])
+    const {
+        runContractFunction: getRankPointOfEachParticipants,
+        isLoading,
+        isFetching,
+    } = useWeb3Contract()
     function validation() {
         if (round == undefined || round == "") {
             setRoundState("error")
@@ -36,39 +37,61 @@ export default function GetWinner({ round: currentRound, participatedRounds }) {
         }
         return true
     }
-    async function getWinnerFunction() {
+    async function getRankPointOfEachParticipantsFunction() {
         if (validation()) {
-            const setUpOpions = {
+            const Options = {
                 abi: abi,
                 contractAddress: raffleAddress,
-                functionName: "getWinnerAddress",
+                functionName: "getRankPointOfEachParticipants",
                 params: {
-                    _round: parseInt(round),
+                    _round: round,
                 },
             }
 
-            winnerAddress = await getWinnerAddress({
-                params: setUpOpions,
+            let result = await getRankPointOfEachParticipants({
+                params: Options,
                 onError: (error) => {
-                    console.log(error)
                     dispatch({
                         type: "error",
-                        message: error?.data?.message,
+                        message: error?.error?.message
+                            ? error.error.message
+                            : error?.data?.message,
                         title: "Error Message",
                         position: "topR",
                         icon: "bell",
                     })
                 },
             })
-            setWinnerAddress(winnerAddress)
+            setRankOfEachParticipants(result)
+            getTableContents(result)
         }
+    }
+    const getTableContents = (result) => {
+        let _results = []
+        if (result) {
+            for (let i = 0; i < result.addresses.length; i++) {
+                _results.push([result.addresses[i], BigInt(result.rankPoints[i]).toString()])
+            }
+        }
+        _results.sort((a, b) => {
+            return BigInt(a[1]) < BigInt(b[1]) ? 1 : BigInt(b[1]) < BigInt(a[1]) ? -1 : 0
+        })
+        for (let i = 0; i < _results.length; i++) {
+            _results[i].unshift("#" + (i + 1))
+        }
+        let mod = _results.length % 5
+        let len = _results.length
+        if (mod != 0) {
+            for (let i = 0; i < 5 - mod; i++) {
+                _results.push(["#" + (len + i + 1), "", ""])
+            }
+        }
+        setTableContents(_results)
     }
     return (
         <div className="p-5">
             <div className="border-dashed border-amber-950 border-2 rounded-lg p-10">
-                <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr">
-                    Get Result
-                </h3>
+                <div className="mb-2 font-bold">Get Results</div>
                 <div className="mt-5">
                     <Input
                         label="Round"
@@ -80,30 +103,43 @@ export default function GetWinner({ round: currentRound, participatedRounds }) {
                         state={roundState}
                         errorMessage="Round is required"
                     />
+                </div>
+                {participatedRounds?.length > 0 ? (
                     <div className="mt-1">
                         Rounds you've participated in : {participatedRounds.toString()}
                     </div>
-                </div>
+                ) : (
+                    <div></div>
+                )}
 
                 <button
                     id="enterRaffleByCommit"
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
                     disabled={isLoading || isFetching}
                     type="button"
-                    onClick={getWinnerFunction}
+                    onClick={getRankPointOfEachParticipantsFunction}
                 >
                     {isLoading || isFetching ? (
                         <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                     ) : (
-                        <div>Get Winner Address</div>
+                        <div>Get Rank Point For All Participants</div>
                     )}
                 </button>
-                <div className="mt-5">
-                    Winnder Address at Round {round} : {winnerAddress}
-                </div>
-                <div>
-                    <Withdraw round={round} />
-                </div>
+                {tableContents.length > 0 ? (
+                    <div className="mt-5">
+                        <Table
+                            columnsConfig="80px 450px 450px 450px 80px"
+                            data={tableContents}
+                            header={["#Rank", <span>Address</span>, <span>Rank Point</span>]}
+                            maxPages={5}
+                            onPageNumberChanged={function noRefCheck() {}}
+                            onRowClick={function noRefCheck() {}}
+                            pageSize={5}
+                        />
+                    </div>
+                ) : (
+                    <div></div>
+                )}
             </div>
         </div>
     )

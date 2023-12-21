@@ -20,8 +20,8 @@ const imageLoader = ({ src, width, quality }) => {
 
 export default function Header() {
     return (
-        <div className="p-5 border-b-2 flex flex-row justify-between items-center">
-            <Link href="/">
+        <div className="p-5 border-b-1 flex flex-row justify-between items-center bg-red-800 text-white font-semibold">
+            <Link href="/" key="5">
                 <a className="flex flex-row items-center">
                     <Image
                         src="../tokamaklogo.png"
@@ -30,18 +30,20 @@ export default function Header() {
                         height={35}
                         alt="Picture of the author"
                     />
-                    <h1 className="py-4 px-4 font-bold text-3xl ">Commit-Reveal-Recover Raffle</h1>
+                    <h1 className="py-4 px-4 font-bold text-3xl text-green-400">
+                        Christmas Gift Distribution
+                    </h1>
                 </a>
             </Link>
 
             <div className="flex flex-row items-center">
-                <Link href="/">
+                <Link href="/" key="1">
                     <a className="mr-4 p-6">Home</a>
                 </Link>
-                <Link href="/set-up">
+                <Link href="/set-up" key="2">
                     <a className="mr-4 p-6">Set Up</a>
                 </Link>
-                <Link href="/testcase">
+                <Link href="/testcase" key="3">
                     <a target="_blank" className="mr-4 p-6">
                         TestCase
                     </a>

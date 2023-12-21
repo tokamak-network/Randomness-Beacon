@@ -52,8 +52,6 @@ export default function Recover({ round: currentRound }) {
                     proofs: JSON.parse(recoveryProofs),
                 },
             }
-            console.log(recoveryOptions.params._round)
-            console.log(recoveryOptions.params.proofs)
 
             await recover({
                 params: recoveryOptions,
@@ -125,7 +123,7 @@ export default function Recover({ round: currentRound }) {
                 <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr">
                     Recover
                 </h3>
-                <div className="my-2">
+                <div className="mb-2 mt-5">
                     <Input
                         label="Round"
                         type="number"
