@@ -13,7 +13,7 @@ from log_data import log_session_data
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
-from Commit_Reveal_Recover import setup, commit, reveal, recover, generate_divisor, GGen
+from Commit_Reveal_Recover import test_setup, setup, commit, reveal, recover, generate_divisor, GGen
 
 
 
@@ -93,8 +93,8 @@ def select_mode():
     print("Select a mode (1/2/3/4):")
     print("1. Manual: A user manually inputs numbers")
     print("2. Automatic (Recommended): This program gets inputs from the smart contract on the Ethereum compatible network")
-    print("3. Use the default test option (256RSA, 0.001s delay)")
-    print("4. Use the default test option (For test, 2048RSA, 1s delay)")
+    print("3. Use the default test3 option (256RSA, 0.001s delay)")
+    print("4. Use the default test4 option (2048RSA)")
     choice = input("Choose: ")
     print()
 
@@ -121,7 +121,7 @@ def select_mode():
         T = 100
         member = 3
         return {
-                "mode": "test",
+                "mode": "test3",
                 "n": n,
                 "g": g,
                 "T": T,
@@ -131,10 +131,10 @@ def select_mode():
     elif choice == "4":
         n = generate_divisor(2048)
         g = GGen(n)
-        T = 100000
+        T = 120000000
         member = 3
         return {
-                "mode": "test",
+                "mode": "test4",
                 "n": n,
                 "g": g,
                 "T": T,
@@ -167,7 +167,7 @@ if __name__=='__main__':
     # print('mode_info:', mode_info)
     print('mode_info[mode]:', mode_info["mode"])
     
-    if mode_info["mode"] == "manual" or mode_info["mode"] == "test":
+    if mode_info["mode"] == "manual" or mode_info["mode"] == "test3":
         n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
         
         h, setupProofs = setup(n, g, T)
@@ -192,10 +192,6 @@ if __name__=='__main__':
             'recoveryProofs': recoveryProofs
         }
         
-        # the log is printed in two ways
-        # 1. print on terminal
-        # 2. print as a JSON file
-        # so it can be imported to js test scripts directly
         log_session_data(mode_info["mode"], sessionData)
         
     elif mode_info["mode"] == "auto-setup":
@@ -241,3 +237,26 @@ if __name__=='__main__':
     
 
     
+    elif mode_info["mode"] == "test4":
+        n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
+        
+        h, setupProofs = test_setup(n, g, T)
+        print('setup complete')
+        """
+        randomList, commitList, b_star = commit(n, g, member)
+        print('commit complete')
+        omega = reveal(n, h, randomList, commitList, b_star)
+        print('reveal complete')
+        recoveredOmega, recoveryProofs = recover(n, g, T, commitList, b_star)
+        print('recover complete')
+        """
+        
+        sessionData = {
+            'n': n,
+            'g': g,
+            'h': h,
+            'T': T,
+            'setupProofs': setupProofs
+        }
+        
+        log_session_data(mode_info["mode"], sessionData)

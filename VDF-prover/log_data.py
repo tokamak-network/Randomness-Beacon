@@ -61,7 +61,34 @@ def decimal_to_padded_hex(decimal_number):
 def val_to_big_number_dictionary(decimal_number):
     new_dic = {"val": decimal_to_padded_hex(decimal_number), "bitlen": get_bitlen_from_hex(decimal_number) }
     return new_dic
+    
+    
+def to_session_data_format(claim):
+    
+    # change the proof list to dictionary
+    keys = ['n', 'x', 'y', 'T', 'v']
+    
+    claim = dict(zip(keys, claim))
+        
+    # change the big decimal numbers as a hex-string 
+    # in the nested dictionary except for the key 't'
+    for key in claim:
 
+        if key == 'T':
+            pass
+                
+        else: # key == 'n' or key == 'x' or key == 'y' or key == 'v':
+            claim[key] = val_to_big_number_dictionary(claim[key])
+        
+    return claim
+
+
+def get_file_name_with_time(mode):
+    # Format the current time as YYYYMMDD_HHMMSS
+    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_name = f"./testlog/data_{current_time}_{mode}.json"
+    
+    return file_name
 
 def log_session_data(mode, sessionData):
     
@@ -105,8 +132,7 @@ def log_session_data(mode, sessionData):
     # encoded_data = ''.join(NoQuoteEncoder().iterencode(sessionData))
     
     # Format the current time as YYYYMMDD_HHMMSS
-    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"./testlog/data_{current_time}_{mode}.json"
+    file_name = get_file_name_with_time(mode)
 
     # Writing the data to a JSON file
     with open(file_name, 'w') as file:

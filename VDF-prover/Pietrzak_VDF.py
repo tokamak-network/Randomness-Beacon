@@ -3,10 +3,13 @@ import hashlib
 import libnum
 import math
 import logging as log
+import json
 from datetime import datetime
 from web3 import Web3
 
 from web3_util import  mod_hash_eth, mod_hash_eth_128
+from log_data import to_session_data_format, get_file_name_with_time
+
 
 
 # utility function for number strings hash mod N
@@ -34,7 +37,7 @@ def VDF(n, g, T, isExp=False):
         
         for i in range(0,T):
             g = g*g % n
-            exp_list.append(g)
+            # exp_list.append(g)
             
         return g, exp_list
             
@@ -123,12 +126,25 @@ def gen_recursive_halving_proof(claim):
     proof_list = [claim]
     T = claim[3]
     
+    file_name = get_file_name_with_time("proof")
+    f = open(file_name, "w")
+    f.write("[")
+    
     # generate & append a proof recursively till the proof outputs T = 1
     while T > 1:
         claim = gen_single_halving_proof(claim)
         T = claim[3]
         log.info(f"[+] Proof for T={T} is generated: {claim}")
-        proof_list.append(claim)
+        
+        # this can make too large dictionary
+        # proof_list.append(claim)
+        
+        # instead, we append to a file
+        f.write("\n  ")  # indentation
+        f.write(json.dumps(to_session_data_format(claim)))
+        
+        
+    f.write("\n]")
         
     return proof_list
 

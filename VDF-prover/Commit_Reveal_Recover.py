@@ -74,6 +74,52 @@ def generate_divisor(bitsize):
     print ("\nPrime*Prime (N): %d. Length: %d bits, Digits: %d" % (N,libnum.len_in_bits(N), len(str(N)) ))
     return N
 
+
+def test_setup(N, g, T):
+
+    print('\n------------------------------------------------\n')
+    print('Setup Phase')
+    print('\n------------------------------------------------\n')
+    
+    print('[+] Setup environment:')
+    print('\t - Description of QR+ Group: ', N)
+    print('\t - Time Delay for VDF (T): ', T)
+    print('\t - Group generator (g): ', g)
+    
+    # Compute h <- g^(2^t), optionally with PoE
+    #h, proof = simple_VDF(g)
+    start = time.time()
+    h, exp_list = VDF(N, g, T, True)
+    end = time.time()   
+    print(f'\t - h: {h} computed in {end - start:.5f} sec')
+    print('')
+
+    # Proof-of-Exponentiation proof & verification
+    claim = construct_claim(exp_list, N, g, h, T)
+
+    start = time.time()    
+    proof_list_setup = gen_recursive_halving_proof(claim)
+    end = time.time()    
+    print(f'[+] The PoE Proof List is generated in {end - start:.5f} sec')    
+    print(f"[+] The generated VDF proof for h:")
+    # print(*proof_list_setup, sep='\n')    
+    
+    """
+    start = time.time()  
+    test = verify_recursive_halving_proof(proof_list_setup)   
+    end = time.time()    
+    
+    if (test==True):
+        print(f"\n[+] Verification Success in {end - start:.5f} sec")
+    else:
+        print("\n[-] Verifier rejects the prover's VDF claim")    
+    """
+    
+    print('')
+    
+    # Output (G, g, h, (pi_h), A, B)
+
+    return h, proof_list_setup
  
  
 def setup(N, g, T):
@@ -103,7 +149,7 @@ def setup(N, g, T):
     end = time.time()    
     print(f'[+] The PoE Proof List is generated in {end - start:.5f} sec')    
     print(f"[+] The generated VDF proof for h:")
-    print(*proof_list_setup, sep='\n')    
+    # print(*proof_list_setup, sep='\n')    
     
     start = time.time()  
     test = verify_recursive_halving_proof(proof_list_setup)   
