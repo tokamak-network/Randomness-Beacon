@@ -146,7 +146,6 @@ def gen_recursive_halving_proof(claim):
         T = claim[3]
         log.info(f"[+] Proof for T={T} is generated: {claim}")
         
-    f.write(",\n  ")  # indentation
     f.write(json.dumps(to_session_data_format(claim)))
         
         
