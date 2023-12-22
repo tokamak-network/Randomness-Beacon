@@ -13,7 +13,7 @@ from log_data import log_session_data
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
-from Commit_Reveal_Recover import test_setup, setup, commit, reveal, recover, generate_divisor, GGen
+from Commit_Reveal_Recover import setup_without_verif, recover_without_verif, setup, commit, reveal, recover, generate_divisor, GGen
 
 
 
@@ -196,7 +196,7 @@ if __name__=='__main__':
         
     elif mode_info["mode"] == "auto-setup":
         n, g, T = mode_info['n'], mode_info['g'], mode_info['T']
-        h, setupProofs = setup(n, g, T)
+        h, setupProofs = test_setup(n, g, T)
         
         sessionData = {
             'n': n,
@@ -223,7 +223,7 @@ if __name__=='__main__':
         for i in commitListHex:
             commitList.append(int.from_bytes(i[0], 'big'))
         
-        recoveredOmega, recoveryProofs = recover(n, g, T, commitList)
+        recoveredOmega, recoveryProofs = recover_without_verif(n, g, T, commitList)
         
         sessionData = {
             'recoveryProofs': recoveryProofs
@@ -240,7 +240,7 @@ if __name__=='__main__':
     elif mode_info["mode"] == "test4":
         n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
         
-        h, setupProofs = test_setup(n, g, T)
+        h, setupProofs = setup_without_verif(n, g, T)
         print('setup complete')
         """
         randomList, commitList, b_star = commit(n, g, member)

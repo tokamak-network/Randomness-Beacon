@@ -75,7 +75,7 @@ def generate_divisor(bitsize):
     return N
 
 
-def test_setup(N, g, T):
+def setup_without_verif(N, g, T):
 
     print('\n------------------------------------------------\n')
     print('Setup Phase')
@@ -101,20 +101,7 @@ def test_setup(N, g, T):
     proof_list_setup = gen_recursive_halving_proof(claim)
     end = time.time()    
     print(f'[+] The PoE Proof List is generated in {end - start:.5f} sec')    
-    print(f"[+] The generated VDF proof for h:")
-    # print(*proof_list_setup, sep='\n')    
-    
-    """
-    start = time.time()  
-    test = verify_recursive_halving_proof(proof_list_setup)   
-    end = time.time()    
-    
-    if (test==True):
-        print(f"\n[+] Verification Success in {end - start:.5f} sec")
-    else:
-        print("\n[-] Verifier rejects the prover's VDF claim")    
-    """
-    
+    print(f"[+] The generated VDF proof for h:")    
     print('')
     
     # Output (G, g, h, (pi_h), A, B)
@@ -239,6 +226,60 @@ def reveal(N, h, a, c, b_star):
     print('[+] Revealed Random: ', omega, '\n')
 
     return omega
+
+def recover_without_verif(N, g, T, c, b_star=None):
+
+    if b_star == None:
+        # b* <- H(c_1||...||c_n)
+        b_star = mod_hash_eth(N, *c)
+        
+    ##### recovery scenario #####
+    
+    # Suppose None of Members Revealed Pessimistically
+    # Omega = [PI for i c_i^H(c_i||b*) ]^(2^t)
+    
+    
+    print('\n------------------------------------------------\n')
+    print('Recovery Phase')
+    print('\n------------------------------------------------\n')
+    
+    print('[+] Suppose None of Members Revealed Pessimistically')
+    
+    """
+    # initialization -> 이거 고치는 중
+    omega = 1
+    
+    for i in range(member-len(recovery_index)):
+        omega = (omega * pow( pow(h, int(hash(c[i], b_star), 16), N), a[i], N) ) % N
+
+    """
+    
+    # recovery value initialization
+    recov = 1
+    
+    for i in c:
+        temp = pow(i, mod_hash_eth(N, i, b_star), N)
+        recov = (recov * temp) % N
+       
+    # recov = simple_VDF(recov, N, T)
+    
+    start = time.time()
+    omega_recov, exp_list_recov = VDF(N, recov, T, True)
+    end = time.time()   
+    print(f'[+] h for recover: {omega_recov} computed in {end - start:.5f} sec')
+    print('')
+    
+    # Proof-of-Exponentiation proof & verification
+    claim = construct_claim(exp_list_recov, N, recov, omega_recov, T)
+    
+    proof_list_recovery = gen_recursive_halving_proof(claim)
+    print('')    
+        
+        
+    print('[+] Recovered random: ', omega_recov)
+
+    return omega_recov, proof_list_recovery
+    
     
 def recover(N, g, T, c, b_star=None):
 
