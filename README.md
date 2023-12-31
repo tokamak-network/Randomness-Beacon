@@ -177,8 +177,8 @@ Recovery Phase
 [+] logs are saved as ./testlog/data_20231231_200513_auto-recover.json
 ```
 - Get the result: After the recovery contract call is confirmed, you can check the result like the below example.
+![Result example](/data/result.png)
 
-<img src="/data/result.png"  width="700" height="370">
   
 
 
