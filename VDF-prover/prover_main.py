@@ -1,6 +1,7 @@
 import random
 import libnum
 import hashlib
+import configparser
 import argparse
 import time
 import sys
@@ -18,38 +19,10 @@ from Commit_Reveal_Recover import setup_without_verif, recover_without_verif, se
 
 
 
-def select_automatic_mode():
-    round_info, stage, value_at_round, commits = get_contract_values()
-     
-    if stage == "Finished":
-    
-        print('[+] There is no active round found')
-        print()
-        ans = input('Do you want to set up a new round? (y or n):')
-        
-        if ans.lower() == 'y':            
-            bitsize = int(input("Input bit size (2048 is recommended): "))
-            n = generate_divisor(bitsize)
-            g = GGen(n)	
-            print()
-            T = int(input("Input time delay (Over 1000000 is recommended): "))
-            
-            return {
-                "mode": "auto-setup",
-                "n": n,
-                "g": g,
-                "T": T,
-            }
-            
-        elif ans.lower() == 'n':
-            print('There is nothing to run. This script terminates.') 
-            exit()
-            
-        else:
-            print("Invalid selection. Please try again.")
-            select_automatic_mode()
-    
-    else: # stage == "Reveal":
+def select_automatic_mode(round):
+    round_info, stage, value_at_round, commits = get_contract_values(round)
+
+    if stage != "Finished":
         print()
         print(f'[+] Round {round_info} is active with Stage {stage}')
         ans = input(f'Do you want to recover RANDOM for Round {round_info+1}? (y or n):')
@@ -74,78 +47,66 @@ def select_automatic_mode():
             
             
         elif ans.lower() == 'n':
-            print('There is nothing to run. This script terminates.') 
+            print('\n\n')
+            print('[+] Then this script terminates.') 
             exit()
             
         else:
             print("Invalid selection. Please try again.")
             select_automatic_mode()
     
-    """
-    else:
-        print('The contract is on the Commit phase. There is nothing to run. This script terminates.')
-        exit()
-    """
+    print(f'[+] Round {round_info} of the contract does not need recovery.') 
+    exit() 
     
-    return 
-    
-def select_mode():
-    print("Select a mode (1/2/3/4):")
-    print("1. Manual: A user manually inputs numbers")
-    print("2. Automatic (Recommended): This program gets inputs from the smart contract on the Ethereum compatible network")
-    print("3. Use the default test3 option (256RSA, 0.001s delay)")
-    print("4. Use the default test4 option (2048RSA)")
-    choice = input("Choose: ")
-    print()
 
-    if choice == "1":
-        bitsize = int(input("Input bit size (2048 is recommended): "))
-        n = generate_divisor(bitsize)
-        g = GGen(n)
-        T = int(input("Input time delay (Over 10000000 is recommended): "))
-        member = int(input("Input number of members: "))
+        
+
+def command_parser():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Run the script based on the provided mode and configuration.")
+    parser.add_argument('-m', '--mode', choices=['auto', 'manual', 'test'], required=True, help="Mode of operation: auto, manual, or test.")
+    parser.add_argument('-r', '--round', type=int, help="Round number for auto mode.")
+    parser.add_argument('-b', '--bit_size', type=int, help="Modulo bit size for manual mode.")
+    parser.add_argument('-d', '--time_delay', type=int, help="VDF time delay for manual mode.")
+    parser.add_argument('-n', '--num_members', type=int, help="Number of members for manual mode.")
+    args = parser.parse_args()
+
+    # Read configuration file if mode is auto
+    if args.mode == 'auto':
+        return select_automatic_mode(args.round)
+
+    elif args.mode == 'manual':
+        if not all([args.bit_size, args.time_delay, args.num_members]):
+            print("All manual mode arguments (-b, -d, -n) are required.")
+            return
+            
+        g = GGen(args.bit_size)
+
         return {
                 "mode": "manual",
-                "n": n,
+                "n": args.bit_size,
                 "g": g,
-                "T": T,
-                "member": member
+                "T": args.time_delay,
+                "member": args.num_members
             }
-        
-    elif choice == "2":
-        return select_automatic_mode()
-        
-    elif choice == "3":
-        n = generate_divisor(256) #256
-        g = GGen(n)
-        T = 100
-        member = 3
-        return {
-                "mode": "test3",
-                "n": n,
-                "g": g,
-                "T": T,
-                "member": member
-            }
-            
-    elif choice == "4":
+
+    elif args.mode == 'test':
         n = generate_divisor(2048)
         g = GGen(n)
-        T = 300000000
+        T = 100000
         member = 3
         return {
-                "mode": "test4",
+                "mode": "test",
                 "n": n,
                 "g": g,
                 "T": T,
                 "member": member
             }
-        
+
+
     else:
-        print("Invalid selection. Please try again.")
-        select_mode()
-        
-        
+        print("Invalid mode selected.")
+        return
 
 
 
@@ -159,15 +120,16 @@ if __name__=='__main__':
     
     print('Commit-Reveal-Recover Game Demo')
     #print('### Bicorn-RX Proof-of-Concept ###')
-    print('-- Version 0.9\n\n')
+    print('-- Version 1.0\n\n')
     
     # User chooses a mode here
-    mode_info = select_mode()   
+    mode_info = command_parser()
+    # mode_info = select_mode()   
 
     # print('mode_info:', mode_info)
     print('mode_info[mode]:', mode_info["mode"])
     
-    if mode_info["mode"] == "manual" or mode_info["mode"] == "test3":
+    if mode_info["mode"] == "manual" or mode_info["mode"] == "test":
         n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
         
         h, setupProofs = setup(n, g, T)
@@ -207,8 +169,6 @@ if __name__=='__main__':
         }
         
         log_session_data(mode_info["mode"], sessionData)
-        
-        
         
         
     elif mode_info["mode"] == "auto-recover":

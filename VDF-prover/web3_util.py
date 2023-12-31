@@ -131,29 +131,23 @@ def parse_setup_values_at_round(values_at_round):
 
 
 
-def get_contract_values():
+def get_contract_values(round=None):
     networks, contract_details = read_config()
     
-    print('The default setting:')
-    print('\t Network: ', DEFAULT_NETWORK)
-    print('\t Contract Address: ', contract_details['address'])
-    ans = input('Will you use the default setting? (y or n):')
+    print('The setting from config.ini:')
+    print('\t Network: ', contract_details['network'])
+    print('\t Contract Address: ', contract_details['address'])    
+      
+    web3 = Web3(Web3.HTTPProvider(networks[contract_details['network']]))
+    contract = setup_contract(web3, contract_details)
     
-    if ans.lower() == 'y':       
-        web3 = Web3(Web3.HTTPProvider(networks[DEFAULT_NETWORK]))
-        contract = setup_contract(web3, contract_details)
-
-    elif ans.lower() == 'n':
-        web3 = select_network(networks, contract_details)
-        address = input('Enter the contract address: ')
-        abi = input('Enter the contract ABI file path: ')
-        contract_details['address'] = address
-        contract_details['abi'] = abi
-        contract = setup_contract(web3, contract_details)
-    
-
-    """Read and return specific values from the smart contract."""
-    round_info = contract.functions.raffleRound().call()
+    if(round==None):
+        """Read and return specific values from the smart contract."""
+        print('\n[+] There no input for option \'round\' so fetch the round information from the contract .... \n')
+        round_info = contract.functions.raffleRound().call()
+        
+    else:
+        round_info = round
 
     # valuesAtRound 정보 가져오기 및 파싱
     raw_general_values_at_round = contract.functions.valuesAtRound(round_info).call()
@@ -171,16 +165,6 @@ def get_contract_values():
     # commitRevealValues 정보 가져오기 및 파싱
     commit_reveal_values = get_commit_reveal_values(contract, round_info)
     commits = parse_commits(commit_reveal_values)
-
-    # 결과 출력
-    # print(f"Round: {round_info}, Stage: {stage}")
-    # print(f"Divisor  n: {values_at_round['n']}")
-    #  print(f"Generator g: {values_at_round['g']}")
-    # print(f"Value h: {values_at_round['h']}")
-    # print(f"Time delay T: {values_at_round['T']}")
-    # print(f"Commits: {commits}")
-    #for value in parsed_commit_reveal_values:
-    #    print(value)
 
     return round_info, stage, values_at_round, commits
 

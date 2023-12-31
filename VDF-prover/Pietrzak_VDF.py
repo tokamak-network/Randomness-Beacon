@@ -39,6 +39,8 @@ def VDF(n, g, T, isExp=False):
         
         for i in range(0,T):
             g = g*g % n
+            # This makes a too large list causing out of memory (process kill)
+            # later it should be saved as a file and referred later
             # exp_list.append(g)
             
         return g, exp_list
@@ -128,28 +130,16 @@ def gen_recursive_halving_proof(claim):
     proof_list = [claim]
     T = claim[3]
     
-    file_name = get_file_name_with_time("proof")
-    f = open(file_name, "w")
-    f.write("[")
-    f.write("\n  ")
     
     # generate & append a proof recursively till the proof outputs T = 1
     while T > 1:
-        # this can make too large dictionary
-        # proof_list.append(claim)
-        
-        # instead, we append to a file
-        f.write(json.dumps(to_session_data_format(claim)))
-        f.write(",\n  ")  # indentation
-    
         claim = gen_single_halving_proof(claim)
+        proof_list.append(claim)
+        
         T = claim[3]
         log.info(f"[+] Proof for T={T} is generated: {claim}")
         
-    f.write(json.dumps(to_session_data_format(claim)))
         
-        
-    f.write("]")
         
     return proof_list
 

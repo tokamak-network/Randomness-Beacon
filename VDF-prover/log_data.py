@@ -138,4 +138,5 @@ def log_session_data(mode, sessionData):
     with open(file_name, 'w') as file:
         file.write(json.dumps(sessionData, indent=2))
     
+    print('\n\n')
     print(f'[+] Session Data is saved as {file_name}')
