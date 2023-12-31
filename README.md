@@ -145,9 +145,9 @@ $ python3 prover_main.py -m setup -b 100 -d 100000000 -n 2
   And then you get the setup values at the testlog directory. Copy values to the popup window.
 - commit: For the commits, you and any participants go to the commit tab and generate random numbers and commmit. Also you can manually input a number.
 
-- recovery: For the recovery, you use the Python prover again. Use the '-m auto' option.
+- recovery: For the recovery, you use the Python prover again. Use the '-m auto' option. And then copy the generated proof to the recovery window.
 ``` bash
-$ python3 prover_main.py -m auto
+$ $ python3 prover_main.py -m auto
 Commit-Reveal-Recover Game Demo
 -- Version 1.0
 
@@ -157,7 +157,29 @@ The setting from config.ini:
          Contract Address:  0x0653692451011e5d9921E30193603321929fE4ef
 
 [+] There no input for option 'round' so fetch the round information from the contract ....
+
+
+[+] Round 3 is active with Stage Commit
+Do you want to recover RANDOM for Round 3? (y or n):y
+mode_info[mode]: auto-recover
+
+------------------------------------------------
+
+Recovery Phase
+
+------------------------------------------------
+
+[+] Suppose None of Members Revealed Pessimistically
+[+] h for recover: 96 computed in 0.00573 sec
+
+
+[+] Recovered random:  96
+[+] logs are saved as ./testlog/data_20231231_200513_auto-recover.json
 ```
+- Get the result: After the recovery contract call is confirmed, you can check the result like the below example.
+
+<img src="/data/result.png"  width="700" height="370">
+  
 
 
 ## Demo app
