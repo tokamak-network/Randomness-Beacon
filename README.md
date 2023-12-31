@@ -67,7 +67,7 @@ yarn
 yarn dev
 ```
 
-## Usage 
+## Usage-
 
 
 1. Install
@@ -136,9 +136,46 @@ yarn dev
 Head over to your [localhost](http://localhost:3000) and play with the Christmas Gift Distribution Event!
 
 ### UI Usage
-- setup
-- commit
-- recovery
+- setup: For the setup, first you go to the setup tab. Now you need to generate the setup values.
+``` bash
+python3 prover_main.py -h
+Commit-Reveal-Recover Game Demo
+-- Version 1.0
+
+
+usage: prover_main.py [-h] -m {auto,manual,test} [-r ROUND] [-b BIT_SIZE] [-d TIME_DELAY] [-n NUM_MEMBERS]
+
+Run the script based on the provided mode and configuration.
+
+options:
+  -h, --help            show this help message and exit
+  -m {auto,manual,test}, --mode {auto,manual,test}
+                        Mode of operation: auto, manual, or test.
+  -r ROUND, --round ROUND
+                        Round number for auto mode.
+  -b BIT_SIZE, --bit_size BIT_SIZE
+                        Modulo bit size for manual mode.
+  -d TIME_DELAY, --time_delay TIME_DELAY
+                        VDF time delay for manual mode.
+  -n NUM_MEMBERS, --num_members NUM_MEMBERS
+                        Number of members for manual mode.
+```
+- commit: For the commits, you and any participants go to the commit tab and generate random numbers and commmit. Also you can manually input a number.
+
+- recovery: For the recovery, you use the Python prover again. Use the '-m auto' option.
+``` bash
+$ python3 prover_main.py -m auto
+Commit-Reveal-Recover Game Demo
+-- Version 1.0
+
+
+The setting from config.ini:
+         Network:  sepolia_testnet
+         Contract Address:  0x0653692451011e5d9921E30193603321929fE4ef
+
+[+] There no input for option 'round' so fetch the round information from the contract ....
+```
+
 
 ## Demo app
 
