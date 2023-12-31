@@ -57,8 +57,8 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
   - You'll know you've installed yarn right if you can run:
     - `yarn --version` and get an output like: `x.x.x`
     - You might need to [install it with `npm`](https://classic.yarnpkg.com/lang/en/docs/install/) or `corepack`
-- pip packages
-  - To run this project, you need to install the required Python libraries. You can do this easily using the `./VDF-prover/requirements.txt` file, which lists all the necessary dependencies. Execute the following command in your terminal:
+- PIP packages
+  - To run the VDF prover, you need to install the required Python libraries. You can do this easily using the `./VDF-prover/requirements.txt` file, which lists all the necessary dependencies. Execute the following command in your terminal:
    ```bash
    pip install -r requirements.txt
    ```
