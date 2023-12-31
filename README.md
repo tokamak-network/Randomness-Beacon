@@ -57,6 +57,7 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
   - You'll know you've installed yarn right if you can run:
     - `yarn --version` and get an output like: `x.x.x`
     - You might need to [install it with `npm`](https://classic.yarnpkg.com/lang/en/docs/install/) or `corepack`
+- Python 3
 
 ### Quick Start
 ```shell
@@ -66,15 +67,24 @@ yarn
 yarn dev
 ```
 
-## Usage
+## Usage 
 
 
-1. Install 
+1. Install
+
+For the VDF prover, you need to install the required Python libraries. You can do this easily using the `./VDF-prover/requirements.txt` file, which lists all the necessary dependencies. Execute the following command in your terminal:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+Now the rest of the part is for the smart contract and web3 front. 
 > In a different terminal / command line
 ```
 cd demo-contract/Raffle-Bicorn-RX
 yarn
 ```
+
+
 
 2. set .env at root folder of Raffle-Bicorn-RX
 ```shell
