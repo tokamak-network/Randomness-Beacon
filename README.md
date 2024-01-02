@@ -57,7 +57,8 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
   - You'll know you've installed yarn right if you can run:
     - `yarn --version` and get an output like: `x.x.x`
     - You might need to [install it with `npm`](https://classic.yarnpkg.com/lang/en/docs/install/) or `corepack`
-- Python 3
+- [Python 3](https://www.python.org/downloads/)
+  - Because of library dependencies, Windows is not currently supported for our Python environment
 
 ### Quick Start
 ```shell
@@ -145,9 +146,9 @@ $ python3 prover_main.py -m setup -b 100 -d 100000000 -n 2
   And then you get the setup values at the testlog directory. Copy values to the popup window.
 - commit: For the commits, you and any participants go to the commit tab and generate random numbers and commmit. Also you can manually input a number.
 
-- recovery: For the recovery, you use the Python prover again. Use the '-m auto' option. And then copy the generated proof to the recovery window.
+- recovery: For the recovery, you use the Python prover again. Use the '-m auto' option. And then copy the generated proof to the recovery window. To use the 'auto' mode, you should put the network information, the contract address, and the contract ABI in 'config.ini' file.
 ``` bash
-$ $ python3 prover_main.py -m auto
+$ python3 prover_main.py -m auto
 Commit-Reveal-Recover Game Demo
 -- Version 1.0
 
