@@ -9,6 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@headlessui/react": "^1.7.17",
         "ethers": "^6.9.0",
         "fs": "^0.0.1-security",
         "magic-sdk": "^21.4.0",
