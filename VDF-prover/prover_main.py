@@ -79,8 +79,8 @@ def command_parser():
         if not all([args.bit_size, args.time_delay, args.num_members]):
             print("All manual mode arguments (-b, -d, -n) are required.")
             return
-            
-        g = GGen(args.bit_size)
+        n = generate_divisor(args.bit_size)
+        g = GGen(n)
 
         return {
                 "mode": "manual",
