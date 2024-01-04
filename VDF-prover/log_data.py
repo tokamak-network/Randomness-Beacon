@@ -126,10 +126,7 @@ def log_session_data(mode, sessionData):
         
     
     # 1. print data on terminal
-    print('\n\n\n[+] Game Data: ', json.dumps(sessionData, indent=2))
-
-    # 2. print data as a JSON-like file
-    # encoded_data = ''.join(NoQuoteEncoder().iterencode(sessionData))
+    # print('\n\n\n[+] Game Data: ', json.dumps(sessionData, indent=2))
     
     # Format the current time as YYYYMMDD_HHMMSS
     file_name = get_file_name_with_time(mode)
@@ -138,5 +135,4 @@ def log_session_data(mode, sessionData):
     with open(file_name, 'w') as file:
         file.write(json.dumps(sessionData, indent=2))
     
-    print('\n\n')
-    print(f'[+] Session Data is saved as {file_name}')
+    print(f'[+] logs are saved as {file_name}')
