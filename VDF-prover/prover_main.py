@@ -82,7 +82,7 @@ def command_parser():
         g = GGen(n)
 
         return {
-                "mode": "manual",
+                "mode": "setup",
                 "n": n,
                 "g": g,
                 "T": args.time_delay,
