@@ -1,8 +1,8 @@
-[submodule "Raffle-Bicorn-RX"]
-	path = demo-contract/Raffle-Bicorn-RX
-	url = https://github.com/tokamak-network/Raffle-Bicorn-RX.git
-	branch = main
 [submodule "VDF-RNG-verifier"]
 	path = VDF-RNG-verifier
 	url = https://github.com/tokamak-network/VDF-RNG-verifier.git
 	branch = optimization
+[submodule "VDF-RNG-demo-contract"]
+	path = VDF-RNG-demo-contract
+	url = https://github.com/tokamak-network/VDF-RNG-demo-contract.git
+	branch = main
