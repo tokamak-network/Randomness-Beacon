@@ -113,7 +113,7 @@ export default function Commit() {
                 Join Christmas Event by Commit
             </h3>
             <div className="mb-2 mt-2 flex flex-row">
-                <div className="mx-1.5">Hex</div>
+                <div className="mx-1.5">JSON</div>
                 <Switch
                     checked={enabled}
                     onChange={setEnabled}
@@ -143,7 +143,7 @@ export default function Commit() {
             </div>
             <div className="mb-2 mt-5 flex flex-row">
                 <Input
-                    label={enabled ? "Commit Value in Decimal" : "Commit Value in Hex"}
+                    label={enabled ? "Commit Value in Decimal" : "Commit Value in JSON Object"}
                     type="text"
                     placeholder=""
                     id="CommitValue"
