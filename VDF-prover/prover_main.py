@@ -84,7 +84,7 @@ def command_parser():
 
         return {
                 "mode": "manual",
-                "n": args.bit_size,
+                "n": n,
                 "g": g,
                 "T": args.time_delay,
                 "member": args.num_members
