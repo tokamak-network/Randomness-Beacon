@@ -61,9 +61,12 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
   - Because of library dependencies, Windows is not currently supported for our Python environment
 
 ### Quick Start
+- Demo App
+[Christmas Event App](https://raffle-bicorn-rx-front.vercel.app/)
+- Local
 ```shell
 git clone --recurse-submodules https://github.com/tokamak-network/Commit-Reveal-Recover-RNG.git
-cd demo-front2
+cd Commit-Reveal-Recover-RNG/demo-front2
 yarn
 yarn dev
 ```

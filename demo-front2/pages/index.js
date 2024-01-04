@@ -70,7 +70,7 @@ export default function Home() {
     })
 
     async function updateUI() {
-        const roundFromCall = await raffleRound({ onError: (error) => console.log(error) })
+        let roundFromCall = await raffleRound({ onError: (error) => console.log(error) })
         if (roundFromCall === undefined) roundFromCall = 0
         setRound(roundFromCall.toString())
         const participatedRoundsfromCall = await getParticipatedRounds({
