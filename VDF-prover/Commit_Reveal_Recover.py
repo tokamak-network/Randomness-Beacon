@@ -43,7 +43,6 @@ def simple_VDF(a, N, T):
     return a
     
 
-### Bicorn-RX Mechanism
 
 def GGen(N): # security parameter lambda can be omitted
     g = random.randint(2, N)
@@ -71,7 +70,7 @@ def generate_divisor(bitsize):
     p=libnum.generate_prime(int(bitsize/2))
     q=libnum.generate_prime(int(bitsize/2))
     N=p*q
-    print ("\nPrime*Prime (N): %d. Length: %d bits, Digits: %d" % (N,libnum.len_in_bits(N), len(str(N)) ))
+    # print ("\nPrime*Prime (N): %d. Length: %d bits, Digits: %d" % (N,libnum.len_in_bits(N), len(str(N)) ))
     return N
 
 
@@ -101,8 +100,7 @@ def setup_without_verif(N, g, T):
     proof_list_setup = gen_recursive_halving_proof(claim)
     end = time.time()    
     print(f'[+] The PoE Proof List is generated in {end - start:.5f} sec')    
-    print(f"[+] The generated VDF proof for h:")    
-    print('')
+    # print(f"[+] The generated VDF proof for h:")    
     
     # Output (G, g, h, (pi_h), A, B)
 
@@ -135,7 +133,7 @@ def setup(N, g, T):
     proof_list_setup = gen_recursive_halving_proof(claim)
     end = time.time()    
     print(f'[+] The PoE Proof List is generated in {end - start:.5f} sec')    
-    print(f"[+] The generated VDF proof for h:")
+    # print(f"[+] The generated VDF proof for h:")
     # print(*proof_list_setup, sep='\n')    
     
     start = time.time()  

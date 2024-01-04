@@ -25,7 +25,7 @@ def select_automatic_mode(round):
     if stage != "Finished":
         print()
         print(f'[+] Round {round_info} is active with Stage {stage}')
-        ans = input(f'Do you want to recover RANDOM for Round {round_info+1}? (y or n):')
+        ans = input(f'Do you want to recover RANDOM for Round {round_info}? (y or n):')
         
         if ans.lower() == 'y':
             n = value_at_round['n']
@@ -64,30 +64,28 @@ def select_automatic_mode(round):
 def command_parser():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the script based on the provided mode and configuration.")
-    parser.add_argument('-m', '--mode', choices=['auto', 'manual', 'test'], required=True, help="Mode of operation: auto, manual, or test.")
+    parser.add_argument('-m', '--mode', choices=['auto', 'setup', 'test'], required=True, help="Mode of operation: auto, setup, or test.")
     parser.add_argument('-r', '--round', type=int, help="Round number for auto mode.")
-    parser.add_argument('-b', '--bit_size', type=int, help="Modulo bit size for manual mode.")
-    parser.add_argument('-d', '--time_delay', type=int, help="VDF time delay for manual mode.")
-    parser.add_argument('-n', '--num_members', type=int, help="Number of members for manual mode.")
+    parser.add_argument('-b', '--bit_size', type=int, help="Modulo bit size for setup mode.")
+    parser.add_argument('-d', '--time_delay', type=int, help="VDF time delay for setup mode.")
     args = parser.parse_args()
 
     # Read configuration file if mode is auto
     if args.mode == 'auto':
         return select_automatic_mode(args.round)
 
-    elif args.mode == 'manual':
-        if not all([args.bit_size, args.time_delay, args.num_members]):
-            print("All manual mode arguments (-b, -d, -n) are required.")
+    elif args.mode == 'setup':
+        if not all([args.bit_size, args.time_delay]):
+            print("All setup mode arguments (-b, -d) are required.")
             return
             
         g = GGen(args.bit_size)
 
         return {
-                "mode": "manual",
+                "mode": "setup",
                 "n": args.bit_size,
                 "g": g,
                 "T": args.time_delay,
-                "member": args.num_members
             }
 
     elif args.mode == 'test':
@@ -129,49 +127,8 @@ if __name__=='__main__':
     # print('mode_info:', mode_info)
     print('mode_info[mode]:', mode_info["mode"])
     
-    if mode_info["mode"] == "manual" or mode_info["mode"] == "test":
-        n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
         
-        h, setupProofs = setup(n, g, T)
-        print('setup complete')
-        randomList, commitList, b_star = commit(n, g, member)
-        print('commit complete')
-        omega = reveal(n, h, randomList, commitList, b_star)
-        print('reveal complete')
-        recoveredOmega, recoveryProofs = recover(n, g, T, commitList, b_star)
-        print('recover complete')
-        
-        sessionData = {
-            'n': n,
-            'g': g,
-            'h': h,
-            'T': T,
-            'setupProofs': setupProofs,
-            'randomList': randomList,
-            'commitList': commitList,
-            'omega': omega,
-            'recoveredOmega': recoveredOmega,
-            'recoveryProofs': recoveryProofs
-        }
-        
-        log_session_data(mode_info["mode"], sessionData)
-        
-    elif mode_info["mode"] == "auto-setup":
-        n, g, T = mode_info['n'], mode_info['g'], mode_info['T']
-        h, setupProofs = test_setup(n, g, T)
-        
-        sessionData = {
-            'n': n,
-            'g': g,
-            'h': h,
-            'T': T,
-            'setupProofs': setupProofs
-        }
-        
-        log_session_data(mode_info["mode"], sessionData)
-        
-        
-    elif mode_info["mode"] == "auto-recover":
+    if mode_info["mode"] == "auto-recover":
         n, g, T, commitListHex = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['commits']
         
         # binary in array to int decimal
@@ -197,11 +154,10 @@ if __name__=='__main__':
     
 
     
-    elif mode_info["mode"] == "test4":
-        n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
+    elif mode_info["mode"] == "setup":
+        n, g, T = mode_info['n'], mode_info['g'], mode_info['T']
         
-        h, setupProofs = setup_without_verif(n, g, T)
-        print('setup complete')
+        h, setupProofs = setup(n, g, T)
         """
         randomList, commitList, b_star = commit(n, g, member)
         print('commit complete')
@@ -217,6 +173,50 @@ if __name__=='__main__':
             'h': h,
             'T': T,
             'setupProofs': setupProofs
+        }
+        
+        log_session_data(mode_info["mode"], sessionData)
+        
+    elif mode_info["mode"] == "auto-setup":
+        n, g, T = mode_info['n'], mode_info['g'], mode_info['T']
+        h, setupProofs = test_setup(n, g, T)
+        
+        sessionData = {
+            'n': n,
+            'g': g,
+            'h': h,
+            'T': T,
+            'setupProofs': setupProofs
+        }
+        
+        log_session_data(mode_info["mode"], sessionData)
+        
+
+    
+    elif mode_info["mode"] == "test":
+        n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
+        
+        h, setupProofs = setup_without_verif(n, g, T)
+        print('setup complete')
+        
+        randomList, commitList, b_star = commit(n, g, member)
+        print('commit complete')
+        omega = reveal(n, h, randomList, commitList, b_star)
+        print('reveal complete')
+        recoveredOmega, recoveryProofs = recover(n, g, T, commitList, b_star)
+        print('recover complete')
+        
+        sessionData = {
+            'n': n,
+            'g': g,
+            'h': h,
+            'T': T,
+            'setupProofs': setupProofs,
+            'randomList': randomList,
+            'commitList': commitList,
+            'omega': omega,
+            'recoveredOmega': recoveredOmega,
+            'recoveryProofs': recoveryProofs
         }
         
         log_session_data(mode_info["mode"], sessionData)
