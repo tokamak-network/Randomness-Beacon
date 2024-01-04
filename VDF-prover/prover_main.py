@@ -78,12 +78,12 @@ def command_parser():
         if not all([args.bit_size, args.time_delay]):
             print("All setup mode arguments (-b, -d) are required.")
             return
-            
-        g = GGen(args.bit_size)
+        n = generate_divisor(args.bit_size)
+        g = GGen(n)
 
         return {
                 "mode": "setup",
-                "n": args.bit_size,
+                "n": n,
                 "g": g,
                 "T": args.time_delay,
             }
