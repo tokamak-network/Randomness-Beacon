@@ -13,8 +13,6 @@ There are two major reasons. Firstly, the hash-to-prime function is too costly o
 - [Features](#features)
 - [Installation](#installation)
 - [Demo app](#demo-app)
-- [VDF-Prover](#VDF-Prover)
-- [VDF-Verifier](#VDF-Verifier)
 - [Contributing](#contributing)
 - [Contact](#contact)
 - [License](#license)
@@ -204,7 +202,7 @@ Recovery Phase
 We welcome contributions to the project. Please refer to our contribution guidelines for more information on how to participate.
 
 ## Contact
-[Your Contact Information - for queries, collaborations, or further discussions.]
+Suhyeon Lee, suhyeon_at_tokamak.network
 
 ## License
 
