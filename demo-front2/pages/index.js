@@ -77,10 +77,12 @@ export default function Home() {
             onError: (error) => console.log(error),
         })
         let temp = []
-        for (let i = 0; i < participatedRoundsfromCall.length; i++) {
-            temp.push(participatedRoundsfromCall[i].toString())
+        if (participatedRoundsfromCall) {
+            for (let i = 0; i < participatedRoundsfromCall.length; i++) {
+                temp.push(participatedRoundsfromCall[i].toString())
+            }
+            setParticipatedRounds(temp)
         }
-        setParticipatedRounds(temp)
         await getSetUpValuesAtRound(roundFromCall)
         if (settedUpValues.setUpTime !== undefined && settedUpValues.setUpTime != "0") {
             setIsSetUp(true)
@@ -103,6 +105,7 @@ export default function Home() {
             params: setUpValuesAtRoundOptions,
             onError: (error) => console.log(error),
         })
+        if (result === undefined) return
         setSettedUpValues({
             T: result["T"].toString(),
             n: result["n"]["val"].toString(),
