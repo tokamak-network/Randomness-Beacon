@@ -198,7 +198,7 @@ export default function Commit() {
                 />
             </div>
             <div
-                className="mt-7 ml-1 text-base"
+                className="mt-7 ml-1 text-base h-40"
                 style={{ textOverflow: "ellipsis", overflow: "hidden" }}
             >
                 {/* calldata: {JSON.stringify(commitCalldata)} */}
