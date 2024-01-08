@@ -73,25 +73,32 @@ yarn dev
 
 ## Usage-
 
+0. Open three terminals
+   <br>
+   <img src = "./data/terminalsscreenshot.png" width="50%">
+   <br>
+   - #1 cd demo-front2
+   - #2 cd VDF-prover
+   - #3 cd VDF-RNG-demo-contract
 
 1. Install
 
 For the VDF prover, you need to install the required Python libraries. You can do this easily using the `./VDF-prover/requirements.txt` file, which lists all the necessary dependencies. Execute the following command in your terminal:
+  > terminal #2 VDF-prover
    ```bash
    pip install -r requirements.txt
    ```
 
 Now the rest of the part is for the smart contract and web3 front. 
-> In a different terminal / command line
+> terminal #3 VDF-RNG-demo-contract
 ```
-cd demo-contract/Raffle-Bicorn-RX
 yarn
 ```
 
 
 
-2. set .env at root folder of Raffle-Bicorn-RX
-```shell
+1. set .env at root folder of Raffle-Bicorn-RX
+```
 MAINNET_RPC_URL=
 SEPOLIA_RPC_URL=
 POLYGON_MAINNET_RPC_URL=
@@ -110,13 +117,14 @@ COINMARKETCAP_API_KEY=
 - COINMARKETCAP_API_KEY
   - Get api key from [CoinMarketCap](https://pro.coinmarketcap.com/account/)
 
-3. Run your local blockchain with the Christmas Gift Distribution code
+1. Run your local blockchain with the Christmas Gift Distribution code
+> terminal #3 VDF-RNG-demo-contract
 ```
 yarn hardhat node
 ```
 > You can read more about how to use that repo from its [README.md](https://github.com/tokamak-network/Raffle-Bicorn-RX/blob/main/README.md)
 
-4. Add hardhat network to your metamask/wallet
+1. Add hardhat network to your metamask/wallet
 
 - Get the RPC_URL of your hh node (usually `http://127.0.0.1:8545/`)
 - Go to your wallet and add a new network. [See instructions here.](https://metamask.zendesk.com/hc/en-us/articles/360043227612-How-to-add-a-custom-network-RPC)
@@ -130,7 +138,7 @@ Ideally, you'd then [import one of the accounts](https://metamask.zendesk.com/hc
 5. Run this code
 
 Back in a different terminal with the code from this repo, run:
-
+> terminal #1 demo-front2
 ```
 yarn dev
 ```
@@ -143,6 +151,7 @@ Head over to your [localhost](http://localhost:3000) and play with the Christmas
 - setup
   1. Connect your wallet and go to the setup tab
   2. Generate a setup value manually. You need to use '-m setup' option and must put the input bitsize(-b) and the input time delay(-d).
+> terminal #2 VDF-prover
 ``` bash
 $ python3 prover_main.py -m setup -b 100 -d 100000000 -n 2
 ```
@@ -150,6 +159,7 @@ $ python3 prover_main.py -m setup -b 100 -d 100000000 -n 2
 - commit: For the commits, you and any participants go to the commit tab and generate random numbers and commmit. Also you can manually input a number.
 
 - recovery: For the recovery, you use the Python prover again. Use the '-m auto' option. And then copy the generated proof to the recovery window. To use the 'auto' mode, you should put the network information, the contract address, and the contract ABI in 'config.ini' file.
+> terminal #2 VDF-prover
 ``` bash
 $ python3 prover_main.py -m auto
 Commit-Reveal-Recover Game Demo
