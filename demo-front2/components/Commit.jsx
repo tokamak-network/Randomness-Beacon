@@ -31,11 +31,12 @@ function classNames(...classes) {
 export default function Commit() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const [commitCalldata, setCommitCalldata] = useState()
     const [commitData, setCommitData] = useState()
     const [commitDataState, setCommitDataState] = useState("initial")
-    const { runContractFunction: enterRafByCommit, isLoading, isFetching } = useWeb3Contract()
+    const { runContractFunction: enterEventByCommit, isLoading, isFetching } = useWeb3Contract()
     const [enabled, setEnabled] = useState(false)
     const dispatch = useNotification()
 
@@ -55,18 +56,18 @@ export default function Commit() {
         }
         return true
     }
-    async function enterRafByCommitFunction() {
+    async function enterEventByCommitFunction() {
         if (validation()) {
-            const enterRafByCommitOptions = {
+            const enterEventByCommitOptions = {
                 abi: abi,
-                contractAddress: raffleAddress,
-                functionName: "enterRafByCommit",
+                contractAddress: randomAirdropAddress,
+                functionName: "enterEventByCommit",
                 params: {
                     _c: commitCalldata,
                 },
             }
-            await enterRafByCommit({
-                params: enterRafByCommitOptions,
+            await enterEventByCommit({
+                params: enterEventByCommitOptions,
                 onSuccess: handleSuccess,
                 onError: (error) => {
                     dispatch({
@@ -110,7 +111,7 @@ export default function Commit() {
     return (
         <div className="border-dashed border-amber-950 border-2 rounded-lg p-10 m-5">
             <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr font-bold">
-                Join Christmas Event by Commit
+                Join Airdrop Event by Commit
             </h3>
             <div className="mb-2 mt-2 flex flex-row">
                 <div className="mx-1.5">JSON</div>
@@ -205,11 +206,11 @@ export default function Commit() {
                 <ReactJson src={commitCalldata} />
             </div>
             <button
-                id="enterRaffleByCommit"
+                id="enterEventByCommit"
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
                 disabled={isLoading || isFetching}
                 type="button"
-                onClick={enterRafByCommitFunction}
+                onClick={enterEventByCommitFunction}
             >
                 {isLoading || isFetching ? (
                     <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>

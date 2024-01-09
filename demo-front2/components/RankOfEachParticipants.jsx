@@ -21,7 +21,8 @@ export default function RankOfEachParticipants({ round: currentRound, participat
     const chainId = parseInt(chainIdHex)
     const [roundState, setRoundState] = useState("initial")
     const [round, setRound] = useState(undefined)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const dispatch = useNotification()
     const [RankOfEachParticipants, setRankOfEachParticipants] = useState(undefined)
     const [tableContents, setTableContents] = useState([])
@@ -41,7 +42,7 @@ export default function RankOfEachParticipants({ round: currentRound, participat
         if (validation()) {
             const Options = {
                 abi: abi,
-                contractAddress: raffleAddress,
+                contractAddress: randomAirdropAddress,
                 functionName: "getRankPointOfEachParticipants",
                 params: {
                     _round: round,
@@ -113,7 +114,7 @@ export default function RankOfEachParticipants({ round: currentRound, participat
                 )}
 
                 <button
-                    id="enterRaffleByCommit"
+                    id="enterEventByCommit"
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
                     disabled={isLoading || isFetching}
                     type="button"

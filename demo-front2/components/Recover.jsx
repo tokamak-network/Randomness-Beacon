@@ -24,7 +24,8 @@ export default function Recover({ round: currentRound }) {
     const [roundState, setRoundState] = useState("initial")
     const [round, setRound] = useState(undefined)
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const recoverParams = createTestCases2()[0]
     const dispatch = useNotification()
     const { runContractFunction: recover, isLoading, isFetching } = useWeb3Contract()
@@ -45,7 +46,7 @@ export default function Recover({ round: currentRound }) {
         if (validation()) {
             const recoveryOptions = {
                 abi: abi,
-                contractAddress: raffleAddress,
+                contractAddress: randomAirdropAddress,
                 functionName: "recover",
                 params: {
                     _round: parseInt(round),

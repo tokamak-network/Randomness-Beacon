@@ -16,11 +16,12 @@ import { useMoralis } from "react-moralis"
 export default function Round({ round, started }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
 
     return (
         <div className="p-5">
-            {raffleAddress ? (
+            {randomAirdropAddress ? (
                 <h2 className="pt-4 px-4 text-2xl subpixel-antialiased font-semibold">
                     Current Round: <span className="font-extrabold">{round}</span> {started}
                 </h2>

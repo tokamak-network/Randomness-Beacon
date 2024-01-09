@@ -18,13 +18,14 @@ import { useNotification } from "web3uikit"
 export default function Withdraw({ round }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const dispatch = useNotification()
     const { runContractFunction: withdraw, isLoading, isFetching } = useWeb3Contract()
     async function withdrawFunction() {
         const withdrawOpions = {
             abi: abi,
-            contractAddress: raffleAddress,
+            contractAddress: randomAirdropAddress,
             functionName: "withdraw",
             params: {
                 _round: round,
@@ -48,7 +49,7 @@ export default function Withdraw({ round }) {
     return (
         <div>
             <button
-                id="enterRaffleByCommit"
+                id="enterEventByCommit"
                 className="bg-teal-400 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
                 disabled={isLoading || isFetching}
                 type="button"

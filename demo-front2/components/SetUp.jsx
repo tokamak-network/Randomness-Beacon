@@ -27,7 +27,8 @@ export default function SetUp({ updateUI, isSetUp }) {
     //const router = useRouter()
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const setUpParams = createTestCases2()[0]
     const dispatch = useNotification()
 
@@ -59,7 +60,7 @@ export default function SetUp({ updateUI, isSetUp }) {
         if (validation()) {
             const setUpOptions = {
                 abi: abi,
-                contractAddress: raffleAddress,
+                contractAddress: randomAirdropAddress,
                 functionName: "setUp",
                 params: {
                     _commitDuration: parseInt(commitDuration),

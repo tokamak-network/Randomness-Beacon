@@ -22,7 +22,8 @@ import RankOfEachParticipants from "./RankOfEachParticipants"
 export default function GetWinner({ round: currentRound, participatedRounds }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
     const setUpParams = createTestCases2()[0]
     const dispatch = useNotification()
     const { runContractFunction: getWinnerAddress, isLoading, isFetching } = useWeb3Contract()
@@ -40,7 +41,7 @@ export default function GetWinner({ round: currentRound, participatedRounds }) {
         if (validation()) {
             const setUpOpions = {
                 abi: abi,
-                contractAddress: raffleAddress,
+                contractAddress: randomAirdropAddress,
                 functionName: "getWinnerAddress",
                 params: {
                     _round: parseInt(round),
@@ -86,7 +87,7 @@ export default function GetWinner({ round: currentRound, participatedRounds }) {
                 </div>
 
                 <button
-                    id="enterRaffleByCommit"
+                    id="enterEventByCommit"
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
                     disabled={isLoading || isFetching}
                     type="button"
