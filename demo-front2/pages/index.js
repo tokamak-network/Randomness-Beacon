@@ -19,7 +19,8 @@ const supportedChains = ["31337", "11155111"]
 export default function Home() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
     let [round, setRound] = useState(0)
     const [isSetUp, setIsSetUp] = useState(false)
     const [isCommit, setIsCommit] = useState(false)
@@ -56,21 +57,21 @@ export default function Home() {
         updateUI()
     }, 12000)
     const { runContractFunction: setUpValuesAtRound } = useWeb3Contract()
-    const { runContractFunction: raffleRound } = useWeb3Contract({
+    const { runContractFunction: randomAirdropRound } = useWeb3Contract({
         abi: abi,
-        contractAddress: raffleAddress, //,
-        functionName: "raffleRound", //,
+        contractAddress: randomAirdropAddress, //,
+        functionName: "randomAirdropRound", //,
         params: {},
     })
     const { runContractFunction: getParticipatedRounds } = useWeb3Contract({
         abi: abi,
-        contractAddress: raffleAddress, //,
+        contractAddress: randomAirdropAddress, //,
         functionName: "getParticipatedRounds", //,
         params: {},
     })
 
     async function updateUI() {
-        let roundFromCall = await raffleRound({ onError: (error) => console.log(error) })
+        let roundFromCall = await randomAirdropRound({ onError: (error) => console.log(error) })
         if (roundFromCall === undefined) roundFromCall = 0
         setRound(roundFromCall.toString())
         const participatedRoundsfromCall = await getParticipatedRounds({
@@ -97,7 +98,7 @@ export default function Home() {
     async function getSetUpValuesAtRound(roundFromCall) {
         const setUpValuesAtRoundOptions = {
             abi: abi,
-            contractAddress: raffleAddress,
+            contractAddress: randomAirdropAddress,
             functionName: "setUpValuesAtRound",
             params: { round: roundFromCall },
         }
@@ -138,13 +139,13 @@ export default function Home() {
         return ret
     }
     return (
-        <div className="bg-[url('../public/christmas_gift_boxes_background.png')] opacity-80 min-h-screen bg-repeat-y bg-cover bg-center py-10">
+        <div className="bg-slate-50	opacity-80 min-h-screen bg-repeat-y bg-cover bg-center py-10">
             <div
                 style={{ minWidth: "852px" }}
-                className="container mx-auto w-5/12 rounded-3xl bg-green-50 "
+                className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-amber-950 border-2"
             >
                 <Round round={round} />
-                {raffleAddress ? (
+                {randomAirdropAddress ? (
                     <div>
                         <div className="border-dashed border-amber-950 border-2 rounded-lg m-5 truncate hover:text-clip ">
                             <div className="mt-10 ml-10 font-bold">Current Round Info</div>
@@ -153,14 +154,9 @@ export default function Home() {
                                     style={{ display: "grid", gap: "20px", padding: "40px 20px" }}
                                 >
                                     <section style={{ display: "flex", gap: "20px" }}>
-                                        <Widget
-                                            style={{ backgroundColor: "rgb(236 253 245)" }}
-                                            info={timeRemaining}
-                                            title="TIME REMAINING"
-                                        />
+                                        <Widget info={timeRemaining} title="TIME REMAINING" />
 
                                         <Widget
-                                            style={{ backgroundColor: "rgb(236 253 245)" }}
                                             info={
                                                 str_pad_left(
                                                     Math.floor(
@@ -187,7 +183,6 @@ export default function Home() {
                                             title="COMMIT DURATION"
                                         ></Widget>
                                         <Widget
-                                            style={{ backgroundColor: "rgb(236 253 245)" }}
                                             info={new Date(settedUpValues.setUpTime * 1000)
                                                 .toLocaleString()
                                                 .slice(5)}

@@ -18,7 +18,8 @@ export default function SetUpPage() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const [nowTime, setNowTime] = useState(new Date())
     const chainId = parseInt(chainIdHex)
-    const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
+    const randomAirdropAddress =
+        chainId in contractAddresses ? contractAddresses[chainId][0] : null
 
     let [round, setRound] = useState(0)
     const [isSetUp, setIsSetUp] = useState(false)
@@ -36,17 +37,17 @@ export default function SetUpPage() {
 
     const { runContractFunction: setUpValuesAtRound } = useWeb3Contract()
 
-    const { runContractFunction: raffleRound } = useWeb3Contract({
+    const { runContractFunction: randomAirdropRound } = useWeb3Contract({
         abi: abi,
-        contractAddress: raffleAddress, //,
-        functionName: "raffleRound", //,
+        contractAddress: randomAirdropAddress, //,
+        functionName: "randomAirdropRound", //,
         params: {},
     })
 
     async function updateUI() {
         const roundFromCall = (
-            await raffleRound({ onError: (error) => console.log(error) })
-        ).toString()
+            await randomAirdropRound({ onError: (error) => console.log(error) })
+        )?.toString()
         setRound(roundFromCall)
         await getSetUpValuesAtRound(roundFromCall)
         if (settedUpValues.setUpTime !== undefined && settedUpValues.setUpTime != "0") {
@@ -63,7 +64,7 @@ export default function SetUpPage() {
         roundFromCall = parseInt(roundFromCall)
         const setUpValuesAtRoundOptions = {
             abi: abi,
-            contractAddress: raffleAddress,
+            contractAddress: randomAirdropAddress,
             functionName: "setUpValuesAtRound",
             params: { round: roundFromCall },
         }
@@ -71,7 +72,7 @@ export default function SetUpPage() {
             params: setUpValuesAtRoundOptions,
             onError: (error) => console.log(error),
         })
-
+        if (result === undefined) return
         setSettedUpValues({
             T: result["T"].toString(),
             n: result["n"]["val"].toString(),
@@ -86,10 +87,10 @@ export default function SetUpPage() {
         })
     }
     return (
-        <div>
-            <div className="container mx-auto">
+        <div className="bg-slate-50 py-10">
+            <div className="w-6/12 container mx-auto bg-white rounded-3xl border-dashed border-amber-950 border-2">
                 <Round round={round} />
-                {raffleAddress ? (
+                {randomAirdropAddress ? (
                     <div>
                         <div className="border-dashed border-amber-950 border-2 rounded-lg p-10 m-5 truncate hover:text-clip">
                             <div>Round: {round}</div>
