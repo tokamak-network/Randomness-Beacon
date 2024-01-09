@@ -60,7 +60,7 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
 
 ### Quick Start
 - Demo App
-[Christmas Event App](https://raffle-bicorn-rx-front.vercel.app/)
+[VDF RNG Demo App](https://vdf-rng-demo.vercel.app/)
 - Local
 ```shell
 git clone --recurse-submodules https://github.com/tokamak-network/Commit-Reveal-Recover-RNG.git
@@ -95,7 +95,7 @@ yarn
 
 
 
-1. set .env at root folder of Raffle-Bicorn-RX
+1. set .env at root folder of VDF-RNG-demo-contract
 ```
 MAINNET_RPC_URL=
 SEPOLIA_RPC_URL=
@@ -120,7 +120,7 @@ COINMARKETCAP_API_KEY=
 ```
 yarn hardhat node
 ```
-> You can read more about how to use that repo from its [README.md](https://github.com/tokamak-network/Raffle-Bicorn-RX/blob/main/README.md)
+> You can read more about how to use that repo from its [README.md](https://github.com/tokamak-network/VDF-RNG-verifier/blob/main/README.md)
 
 1. Add hardhat network to your metamask/wallet
 
