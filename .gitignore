@@ -18,18 +18,20 @@
 /demo-front/build
 
 # misc
-/demo-front.DS_Store
-/demo-front*.pem
+/demo-front/.DS_Store
+/demo-front/*.pem
 
 # debug
-/demo-frontnpm-debug.log*
-/demo-frontyarn-debug.log*
-/demo-frontyarn-error.log*
-/demo-front.pnpm-debug.log*
+/demo-fron/tnpm-debug.log*
+/demo-front/yarn-debug.log*
+/demo-front/yarn-error.log*
+/demo-front/.pnpm-debug.log*
 
 # local env files
-/demo-front.env*.local
+/demo-front/.env*.local
 
 # vercel
-/demo-front.vercel
+/demo-front/.vercel
 VDF-prover/__pycache__/web3_util.cpython-310.pyc
+
+.DS_Store

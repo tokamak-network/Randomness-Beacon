@@ -102,8 +102,9 @@ SEPOLIA_RPC_URL=
 POLYGON_MAINNET_RPC_URL=
 PRIVATE_KEY=
 ETHERSCAN_API_KEY=
-REPORT_GAS=true
 COINMARKETCAP_API_KEY=
+REPORT_GAS=true
+UPDATE_ABI_ADDRESS_FRONTEND_VDFPROVER=true
 ```
 - `MAINNET_RPC_URL`, `SEPOLIA_RPC_URL`, `POLYGON_MAINNET_RPC_URL`
   - Get url from [Infura](https://app.infura.io/dashboard) or [Alchemy](https://alchemy.com/?a=673c802981)
@@ -114,17 +115,23 @@ COINMARKETCAP_API_KEY=
   - Get api key from [Etherscan](https://etherscan.io/myapikey/)
 - COINMARKETCAP_API_KEY
   - Get api key from [CoinMarketCap](https://pro.coinmarketcap.com/account/)
+- REPORT_GAS
+  - enables hardhat-gas-reporter by setting to true
+- UPDATE_ABI_ADDRESS_FRONTEND_VDFPROVER
+  - Set to true to update the ABI and address of VDF-RNG-demo-contract and VDF-prover folder on a new deployment of the contract.
 
-1. Run your local blockchain with the Christmas Gift Distribution code
+1. Run your local blockchain with the Random Airdrop code
 > terminal #3 VDF-RNG-demo-contract
 ```
 yarn hardhat node
 ```
 > You can read more about how to use that repo from its [README.md](https://github.com/tokamak-network/VDF-RNG-verifier/blob/main/README.md)
+<br>
+> **Every time you run a hardhat node, you need to clear activity and nonce data of the accounts imported from the hardhat node. You can do this through metamask-settings-advanced-clear activity tab data.**
 
 1. Add hardhat network to your metamask/wallet
 
-- Get the RPC_URL of your hh node (usually `http://127.0.0.1:8545/`)
+- Get the RPC_URL of your hardhat node (usually `http://127.0.0.1:8545/`)
 - Go to your wallet and add a new network. [See instructions here.](https://metamask.zendesk.com/hc/en-us/articles/360043227612-How-to-add-a-custom-network-RPC)
   - Network Name: Hardhat-Localhost
   - New RPC URL: http://127.0.0.1:8545/
@@ -132,6 +139,7 @@ yarn hardhat node
   - Currency Symbol: ETH (or GO)
   - Block Explorer URL: None
 Ideally, you'd then [import one of the accounts](https://metamask.zendesk.com/hc/en-us/articles/360015489331-How-to-import-an-Account) from hardhat to your wallet/metamask. 
+> **Every time you run a hardhat node, you need to clear activity and nonce data of the accounts imported from the hardhat node. You can do this through metamask-settings-advanced-clear activity tab data.**
 
 5. Run this code
 
@@ -151,7 +159,7 @@ Head over to your [localhost](http://localhost:3000) and play with the Christmas
   2. Generate a setup value manually. You need to use '-m setup' option and must put the input bitsize(-b) and the input time delay(-d).
 > terminal #2 VDF-prover
 ``` bash
-$ python3 prover_main.py -m setup -b 100 -d 100000000 -n 2
+$ python3 prover_main.py -m setup -b 100 -d 100000000
 ```
   And then you get the setup values at the testlog directory. Copy values to the popup window.
 - commit: For the commits, you and any participants go to the commit tab and generate random numbers and commmit. Also you can manually input a number.
@@ -166,7 +174,7 @@ Commit-Reveal-Recover Game Demo
 
 The setting from config.ini:
          Network:  sepolia_testnet
-         Contract Address:  0x0653692451011e5d9921E30193603321929fE4ef
+         Contract Address:  0x9CdD8F27ac9a18D71e9c01C340411ac3456A90Cc
 
 [+] There no input for option 'round' so fetch the round information from the contract ....
 
@@ -196,7 +204,7 @@ Recovery Phase
 
 ## Demo app
 
-- Demo app: [Demo App Link]()
+- Demo app: [Demo App Link](https://vdf-rng-demo.vercel.app/)
 
 ## Contributing
 We welcome contributions to the project. Please refer to our contribution guidelines for more information on how to participate.
