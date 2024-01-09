@@ -14,7 +14,7 @@
  limitations under the License.
 -->
 # Christmas Gift Distribution Event Using Commit-Reveal-Recover Random Number Generation(RNG)
-[Example App](https://raffle-bicorn-rx-front.vercel.app/)
+[Example App](https://randomAirdrop-commitRevealRecoverRNG-front.vercel.app/)
 - Currently Works on Sepolia Network
 
 ![App](img/EventPage.png)
@@ -45,8 +45,8 @@ Hardhat
 
 ## QuickStart
 ```
-git clone https://github.com/tokamak-network/Raffle-Bicorn-RX-Front.git
-cd Raffle-Bicorn-RX-Front
+git clone https://github.com/tokamak-network/RandomAirdrop-Bicorn-RX-Front.git
+cd RandomAirdrop-Bicorn-RX-Front
 yarn
 yarn dev
 ```
@@ -70,12 +70,12 @@ To have VSCode extension prettier auto-format `.jsx` and `.tsx`, add the followi
 > In a different terminal / command line
 
 ```
-git clone https://github.com/tokamak-network/Raffle-Bicorn-RX.git
-cd Raffle-Bicorn-RX
+git clone https://github.com/tokamak-network/RandomAirdrop-Bicorn-RX.git
+cd RandomAirdrop-Bicorn-RX
 yarn 
 yarn hardhat node
 ```
-> You can read more about how to use that repo from its [README.md](https://github.com/tokamak-network/Raffle-Bicorn-RX/blob/main/README.md)
+> You can read more about how to use that repo from its [README.md](https://github.com/tokamak-network/RandomAirdrop-Bicorn-RX/blob/main/README.md)
 
 2. Add hardhat network to your metamask/wallet
 
