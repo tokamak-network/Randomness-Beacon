@@ -41,18 +41,19 @@ export default function SetUp({ updateUI, isSetUp }) {
     const [setUpProofs, setSetUpProofs] = useState(JSON.stringify(setUpParams.setupProofs))
     const [commitDuration, setCommitDuration] = useState()
     const [commitDurationState, setCommitDurationState] = useState("initial")
-    const [revealDuration, setRevealDuration] = useState()
-    const [revealDurationState, setRevealDurationState] = useState("initial")
+    // const [revealDuration, setRevealDuration] = useState()
+    // const [revealDurationState, setRevealDurationState] = useState("initial")
 
     const { runContractFunction: setUp, isLoading, isFetching } = useWeb3Contract()
     function validation() {
         if (commitDuration == undefined || commitDuration == "" || commitDuration == 0) {
             setCommitDurationState("error")
             return false
-        } else if (revealDuration == undefined || revealDuration == "" || revealDuration == 0) {
-            setRevealDurationState("error")
-            return false
         }
+        // } else if (revealDuration == undefined || revealDuration == "" || revealDuration == 0) {
+        //     setRevealDurationState("error")
+        //     return false
+        // }
         return true
     }
 
@@ -64,7 +65,7 @@ export default function SetUp({ updateUI, isSetUp }) {
                 functionName: "setUp",
                 params: {
                     _commitDuration: parseInt(commitDuration),
-                    _commitRevealDuration: parseInt(commitDuration) + parseInt(revealDuration),
+                    _commitRevealDuration: parseInt(commitDuration) + 1,
                     _n: JSON.parse(nValue),
                     _proofs: JSON.parse(setUpProofs),
                 },
@@ -153,7 +154,7 @@ export default function SetUp({ updateUI, isSetUp }) {
                         state={commitDurationState}
                     />
                 </div>
-                <div className="mt-10">
+                {/* <div className="mt-10">
                     <Input
                         label="Reveal Duration in Seconds"
                         placeholder="120 (2 mins*)"
@@ -164,7 +165,7 @@ export default function SetUp({ updateUI, isSetUp }) {
                         onChange={(e) => setRevealDuration(e.target.value)}
                         state={revealDurationState}
                     />
-                </div>
+                </div> */}
                 <div className="mt-9">
                     <Input
                         label="n value"
