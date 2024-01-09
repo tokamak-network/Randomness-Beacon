@@ -64,7 +64,7 @@ Why Commit-Reveal-Recover Scheme and VDFs Matter? Generating random numbers on a
 - Local
 ```shell
 git clone --recurse-submodules https://github.com/tokamak-network/Commit-Reveal-Recover-RNG.git
-cd Commit-Reveal-Recover-RNG/demo-front2
+cd Commit-Reveal-Recover-RNG/demo-front
 yarn
 yarn dev
 ```
@@ -75,7 +75,7 @@ yarn dev
    <br>
    <img src = "./data/terminalsscreenshot.png" width="50%">
    <br>
-   - #1 cd demo-front2
+   - #1 cd demo-front
    - #2 cd VDF-prover
    - #3 cd VDF-RNG-demo-contract
 
@@ -136,7 +136,7 @@ Ideally, you'd then [import one of the accounts](https://metamask.zendesk.com/hc
 5. Run this code
 
 Back in a different terminal with the code from this repo, run:
-> terminal #1 demo-front2
+> terminal #1 demo-front
 ```
 yarn dev
 ```
