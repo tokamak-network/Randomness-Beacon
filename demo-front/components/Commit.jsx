@@ -198,16 +198,9 @@ export default function Commit() {
                     theme="primary"
                 />
             </div>
-            <div
-                className="mt-7 ml-1 text-base h-40"
-                style={{ textOverflow: "ellipsis", overflow: "hidden" }}
-            >
-                {/* calldata: {JSON.stringify(commitCalldata)} */}
-                <ReactJson src={commitCalldata} />
-            </div>
             <button
                 id="enterEventByCommit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-3"
                 disabled={isLoading || isFetching}
                 type="button"
                 onClick={enterEventByCommitFunction}
@@ -218,6 +211,13 @@ export default function Commit() {
                     <div>Commit</div>
                 )}
             </button>
+            <div
+                className="mt-4 ml-1 text-base h-40"
+                style={{ textOverflow: "ellipsis", overflow: "hidden" }}
+            >
+                {/* calldata: {JSON.stringify(commitCalldata)} */}
+                <ReactJson src={commitCalldata} />
+            </div>
             <div className="mt-2">
                 <div>
                     Commit your value using the Auto Generate button or Type your number manually.
