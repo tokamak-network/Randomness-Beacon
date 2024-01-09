@@ -144,7 +144,7 @@ def get_contract_values(round=None):
     if(round==None):
         """Read and return specific values from the smart contract."""
         print('\n[+] There no input for option \'round\' so fetch the round information from the contract .... \n')
-        round_info = contract.functions.raffleRound().call()
+        round_info = contract.functions.randomAirdropRound().call()
         
     else:
         round_info = round
