@@ -56,7 +56,7 @@ export default function Home() {
     useInterval(() => {
         updateUI()
     }, 12000)
-    const { runContractFunction: setUpValuesAtRound } = useWeb3Contract()
+    const { runContractFunction: getSetUpValuesAtRound } = useWeb3Contract()
     const { runContractFunction: randomAirdropRound } = useWeb3Contract({
         abi: abi,
         contractAddress: randomAirdropAddress, //,
@@ -84,7 +84,7 @@ export default function Home() {
             }
             setParticipatedRounds(temp)
         }
-        await getSetUpValuesAtRound(roundFromCall)
+        await getGetSetUpValuesAtRound(roundFromCall)
         if (settedUpValues.setUpTime !== undefined && settedUpValues.setUpTime != "0") {
             setIsSetUp(true)
             setIsCommit(true)
@@ -95,14 +95,14 @@ export default function Home() {
             setStarted("Not Started")
         }
     }
-    async function getSetUpValuesAtRound(roundFromCall) {
+    async function getGetSetUpValuesAtRound(roundFromCall) {
         const setUpValuesAtRoundOptions = {
             abi: abi,
             contractAddress: randomAirdropAddress,
-            functionName: "setUpValuesAtRound",
-            params: { round: roundFromCall },
+            functionName: "getSetUpValuesAtRound",
+            params: { _round: roundFromCall },
         }
-        const result = await setUpValuesAtRound({
+        const result = await getSetUpValuesAtRound({
             params: setUpValuesAtRoundOptions,
             onError: (error) => console.log(error),
         })

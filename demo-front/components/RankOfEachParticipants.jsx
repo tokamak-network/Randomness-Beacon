@@ -131,7 +131,7 @@ export default function RankOfEachParticipants({ round: currentRound, participat
                         <Table
                             columnsConfig="80px 450px 450px 450px 80px"
                             data={tableContents}
-                            header={["#Rank", <span>Address</span>, <span>Rank Point</span>]}
+                            header={["#Rank", "Address", "Rank Point"]}
                             maxPages={5}
                             onPageNumberChanged={function noRefCheck() {}}
                             onRowClick={function noRefCheck() {}}

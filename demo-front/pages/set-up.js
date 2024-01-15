@@ -35,7 +35,7 @@ export default function SetUpPage() {
         }
     }, [isWeb3Enabled, round])
 
-    const { runContractFunction: setUpValuesAtRound } = useWeb3Contract()
+    const { runContractFunction: getSetUpValuesAtRound } = useWeb3Contract()
 
     const { runContractFunction: randomAirdropRound } = useWeb3Contract({
         abi: abi,
@@ -49,7 +49,7 @@ export default function SetUpPage() {
             await randomAirdropRound({ onError: (error) => console.log(error) })
         )?.toString()
         setRound(roundFromCall)
-        await getSetUpValuesAtRound(roundFromCall)
+        await getGetSetUpValuesAtRound(roundFromCall)
         if (settedUpValues.setUpTime !== undefined && settedUpValues.setUpTime != "0") {
             setIsSetUp(true)
             setIsCommit(true)
@@ -60,15 +60,15 @@ export default function SetUpPage() {
             setStarted("Not Started")
         }
     }
-    async function getSetUpValuesAtRound(roundFromCall) {
+    async function getGetSetUpValuesAtRound(roundFromCall) {
         roundFromCall = parseInt(roundFromCall)
         const setUpValuesAtRoundOptions = {
             abi: abi,
             contractAddress: randomAirdropAddress,
-            functionName: "setUpValuesAtRound",
-            params: { round: roundFromCall },
+            functionName: "getSetUpValuesAtRound",
+            params: { _round: roundFromCall },
         }
-        const result = await setUpValuesAtRound({
+        const result = await getSetUpValuesAtRound({
             params: setUpValuesAtRoundOptions,
             onError: (error) => console.log(error),
         })
