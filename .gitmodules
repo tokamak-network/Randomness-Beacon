@@ -5,4 +5,4 @@
 [submodule "VDF-RNG-demo-contract"]
 	path = VDF-RNG-demo-contract
 	url = https://github.com/tokamak-network/VDF-RNG-demo-contract.git
-	branch = main
+	branch = JanuaryEvent
