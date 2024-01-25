@@ -1,15 +1,6 @@
-import ethers, { BigNumberish, Contract, BytesLike, toBeHex, dataLength } from "ethers"
+import { ethers, BigNumberish } from "ethers"
 
-import {
-    VDFClaim,
-    TestCase,
-    BigNumber,
-    SetUpParams,
-    CommitParams,
-    RevealParams,
-    TestCaseJson,
-    VDFClaimJson,
-} from "./interfaces"
+import { VDFClaim, TestCase, BigNumber } from "./interfaces"
 import testData from "./data_20231212_150019.json"
 
 export const createTestCases2 = () => {
@@ -23,26 +14,34 @@ export const createTestCases2 = () => {
         setUpProofs.push({
             x: {
                 //val: toBeHex(testcase[4][i][1]),
-                val: toBeHex(
-                    testData.setupProofs[i].x,
-                    getLength(dataLength(toBeHex(testData.setupProofs[i].x)))
+                // val: toBeHex(
+                //     testData.setupProofs[i].x,
+                //     getLength(dataLength(toBeHex(testData.setupProofs[i].x)))
+                // ),
+                val: ethers.utils.hexZeroPad(
+                    ethers.utils.hexlify(testData.setupProofs[i].x),
+                    getLength(
+                        ethers.utils.hexDataLength(ethers.utils.hexlify(testData.setupProofs[i].x))
+                    )
                 ),
                 bitlen: getBitLenth2(testData.setupProofs[i].x),
             },
             y: {
-                //val: toBeHex(testcase[4][i][2]),
-                val: toBeHex(
-                    testData.setupProofs[i].y,
-                    getLength(dataLength(toBeHex(testData.setupProofs[i].y)))
+                val: ethers.utils.hexZeroPad(
+                    ethers.utils.hexlify(testData.setupProofs[i].y),
+                    getLength(
+                        ethers.utils.hexDataLength(ethers.utils.hexlify(testData.setupProofs[i].y))
+                    )
                 ),
                 bitlen: getBitLenth2(testData.setupProofs[i].y),
             },
             T: testData.setupProofs[i].T,
             v: {
-                //val: toBeHex(testcase[4][i][4]),
-                val: toBeHex(
-                    testData.setupProofs[i].v,
-                    getLength(dataLength(toBeHex(testData.setupProofs[i].v)))
+                val: ethers.utils.hexZeroPad(
+                    ethers.utils.hexlify(testData.setupProofs[i].v),
+                    getLength(
+                        ethers.utils.hexDataLength(ethers.utils.hexlify(testData.setupProofs[i].v))
+                    )
                 ),
                 bitlen: getBitLenth2(testData.setupProofs[i].v),
             },
@@ -51,27 +50,36 @@ export const createTestCases2 = () => {
     for (let i = 0; i < (testData.recoveryProofs as []).length; i++) {
         recoveryProofs.push({
             x: {
-                //val: toBeHex(testcase[9][i][1]),
-                val: toBeHex(
-                    testData.recoveryProofs[i].x,
-                    getLength(dataLength(toBeHex(testData.recoveryProofs[i].x)))
+                val: ethers.utils.hexZeroPad(
+                    ethers.utils.hexlify(testData.recoveryProofs[i].x),
+                    getLength(
+                        ethers.utils.hexDataLength(
+                            ethers.utils.hexlify(testData.recoveryProofs[i].x)
+                        )
+                    )
                 ),
                 bitlen: getBitLenth2(testData.recoveryProofs[i].x),
             },
             y: {
-                //val: toBeHex(testcase[9][i][2]),
-                val: toBeHex(
-                    testData.recoveryProofs[i].y,
-                    getLength(dataLength(toBeHex(testData.recoveryProofs[i].y)))
+                val: ethers.utils.hexZeroPad(
+                    ethers.utils.hexlify(testData.recoveryProofs[i].y),
+                    getLength(
+                        ethers.utils.hexDataLength(
+                            ethers.utils.hexlify(testData.recoveryProofs[i].y)
+                        )
+                    )
                 ),
                 bitlen: getBitLenth2(testData.recoveryProofs[i].y),
             },
             T: testData.recoveryProofs[i].T,
             v: {
-                //val: toBeHex(testcase[9][i][4]),
-                val: toBeHex(
-                    testData.recoveryProofs[i].v,
-                    getLength(dataLength(toBeHex(testData.recoveryProofs[i].v)))
+                val: ethers.utils.hexZeroPad(
+                    ethers.utils.hexlify(testData.recoveryProofs[i].v),
+                    getLength(
+                        ethers.utils.hexDataLength(
+                            ethers.utils.hexlify(testData.recoveryProofs[i].v)
+                        )
+                    )
                 ),
                 bitlen: getBitLenth2(testData.recoveryProofs[i].v),
             },
@@ -79,55 +87,61 @@ export const createTestCases2 = () => {
     }
     for (let i = 0; i < (testData.randomList as []).length; i++) {
         randomList.push({
-            //val: toBeHex(testcase[5][i]),
-            val: toBeHex(
-                testData.randomList[i],
-                getLength(dataLength(toBeHex(testData.randomList[i])))
+            val: ethers.utils.hexZeroPad(
+                ethers.utils.hexlify(testData.randomList[i]),
+                getLength(ethers.utils.hexDataLength(ethers.utils.hexlify(testData.randomList[i])))
             ),
             bitlen: getBitLenth2(testData.randomList[i]),
         })
     }
     for (let i = 0; i < (testData.commitList as []).length; i++) {
-        //commitList.push(testcase[6][i])
         commitList.push({
-            //val: toBeHex(testcase[6][i]),
-            val: toBeHex(
-                testData.commitList[i],
-                getLength(dataLength(toBeHex(testData.commitList[i])))
+            val: ethers.utils.hexZeroPad(
+                ethers.utils.hexlify(testData.commitList[i]),
+                getLength(ethers.utils.hexDataLength(ethers.utils.hexlify(testData.commitList[i])))
             ),
             bitlen: getBitLenth2(testData.commitList[i]),
         })
     }
     result.push({
-        //n: { val: toBeHex(testcase[0]), neg: false, bitlen: getBitLenth2(testcase[0]) },
         n: {
-            val: toBeHex(testData.n, getLength(dataLength(toBeHex(testData.n)))),
+            val: ethers.utils.hexZeroPad(
+                ethers.utils.hexlify(testData.n),
+                getLength(ethers.utils.hexDataLength(ethers.utils.hexlify(testData.n)))
+            ),
             bitlen: getBitLenth2(testData.n),
         },
-        //g: { val: toBeHex(testcase[1]), neg: false, bitlen: getBitLenth2(testcase[1]) },
         g: {
-            val: toBeHex(testData.g, getLength(dataLength(toBeHex(testData.g)))),
+            val: ethers.utils.hexZeroPad(
+                ethers.utils.hexlify(testData.g),
+                getLength(ethers.utils.hexDataLength(ethers.utils.hexlify(testData.g)))
+            ),
             bitlen: getBitLenth2(testData.g),
         },
-        //h: { val: toBeHex(testcase[2]), neg: false, bitlen: getBitLenth2(testcase[2]) },
         h: {
-            val: toBeHex(testData.h, getLength(dataLength(toBeHex(testData.h)))),
+            val: ethers.utils.hexZeroPad(
+                ethers.utils.hexlify(testData.h),
+                getLength(ethers.utils.hexDataLength(ethers.utils.hexlify(testData.h)))
+            ),
             bitlen: getBitLenth2(testData.h),
         },
         T: testData.T,
         setupProofs: setUpProofs,
         randomList: randomList,
         commitList: commitList,
-        //omega: { val: toBeHex(testcase[7]), neg: false, bitlen: getBitLenth2(testcase[7]) },
         omega: {
-            val: toBeHex(testData.omega, getLength(dataLength(toBeHex(testData.omega)))),
+            val: ethers.utils.hexZeroPad(
+                ethers.utils.hexlify(testData.omega),
+                getLength(ethers.utils.hexDataLength(ethers.utils.hexlify(testData.omega)))
+            ),
             bitlen: getBitLenth2(testData.omega),
         },
         recoveredOmega: {
-            //val: toBeHex(testcase[8]),
-            val: toBeHex(
-                testData.recoveredOmega,
-                getLength(dataLength(toBeHex(testData.recoveredOmega)))
+            val: ethers.utils.hexZeroPad(
+                ethers.utils.hexlify(testData.recoveredOmega),
+                getLength(
+                    ethers.utils.hexDataLength(ethers.utils.hexlify(testData.recoveredOmega))
+                )
             ),
             bitlen: getBitLenth2(testData.recoveredOmega),
         },
@@ -137,7 +151,7 @@ export const createTestCases2 = () => {
     return result
 }
 
-export const getBitLenth2 = (num: BigNumberish): BigNumberish => {
+export const getBitLenth2 = (num: string): BigNumberish => {
     return BigInt(num).toString(2).length
 }
 
