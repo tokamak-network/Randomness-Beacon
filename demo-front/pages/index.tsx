@@ -7,8 +7,9 @@ import { useInterval } from "use-interval"
 import { useNotification, Bell } from "web3uikit"
 import RankOfEachParticipants from "../components/RankOfEachParticipants"
 import { BigNumber, BigNumberish, ethers } from "ethers"
-import {SettedUpValues} from "../typechain-types/RandomAirdrop"
-import {ICommitRevealRecoverRNG} from "../typechain-types/RandomAirdrop"
+import { SettedUpValues } from "../typechain-types/RandomAirdrop"
+import { ICommitRevealRecoverRNG } from "../typechain-types/RandomAirdrop"
+import Header from "../components/Header"
 
 export default function Home() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
@@ -34,9 +35,9 @@ export default function Home() {
     const [timeRemaining, setTimeRemaining] = useState<string>("")
     const [participatedRoundsLength, setParticipatedRoundsLength] = useState<string>("")
     const [participatedRounds, setParticipatedRounds] = useState<string[]>([])
-    const [nextRound, setNextRound] = useState<string>('')
+    const [nextRound, setNextRound] = useState<string>("")
     const dispatch = useNotification()
-    function str_pad_left(string:number, pad:string, length:number) {
+    function str_pad_left(string: number, pad: string, length: number) {
         return (new Array(length + 1).join(pad) + string).slice(-length)
     }
     // @ts-ignore
@@ -61,7 +62,7 @@ export default function Home() {
         await registerNextRound({
             params: registerNextRoundOptions,
             onSuccess: handleSuccess,
-            onError: (error:any) => {
+            onError: (error: any) => {
                 console.log(error)
                 setIsFetching(false)
                 dispatch({
@@ -78,12 +79,12 @@ export default function Home() {
                             : error?.data?.message,
                     title: "Error Message",
                     position: "topR",
-                    icon: <Bell/>//"bell",
+                    icon: <Bell />, //"bell",
                 })
             },
         })
     }
-    const handleSuccess = async function (tx:any) {
+    const handleSuccess = async function (tx: any) {
         await tx.wait(1)
         setIsFetching(false)
         handleNewNotification()
@@ -94,7 +95,7 @@ export default function Home() {
             message: "Transaction Completed",
             title: "Tx Notification",
             position: "topR",
-            icon: <Bell/>//"bell",
+            icon: <Bell />, //"bell",
         })
     }
     useInterval(() => {
@@ -138,9 +139,13 @@ export default function Home() {
     })
 
     async function updateUI() {
-        let roundFromCall = await randomAirdropRound({ onError: (error) => console.log(error) }) as BigNumberish
-        let nextRoundFromCall = await getNextRound({ onError: (error) => console.log(error) }) as BigNumberish
-        setNextRound(nextRoundFromCall.toString())
+        let roundFromCall = (await randomAirdropRound({
+            onError: (error) => console.log(error),
+        })) as BigNumberish
+        let nextRoundFromCall = (await getNextRound({
+            onError: (error) => console.log(error),
+        })) as BigNumberish
+        setNextRound(nextRoundFromCall?.toString())
         if (roundFromCall === undefined) roundFromCall = 0
         setRound(roundFromCall.toString())
         const participantsLengthfromCallOptions = {
@@ -149,14 +154,14 @@ export default function Home() {
             functionName: "getParticipantsLengthAtRound",
             params: { _round: nextRoundFromCall },
         }
-        const participantsLengthfromCall = await getParticipantsLengthAtRound({
+        const participantsLengthfromCall = (await getParticipantsLengthAtRound({
             params: participantsLengthfromCallOptions,
             onError: (error) => console.log(error),
-        }) as BigNumberish
+        })) as BigNumberish
         setParticipatedRoundsLength(participantsLengthfromCall?.toString())
-        const participatedRoundsfromCall = await getParticipatedRounds({
+        const participatedRoundsfromCall = (await getParticipatedRounds({
             onError: (error) => console.log(error),
-        }) as BigNumber[]
+        })) as BigNumber[]
         let temp = []
 
         if (participatedRoundsfromCall) {
@@ -167,17 +172,18 @@ export default function Home() {
         }
         await getGetSetUpValuesAtRound(roundFromCall)
     }
-    async function getGetSetUpValuesAtRound(roundFromCall:BigNumberish) {
+    async function getGetSetUpValuesAtRound(roundFromCall: BigNumberish) {
         const setUpValuesAtRoundOptions = {
             abi: abi,
             contractAddress: randomAirdropAddress!,
             functionName: "getSetUpValuesAtRound",
             params: { _round: roundFromCall },
         }
-        const result: ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput = await getSetUpValuesAtRound({
-            params: setUpValuesAtRoundOptions,
-            onError: (error) => console.log(error),
-        }) as ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput
+        const result: ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput =
+            (await getSetUpValuesAtRound({
+                params: setUpValuesAtRoundOptions,
+                onError: (error) => console.log(error),
+            })) as ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput
         if (result === undefined) return
         setSettedUpValues({
             T: result["T"].toString(),
@@ -193,50 +199,56 @@ export default function Home() {
         })
     }
     return (
-        <div className="bg-slate-50	opacity-80 min-h-screen bg-repeat-y bg-cover bg-center py-10">
-            <div
-                style={{ minWidth: "852px" }}
-                className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-amber-950 border-2"
-            >
-                <Round round={round} />
-                {randomAirdropAddress ? (
-                    <div>
-                        <div className="p-5">
-                            <div className="border-dashed border-amber-950 border-2 rounded-lg p-10">
-                                <div className="mb-2 font-bold">
-                                    Register For Round{" "}
-                                    <span className="font-black">{nextRound}</span>
-                                </div>
-                                <button
-                                    id="enterEventByCommit"
-                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
-                                    disabled={isLoading || isFetching}
-                                    type="button"
-                                    onClick={getRankPointOfEachParticipantsFunction}
-                                >
-                                    {isLoading || isFetching ? (
-                                        <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
-                                    ) : (
-                                        <div>Register</div>
-                                    )}
-                                </button>
-                                <div className="pt-2">
-                                    Number of participants registered :
-                                    <span className="font-bold"> {participatedRoundsLength}</span>
+        <>
+            <Header />
+            <div className="bg-slate-50	opacity-80 min-h-screen bg-repeat-y bg-cover bg-center py-10">
+                <div
+                    style={{ minWidth: "852px" }}
+                    className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-amber-950 border-2"
+                >
+                    <Round round={round} />
+                    {randomAirdropAddress ? (
+                        <div>
+                            <div className="p-5">
+                                <div className="border-dashed border-amber-950 border-2 rounded-lg p-10">
+                                    <div className="mb-2 font-bold">
+                                        Register For Round{" "}
+                                        <span className="font-black">{nextRound}</span>
+                                    </div>
+                                    <button
+                                        id="enterEventByCommit"
+                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
+                                        disabled={isLoading || isFetching}
+                                        type="button"
+                                        onClick={getRankPointOfEachParticipantsFunction}
+                                    >
+                                        {isLoading || isFetching ? (
+                                            <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+                                        ) : (
+                                            <div>Register</div>
+                                        )}
+                                    </button>
+                                    <div className="pt-2">
+                                        Number of participants registered :
+                                        <span className="font-bold">
+                                            {" "}
+                                            {participatedRoundsLength}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
+                            <div>
+                                <RankOfEachParticipants
+                                    round={round}
+                                    participatedRounds={participatedRounds}
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <RankOfEachParticipants
-                                round={round}
-                                participatedRounds={participatedRounds}
-                            />
-                        </div>
-                    </div>
-                ) : (
-                    <div></div>
-                )}
+                    ) : (
+                        <div></div>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     )
 }
