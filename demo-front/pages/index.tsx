@@ -1,17 +1,27 @@
-import Round from "../components/Round"
-import { useMoralis } from "react-moralis"
-import { useState, useEffect } from "react"
+// Copyright 2024 justin
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+import { MainHeader } from "../components/MainComponents/MainHeader"
+import { Register } from "../components/MainComponents/Register"
 import { useWeb3Contract } from "react-moralis"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
 import { useInterval } from "use-interval"
 import { useNotification, Bell } from "web3uikit"
-import RankOfEachParticipants from "../components/RankOfEachParticipants"
+import RankOfEachParticipantsMain from "../components/MainComponents/RankOfEachParticipantsMain"
+import { useMoralis } from "react-moralis"
+import { useState, useEffect } from "react"
 import { BigNumber, BigNumberish, ethers } from "ethers"
-import { SettedUpValues } from "../typechain-types/RandomAirdrop"
-import { ICommitRevealRecoverRNG } from "../typechain-types/RandomAirdrop"
-import Header from "../components/Header"
-
-export default function Home() {
+import { abi, contractAddresses as contractAddressesJSON } from "../constants"
+export default function TempMain() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
     const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
@@ -20,22 +30,19 @@ export default function Home() {
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
             : null
     let [round, setRound] = useState<string>("")
-    const [settedUpValues, setSettedUpValues] = useState<SettedUpValues>({
-        T: "",
-        n: "",
-        nl: "",
-        g: "",
-        gl: "",
-        h: "",
-        hl: "",
-        commitDuration: "",
-        commitRevealDuration: "",
-        setUpTime: "",
-    })
-    const [timeRemaining, setTimeRemaining] = useState<string>("")
-    const [participatedRoundsLength, setParticipatedRoundsLength] = useState<string>("")
+    const [timeRemaining, setTimeRemaining] = useState<string>("00:00:00")
+    const [participatedRoundsLength, setParticipatedRoundsLength] = useState<string>("0")
     const [participatedRounds, setParticipatedRounds] = useState<string[]>([])
     const [nextRound, setNextRound] = useState<string>("")
+    const [isRegistrationOpen, setIsRegistrationOpen] = useState<boolean>(false)
+    const [startRegistrationTimeForNextRound, setStartRegistrationTimeForNextRound] =
+        useState<string>("0")
+    const [prettyStartRegistrationTimeForNextRound, setPrettyStartRegistrationTimeForNextRound] =
+        useState<string>("1. 1. 오전 9:00:00")
+    const [prettyRegistrationDurationForNextRound, setPrettyRegistrationDurationForNextRound] =
+        useState<string>("00hrs 00min 00sec")
+    const [registrationDurationForNextRound, setRegistrationDurationForNextRound] =
+        useState<string>("")
     const dispatch = useNotification()
     function str_pad_left(string: number, pad: string, length: number) {
         return (new Array(length + 1).join(pad) + string).slice(-length)
@@ -51,67 +58,40 @@ export default function Home() {
         functionName: "getNextRound", //,
         params: {},
     })
-    async function getRankPointOfEachParticipantsFunction() {
-        setIsFetching(true)
-        const registerNextRoundOptions = {
-            abi: abi,
-            contractAddress: randomAirdropAddress!,
-            functionName: "registerNextRound",
-            params: {},
-        }
-        await registerNextRound({
-            params: registerNextRoundOptions,
-            onSuccess: handleSuccess,
-            onError: (error: any) => {
-                console.log(error)
-                setIsFetching(false)
-                dispatch({
-                    type: "error",
-                    message:
-                        error?.data && error.data.message?.includes("gas required exceeds")
-                            ? "already registered"
-                            : error?.error?.message && error.error.message != "execution reverted"
-                            ? error.error.message
-                            : error.error
-                            ? new ethers.utils.Interface(abi).parseError(
-                                  error.error.data.originalError.data
-                              ).name
-                            : error?.data?.message,
-                    title: "Error Message",
-                    position: "topR",
-                    icon: <Bell />, //"bell",
-                })
-            },
-        })
-    }
-    const handleSuccess = async function (tx: any) {
-        await tx.wait(1)
-        setIsFetching(false)
-        handleNewNotification()
-    }
-    const handleNewNotification = function () {
-        dispatch({
-            type: "info",
-            message: "Transaction Completed",
-            title: "Tx Notification",
-            position: "topR",
-            icon: <Bell />, //"bell",
-        })
-    }
+    const {
+        runContractFunction: getRegistrationDurationForNextRound, //
+    } = useWeb3Contract({
+        abi: abi,
+        contractAddress: randomAirdropAddress!, //,
+        functionName: "getRegistrationDurationForNextRound", //,
+        params: {},
+    })
+    const { runContractFunction: getStartRegistrationTimeForNextRound } = useWeb3Contract({
+        abi: abi,
+        contractAddress: randomAirdropAddress!, //,
+        functionName: "getStartRegistrationTimeForNextRound", //,
+        params: {},
+    })
     useInterval(() => {
-        let commitDurationInt
-        if (settedUpValues.commitDuration) {
-            commitDurationInt = parseInt(settedUpValues.commitDuration.toString())
-            if (commitDurationInt > 0) {
-                let _timeRemaing =
-                    commitDurationInt -
-                    (Math.floor(Date.now() / 1000) - parseInt(settedUpValues.setUpTime.toString()))
-                const minutes = Math.floor(_timeRemaing / 60)
-                const seconds = _timeRemaing - minutes * 60
-                if (_timeRemaing > -1)
-                    setTimeRemaining(
-                        str_pad_left(minutes, "0", 2) + ":" + str_pad_left(seconds, "0", 2)
-                    )
+        let registrationDurationForNextRoundInt = parseInt(registrationDurationForNextRound)
+        if (registrationDurationForNextRoundInt > 0) {
+            let _timeRemaing =
+                registrationDurationForNextRoundInt -
+                (Math.floor(Date.now() / 1000) - parseInt(startRegistrationTimeForNextRound))
+            if (_timeRemaing > -1) {
+                const hours = Math.floor(_timeRemaing / 3600)
+                const minutes = Math.floor((_timeRemaing - hours * 3600) / 60)
+                const seconds = _timeRemaing - hours * 3600 - minutes * 60
+                setTimeRemaining(
+                    str_pad_left(hours, "0", 2) +
+                        ":" +
+                        str_pad_left(minutes, "0", 2) +
+                        ":" +
+                        str_pad_left(seconds, "0", 2)
+                )
+                setIsRegistrationOpen(true)
+            } else {
+                setIsRegistrationOpen(false)
             }
         }
     }, 1000)
@@ -122,9 +102,7 @@ export default function Home() {
     }, [isWeb3Enabled, round])
     useInterval(() => {
         updateUI()
-    }, 12000)
-    // @ts-ignore
-    const { runContractFunction: getSetUpValuesAtRound } = useWeb3Contract()
+    }, 11500)
     const { runContractFunction: randomAirdropRound } = useWeb3Contract({
         abi: abi,
         contractAddress: randomAirdropAddress!, //,
@@ -139,115 +117,92 @@ export default function Home() {
     })
 
     async function updateUI() {
-        let roundFromCall = (await randomAirdropRound({
-            onError: (error) => console.log(error),
-        })) as BigNumberish
-        let nextRoundFromCall = (await getNextRound({
-            onError: (error) => console.log(error),
-        })) as BigNumberish
-        setNextRound(nextRoundFromCall?.toString())
-        if (roundFromCall === undefined) roundFromCall = 0
-        setRound(roundFromCall.toString())
-        const participantsLengthfromCallOptions = {
-            abi: abi,
-            contractAddress: randomAirdropAddress!,
-            functionName: "getParticipantsLengthAtRound",
-            params: { _round: nextRoundFromCall },
-        }
-        const participantsLengthfromCall = (await getParticipantsLengthAtRound({
-            params: participantsLengthfromCallOptions,
-            onError: (error) => console.log(error),
-        })) as BigNumberish
-        setParticipatedRoundsLength(participantsLengthfromCall?.toString())
-        const participatedRoundsfromCall = (await getParticipatedRounds({
-            onError: (error) => console.log(error),
-        })) as BigNumber[]
-        let temp = []
-
-        if (participatedRoundsfromCall) {
-            for (let i = 0; i < participatedRoundsfromCall.length; i++) {
-                temp.push(participatedRoundsfromCall[i].toString())
-            }
-            setParticipatedRounds(temp)
-        }
-        await getGetSetUpValuesAtRound(roundFromCall)
-    }
-    async function getGetSetUpValuesAtRound(roundFromCall: BigNumberish) {
-        const setUpValuesAtRoundOptions = {
-            abi: abi,
-            contractAddress: randomAirdropAddress!,
-            functionName: "getSetUpValuesAtRound",
-            params: { _round: roundFromCall },
-        }
-        const result: ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput =
-            (await getSetUpValuesAtRound({
-                params: setUpValuesAtRoundOptions,
+        if (randomAirdropAddress) {
+            let registrationDurationForNextRoundFromCall =
+                (await getRegistrationDurationForNextRound()) as BigNumberish
+            let startRegistrationTimeForNextRoundFromCall =
+                (await getStartRegistrationTimeForNextRound()) as BigNumberish
+            let roundFromCall = (await randomAirdropRound({
                 onError: (error) => console.log(error),
-            })) as ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput
-        if (result === undefined) return
-        setSettedUpValues({
-            T: result["T"].toString(),
-            n: result["n"]["val"].toString(),
-            nl: result["n"]["bitlen"].toString(),
-            g: result["g"]["val"].toString(),
-            gl: result["g"]["bitlen"].toString(),
-            h: result["h"]["val"].toString(),
-            hl: result["h"]["bitlen"].toString(),
-            commitDuration: result["commitDuration"].toString(),
-            commitRevealDuration: result["commitRevealDuration"].toString(),
-            setUpTime: result["setUpTime"].toString(),
-        })
+            })) as BigNumberish
+            let nextRoundFromCall = (await getNextRound({
+                onError: (error) => console.log(error),
+            })) as BigNumberish
+            setRegistrationDurationForNextRound(
+                registrationDurationForNextRoundFromCall?.toString()
+            )
+            const hours = Math.floor(
+                parseInt(registrationDurationForNextRoundFromCall?.toString()) / 3600
+            )
+            const minutes = Math.floor(
+                (parseInt(registrationDurationForNextRoundFromCall?.toString()) - hours * 3600) /
+                    60
+            )
+            const seconds =
+                parseInt(registrationDurationForNextRoundFromCall?.toString()) -
+                hours * 3600 -
+                minutes * 60
+            setPrettyRegistrationDurationForNextRound(
+                str_pad_left(hours, "0", 2) +
+                    "hrs " +
+                    str_pad_left(minutes, "0", 2) +
+                    "min " +
+                    str_pad_left(seconds, "0", 2) +
+                    "sec"
+            )
+            setStartRegistrationTimeForNextRound(
+                startRegistrationTimeForNextRoundFromCall.toString()
+            )
+            setPrettyStartRegistrationTimeForNextRound(
+                new Date(Number(startRegistrationTimeForNextRoundFromCall.toString()) * 1000)
+                    .toLocaleString()
+                    .slice(5)
+            )
+            setNextRound(nextRoundFromCall.toString())
+            if (roundFromCall === undefined) roundFromCall = 0
+            setRound(roundFromCall.toString())
+            const participantsLengthfromCallOptions = {
+                abi: abi,
+                contractAddress: randomAirdropAddress!,
+                functionName: "getParticipantsLengthAtRound",
+                params: { _round: nextRoundFromCall },
+            }
+            const participantsLengthfromCall = (await getParticipantsLengthAtRound({
+                params: participantsLengthfromCallOptions,
+                onError: (error) => console.log(error),
+            })) as BigNumberish
+            setParticipatedRoundsLength(participantsLengthfromCall?.toString())
+            const participatedRoundsfromCall = (await getParticipatedRounds({
+                onError: (error) => console.log(error),
+            })) as BigNumber[]
+            let temp = []
+
+            if (participatedRoundsfromCall) {
+                for (let i = 0; i < participatedRoundsfromCall.length; i++) {
+                    temp.push(participatedRoundsfromCall[i].toString())
+                }
+                setParticipatedRounds(temp)
+            }
+        }
     }
     return (
         <>
-            <Header />
-            <div className="bg-slate-50	opacity-80 min-h-screen bg-repeat-y bg-cover bg-center py-10">
-                <div
-                    style={{ minWidth: "852px" }}
-                    className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-amber-950 border-2"
-                >
-                    <Round round={round} />
-                    {randomAirdropAddress ? (
-                        <div>
-                            <div className="p-5">
-                                <div className="border-dashed border-amber-950 border-2 rounded-lg p-10">
-                                    <div className="mb-2 font-bold">
-                                        Register For Round{" "}
-                                        <span className="font-black">{nextRound}</span>
-                                    </div>
-                                    <button
-                                        id="enterEventByCommit"
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
-                                        disabled={isLoading || isFetching}
-                                        type="button"
-                                        onClick={getRankPointOfEachParticipantsFunction}
-                                    >
-                                        {isLoading || isFetching ? (
-                                            <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
-                                        ) : (
-                                            <div>Register</div>
-                                        )}
-                                    </button>
-                                    <div className="pt-2">
-                                        Number of participants registered :
-                                        <span className="font-bold">
-                                            {" "}
-                                            {participatedRoundsLength}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <RankOfEachParticipants
-                                    round={round}
-                                    participatedRounds={participatedRounds}
-                                />
-                            </div>
-                        </div>
-                    ) : (
-                        <div></div>
-                    )}
-                </div>
+            {" "}
+            <MainHeader />
+            <Register
+                participatedRoundsLength={participatedRoundsLength}
+                timeRemaining={timeRemaining}
+                registrationDurationForNextRound={prettyRegistrationDurationForNextRound}
+                startRegistrationTimeForNextRound={prettyStartRegistrationTimeForNextRound}
+                round={nextRound}
+                updateUI={updateUI}
+                isRegistrationOpen={isRegistrationOpen}
+            />
+            <div>
+                <RankOfEachParticipantsMain
+                    round={round}
+                    participatedRounds={participatedRounds}
+                />
             </div>
         </>
     )
