@@ -14,13 +14,13 @@
 import { useWeb3Contract } from "react-moralis"
 import { abi, contractAddresses as contractAddressesJSON } from "../constants"
 import { useMoralis } from "react-moralis"
-import { useState, Dispatch, SetStateAction } from "react"
+import { useState } from "react"
 import { createTestCases2 } from "../utils/testFunctions"
 import { Input, useNotification, Button, Bell } from "web3uikit"
 import SetModal from "./SetModal"
+import { ethers } from "ethers"
 
-export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
-    const [, updateState] = useState()
+export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
     const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
@@ -37,7 +37,9 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
     const [nValue, setNValue] = useState(JSON.stringify(setUpParams.n))
     const [setUpProofs, setSetUpProofs] = useState(JSON.stringify(setUpParams.setupProofs))
     const [commitDuration, setCommitDuration] = useState<string>("")
-    const [commitDurationState, setCommitDurationState] = useState<"initial" | "error" | "disabled" | "confirmed">("initial")
+    const [commitDurationState, setCommitDurationState] = useState<
+        "initial" | "error" | "disabled" | "confirmed"
+    >("initial")
 
     // @ts-ignore
     const { runContractFunction: setUp, isLoading, isFetching } = useWeb3Contract()
@@ -66,21 +68,32 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
             await setUp({
                 params: setUpOptions,
                 onSuccess: handleSuccess,
-                onError: (error:any) => {
+                onError: (error: any) => {
+                    console.log(error)
+                    const iface = new ethers.utils.Interface(abi)
+                    let errorMessage = ""
+                    if (error?.data?.data?.data) {
+                        errorMessage = iface.parseError(error?.data?.data?.data).name
+                    }
                     dispatch({
                         type: "error",
-                        message: error?.data?.message,
+                        message: error?.data?.data?.data
+                            ? errorMessage
+                            : error?.error?.message && error.error.message != "execution reverted"
+                            ? error.error.message
+                            : error?.data
+                            ? error?.data?.message
+                            : error?.message,
                         title: "Error Message",
                         position: "topR",
-                        icon: <Bell/>//"bell",
+                        icon: <Bell />,
                     })
-                    console.log(error)
                 },
             })
             await updateUI()
         }
     }
-    const handleSuccess = async function (tx:any) {
+    const handleSuccess = async function (tx: any) {
         await tx.wait(1)
         handleNewNotification()
     }
@@ -90,11 +103,11 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
             message: "Transaction Completed",
             title: "Tx Notification",
             position: "topR",
-            icon: <Bell/>
+            icon: <Bell />,
         })
     }
 
-    const setValue = function (jsonString:string) {
+    const setValue = function (jsonString: string) {
         if (isModalOpen) {
             if (jsonString) {
                 if (editItem === "n value") {
@@ -121,7 +134,10 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
 
     return (
         <div className="p-5" key="1">
-            <div className="border-dashed border-amber-950 border-2 rounded-lg p-10" key="bordercontainer">
+            <div
+                className="border-dashed border-amber-950 border-2 rounded-lg p-10"
+                key="bordercontainer"
+            >
                 <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr" key="h3">
                     Set Up
                 </h3>
@@ -185,7 +201,7 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
                     setValue={setValue}
                     setModalInputValue={setModalInputValue}
                     modalInputValue={modalInputValue}
-                    key = {editItem}
+                    key={editItem}
                 />
             </div>
         </div>

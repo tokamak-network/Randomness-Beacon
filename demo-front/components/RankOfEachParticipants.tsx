@@ -22,10 +22,18 @@ interface Result {
     addresses: string[]
     rankPoints: string[]
 }
-export default function RankOfEachParticipants({ round: currentRound = "0", participatedRounds }:{round:string, participatedRounds:string[]}) {
+export default function RankOfEachParticipants({
+    round: currentRound = "0",
+    participatedRounds,
+}: {
+    round: string
+    participatedRounds: string[]
+}) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
-    const [roundState, setRoundState] = useState<"initial" | "error" | "disabled" | "confirmed">("initial")
+    const [roundState, setRoundState] = useState<"initial" | "error" | "disabled" | "confirmed">(
+        "initial"
+    )
     const [round, setRound] = useState<string>("")
     const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
     const randomAirdropAddress =
@@ -34,11 +42,11 @@ export default function RankOfEachParticipants({ round: currentRound = "0", part
             : null
     const dispatch = useNotification()
     const [tableContents, setTableContents] = useState<string[][]>([])
-    
+
     const {
         runContractFunction: getRankPointOfEachParticipants,
         isLoading,
-        isFetching,// @ts-ignore
+        isFetching, // @ts-ignore
     } = useWeb3Contract()
     function validation() {
         if (round == undefined || round == "") {
@@ -58,29 +66,34 @@ export default function RankOfEachParticipants({ round: currentRound = "0", part
                 },
             }
 
-            let result:Result = await getRankPointOfEachParticipants({
+            let result: Result = (await getRankPointOfEachParticipants({
                 params: Options,
-                onError: (error :any) => {
+                onError: (error: any) => {
+                    console.log(error)
+                    const iface = new ethers.utils.Interface(abi)
+                    let errorMessage = ""
+                    if (error?.data?.data?.data) {
+                        errorMessage = iface.parseError(error?.data?.data?.data).name
+                    }
                     dispatch({
                         type: "error",
-                        message:
-                            error?.error?.message && error.error.message != "execution reverted"
-                                ? error.error.message
-                                : error.error
-                                ? new ethers.utils.Interface(abi).parseError(
-                                      error.error.data.originalError.data
-                                  ).name
-                                : error?.data?.message,
+                        message: error?.data?.data?.data
+                            ? errorMessage
+                            : error?.error?.message && error.error.message != "execution reverted"
+                            ? error.error.message
+                            : error?.data
+                            ? error?.data?.message
+                            : error?.message,
                         title: "Error Message",
                         position: "topR",
-                        icon: <Bell/>//"bell",
+                        icon: <Bell />,
                     })
                 },
-            }) as Result
+            })) as Result
             getTableContents(result)
         }
     }
-    const getTableContents = (result:Result) => {
+    const getTableContents = (result: Result) => {
         let _results = []
         if (result) {
             for (let i = 0; i < result.addresses.length; i++) {

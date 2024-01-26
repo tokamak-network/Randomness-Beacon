@@ -18,11 +18,13 @@ import { useState } from "react"
 import { createTestCases2 } from "../utils/testFunctions"
 import { Input, useNotification, Button, Bell } from "web3uikit"
 import SetModal from "./SetModal"
-//import {ethers} from "ethers"
+import { ethers } from "ethers"
 
-export default function Recover({ round: currentRound }:{round:string}) {
+export default function Recover({ round: currentRound }: { round: string }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
-    const [roundState, setRoundState] = useState<"error" | "initial" | "confirmed" | "disabled">("initial")
+    const [roundState, setRoundState] = useState<"error" | "initial" | "confirmed" | "disabled">(
+        "initial"
+    )
     const [round, setRound] = useState<string>("")
     const chainId = parseInt(chainIdHex!)
     const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
@@ -48,7 +50,6 @@ export default function Recover({ round: currentRound }:{round:string}) {
         return true
     }
     async function recoverFunction() {
-        
         // const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any");
         // await provider.send("eth_requestAccounts", []);
         // const signer = provider.getSigner();
@@ -56,7 +57,7 @@ export default function Recover({ round: currentRound }:{round:string}) {
         //const estimateGas = await randomAirdropContract.connect(signer).estimateGas.recover(parseInt(round), JSON.parse(recoveryProofs))
         // const tx = await randomAirdropContract.connect(signer).recover(parseInt(round), JSON.parse(recoveryProofs), {gasLimit:3000000})
         // console.log(await tx.wait())
-    
+
         if (validation()) {
             const recoveryOptions = {
                 abi: abi,
@@ -71,20 +72,31 @@ export default function Recover({ round: currentRound }:{round:string}) {
             await recover({
                 params: recoveryOptions,
                 onSuccess: handleSuccess,
-                onError: (error:any) => {
+                onError: (error: any) => {
                     console.log(error)
+                    const iface = new ethers.utils.Interface(abi)
+                    let errorMessage = ""
+                    if (error?.data?.data?.data) {
+                        errorMessage = iface.parseError(error?.data?.data?.data).name
+                    }
                     dispatch({
                         type: "error",
-                        message: error?.data?.message,
+                        message: error?.data?.data?.data
+                            ? errorMessage
+                            : error?.error?.message && error.error.message != "execution reverted"
+                            ? error.error.message
+                            : error?.data
+                            ? error?.data?.message
+                            : error?.message,
                         title: "Error Message",
                         position: "topR",
-                        icon: <Bell/>
+                        icon: <Bell />,
                     })
                 },
             })
         }
     }
-    const handleSuccess = async function (tx:any) {
+    const handleSuccess = async function (tx: any) {
         await tx.wait(1)
         handleNewNotification()
 
@@ -97,7 +109,7 @@ export default function Recover({ round: currentRound }:{round:string}) {
             message: "Transaction Completed",
             title: "Tx Notification",
             position: "topR",
-            icon: <Bell/>//"bell",
+            icon: <Bell />, //"bell",
         })
     }
 
@@ -108,7 +120,7 @@ export default function Recover({ round: currentRound }:{round:string}) {
     const onClose = function () {
         setIsModalOpen(false)
     }
-    const setValue = function (jsonString:string) {
+    const setValue = function (jsonString: string) {
         if (isModalOpen) {
             if (jsonString) {
                 if (editItem === "recoveryProofs") {
@@ -129,7 +141,7 @@ export default function Recover({ round: currentRound }:{round:string}) {
                     setValue={setValue}
                     setModalInputValue={setModalInputValue}
                     modalInputValue={modalInputValue}
-                    key = {editItem}
+                    key={editItem}
                 />
                 <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr">
                     Recover
