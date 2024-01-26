@@ -99,44 +99,54 @@ export function Register({
             <BackgroundImage className="-bottom-14 -top-36 " />
             <Container className="relative pb-3.5">
                 <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12 ">
-                    <h1 className="font-display text-5xl font-bold tracking-tighter text-blue-600 sm:text-7xl ">
-                        Register For TON Airdrop
-                    </h1>
-                    {isRegistrationOpen ? (
-                        <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-blue-900">
-                            <div>
-                                You are registering for round :{" "}
-                                <span className="font-semibold">{round}</span>
-                            </div>
-                        </div>
+                    {randomAirdropAddress ? (
+                        <>
+                            {" "}
+                            <h1 className="font-display text-5xl font-bold tracking-tighter text-blue-600 sm:text-7xl ">
+                                Register For TON Airdrop
+                            </h1>
+                            {isRegistrationOpen ? (
+                                <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-blue-900">
+                                    <div>
+                                        You are registering for round :{" "}
+                                        <span className="font-semibold">{round}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-red-900">
+                                    Registration is closed
+                                </div>
+                            )}
+                            <Button
+                                className={
+                                    "mt-10 w-full " + (isRegistrationOpen ? "" : "opacity-20")
+                                }
+                                disabled={isRegistrationOpen ? false : true}
+                                onClick={registerFunction}
+                            >
+                                Register
+                            </Button>
+                            <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 sm:mt-16 sm:gap-x-16 sm:gap-y-10 sm:text-center lg:auto-cols-auto lg:grid-flow-col lg:grid-cols-none lg:justify-start lg:text-left">
+                                {[
+                                    ["Registered", participatedRoundsLength],
+                                    ["Time Remaining", timeRemaining],
+                                    ["Duration", registrationDurationForNextRound],
+                                    [`Started At`, startRegistrationTimeForNextRound],
+                                ].map(([name, value]) => (
+                                    <div key={name}>
+                                        <dt className="font-mono text-sm text-blue-600">{name}</dt>
+                                        <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-blue-900">
+                                            {value}
+                                        </dd>
+                                    </div>
+                                ))}
+                            </dl>
+                        </>
                     ) : (
-                        <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-red-900">
-                            Registration is closed
-                        </div>
+                        <h2 className="py-4 px-4 font-bold text-2xl text-red-600 h-60">
+                            Connect to Sepolia, Titan or Set Hardhat Local Node
+                        </h2>
                     )}
-
-                    <Button
-                        className={"mt-10 w-full " + (isRegistrationOpen ? "" : "opacity-20")}
-                        disabled={isRegistrationOpen ? false : true}
-                        onClick={registerFunction}
-                    >
-                        Register
-                    </Button>
-                    <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 sm:mt-16 sm:gap-x-16 sm:gap-y-10 sm:text-center lg:auto-cols-auto lg:grid-flow-col lg:grid-cols-none lg:justify-start lg:text-left">
-                        {[
-                            ["Registered", participatedRoundsLength],
-                            ["Time Remaining", timeRemaining],
-                            ["Duration", registrationDurationForNextRound],
-                            [`Started At`, startRegistrationTimeForNextRound],
-                        ].map(([name, value]) => (
-                            <div key={name}>
-                                <dt className="font-mono text-sm text-blue-600">{name}</dt>
-                                <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-blue-900">
-                                    {value}
-                                </dd>
-                            </div>
-                        ))}
-                    </dl>
                 </div>
             </Container>
         </div>

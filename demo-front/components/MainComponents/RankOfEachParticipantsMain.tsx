@@ -120,47 +120,57 @@ export default function RankOfEachParticipantsMain({
         <>
             <section id="speakers" aria-labelledby="speakers-title" className="py-20  sm:py-32">
                 <Container>
-                    <div className="mx-auto max-w-2xl lg:mx-0">
-                        <h2
-                            id="speakers-title"
-                            className="font-display text-4xl font-medium tracking-tighter text-blue-600 sm:text-5xl"
-                        >
-                            Get Results
-                        </h2>
-                        <div className="mt-10 ml-1">
-                            <Input
-                                label="Round"
-                                type="number"
-                                placeholder={currentRound}
-                                id="round"
-                                validation={{ required: true, numberMax: Number(currentRound) }}
-                                onChange={(e) => setRound(e.target.value)}
-                                state={roundState}
-                                errorMessage="Round is required"
-                            />
-                        </div>
-                        {participatedRounds?.length > 0 ? (
-                            <div className="mt-6 ml-1 font-display text-xl tracking-tight text-blue-900">
-                                Rounds you've participated in :{" "}
-                                <span className="font-bold">{participatedRounds.toString()}</span>
+                    {randomAirdropAddress ? (
+                        <div className="mx-auto max-w-2xl lg:mx-0">
+                            <h2
+                                id="speakers-title"
+                                className="font-display text-4xl font-medium tracking-tighter text-blue-600 sm:text-5xl"
+                            >
+                                Get Results
+                            </h2>
+                            <div className="mt-10 ml-1">
+                                <Input
+                                    label="Round"
+                                    type="number"
+                                    placeholder={currentRound}
+                                    id="round"
+                                    validation={{
+                                        required: true,
+                                        numberMax: Number(currentRound),
+                                    }}
+                                    onChange={(e) => setRound(e.target.value)}
+                                    state={roundState}
+                                    errorMessage="Round is required"
+                                />
                             </div>
-                        ) : (
-                            <div></div>
-                        )}
-                        <button
-                            id="enterEventByCommit"
-                            className="mt-7 inline-flex justify-center rounded-2xl bg-blue-600 p-4 text-base font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:text-white/70"
-                            disabled={isLoading || isFetching}
-                            type="button"
-                            onClick={getRankPointOfEachParticipantsFunction}
-                        >
-                            {isLoading || isFetching ? (
-                                <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+                            {participatedRounds?.length > 0 ? (
+                                <div className="mt-6 ml-1 font-display text-xl tracking-tight text-blue-900">
+                                    Rounds you've participated in :{" "}
+                                    <span className="font-bold">
+                                        {participatedRounds.toString()}
+                                    </span>
+                                </div>
                             ) : (
-                                <div>Get Rank Point For All Participants</div>
+                                <div></div>
                             )}
-                        </button>
-                    </div>
+                            <button
+                                id="enterEventByCommit"
+                                className="mt-7 inline-flex justify-center rounded-2xl bg-blue-600 p-4 text-base font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:text-white/70"
+                                disabled={isLoading || isFetching}
+                                type="button"
+                                onClick={getRankPointOfEachParticipantsFunction}
+                            >
+                                {isLoading || isFetching ? (
+                                    <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+                                ) : (
+                                    <div>Get Rank Point For All Participants</div>
+                                )}
+                            </button>
+                        </div>
+                    ) : (
+                        <div></div>
+                    )}
+
                     {tableContents.length > 0 ? (
                         <div className="mt-7">
                             <Table
