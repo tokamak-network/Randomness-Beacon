@@ -86,7 +86,7 @@ def to_session_data_format(claim):
 def get_file_name_with_time(mode):
     # Format the current time as YYYYMMDD_HHMMSS
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"./testlog/data_{current_time}_{mode}.json"
+    file_name = f"./testLog/data_{current_time}_{mode}.json"
     
     return file_name
 

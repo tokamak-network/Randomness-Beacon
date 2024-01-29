@@ -74,7 +74,7 @@ def get_commit_reveal_values(contract, round_number):
     commit_reveal_values = []
     index = 0
     while True:
-        value = contract.functions.commitRevealValues(round_number, index).call()
+        value = contract.functions.getCommitRevealValues(round_number, index).call()
         # participantAddress가 '0x000...'인 경우 더 이상의 유효한 값이 없다고 간주
         if value[2] == '0x0000000000000000000000000000000000000000':
             break
@@ -124,9 +124,10 @@ def parse_setup_values_at_round(values_at_round):
         "commitDuration": values_at_round[1],
         "commitRevealDuration": values_at_round[2],
         "T": values_at_round[3],
-        "n": values_at_round[4],
-        "g": values_at_round[5],
-        "h": values_at_round[6]
+        "proofSize" : values_at_round[4],
+        "n": values_at_round[5],
+        "g": values_at_round[6],
+        "h": values_at_round[7]
     }
 
 
@@ -144,18 +145,18 @@ def get_contract_values(round=None):
     if(round==None):
         """Read and return specific values from the smart contract."""
         print('\n[+] There no input for option \'round\' so fetch the round information from the contract .... \n')
-        round_info = contract.functions.raffleRound().call()
+        round_info = contract.functions.randomAirdropRound().call()
         
     else:
         round_info = round
 
     # valuesAtRound 정보 가져오기 및 파싱
-    raw_general_values_at_round = contract.functions.valuesAtRound(round_info).call()
+    raw_general_values_at_round = contract.functions.getValuesAtRound(round_info).call()
     genearl_values_at_round = parse_general_values_at_round(raw_general_values_at_round)
     stage = get_stage(genearl_values_at_round['stage'])
     # print('genearl_values_at_round: ', genearl_values_at_round)
     
-    raw_setup_values_at_round = contract.functions.setUpValuesAtRound(round_info).call()
+    raw_setup_values_at_round = contract.functions.getSetUpValuesAtRound(round_info).call()
     setup_values_at_round = parse_setup_values_at_round(raw_setup_values_at_round)
     # print('genearl_values_at_round: ', print(setup_values_at_round))
     
