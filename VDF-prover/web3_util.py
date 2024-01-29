@@ -70,7 +70,7 @@ def setup_contract(web3, contract_details):
     
 
 def get_commit_reveal_values(contract, round_number):
-    """Retrieve all CommitRevealValues for a given round until an empty participant address is found."""
+    """Retrieve all getCommitRevealValues for a given round until an empty participant address is found."""
     commit_reveal_values = []
     index = 0
     while True:
@@ -124,7 +124,10 @@ def parse_setup_values_at_round(values_at_round):
         "commitDuration": values_at_round[1],
         "commitRevealDuration": values_at_round[2],
         "T": values_at_round[3],
+<<<<<<< HEAD
         "proofSize" : values_at_round[4],
+=======
+>>>>>>> deea78672507674db45c760ba8cfd18a60d10d2e
         "n": values_at_round[5],
         "g": values_at_round[6],
         "h": values_at_round[7]
@@ -150,20 +153,24 @@ def get_contract_values(round=None):
     else:
         round_info = round
 
+<<<<<<< HEAD
     # valuesAtRound 정보 가져오기 및 파싱
+=======
+    # getValuesAtRound 정보 가져오기 및 파싱
+>>>>>>> deea78672507674db45c760ba8cfd18a60d10d2e
     raw_general_values_at_round = contract.functions.getValuesAtRound(round_info).call()
     genearl_values_at_round = parse_general_values_at_round(raw_general_values_at_round)
     stage = get_stage(genearl_values_at_round['stage'])
+    print("stage", stage)
     # print('genearl_values_at_round: ', genearl_values_at_round)
     
     raw_setup_values_at_round = contract.functions.getSetUpValuesAtRound(round_info).call()
     setup_values_at_round = parse_setup_values_at_round(raw_setup_values_at_round)
     # print('genearl_values_at_round: ', print(setup_values_at_round))
-    
     genearl_values_at_round.update(setup_values_at_round)
     values_at_round = genearl_values_at_round
 
-    # commitRevealValues 정보 가져오기 및 파싱
+    # getCommitRevealValues 정보 가져오기 및 파싱
     commit_reveal_values = get_commit_reveal_values(contract, round_info)
     commits = parse_commits(commit_reveal_values)
 

@@ -1,35 +1,37 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-/demo-front2/.env
-/demo-front2/.encryptedKey.json
+/demo-front/.env
+/demo-front/.encryptedKey.json
 
 # dependencies
-/demo-front2/node_modules
-/demo-front2/.pnp
-/demo-front2/.pnp.js
+/demo-front/node_modules
+/demo-front/.pnp
+/demo-front/.pnp.js
 
 # testing
-/demo-front2/coverage
+/demo-front/coverage
 
 # next.js
-/demo-front2/.next/
-/demo-front2/out/
+/demo-front/.next/
+/demo-front/out/
 
 # production
-/demo-front2/build
+/demo-front/build
 
 # misc
-/demo-front2.DS_Store
-/demo-front2*.pem
+/demo-front/.DS_Store
+/demo-front/*.pem
 
 # debug
-/demo-front2npm-debug.log*
-/demo-front2yarn-debug.log*
-/demo-front2yarn-error.log*
-/demo-front2.pnpm-debug.log*
+/demo-fron/tnpm-debug.log*
+/demo-front/yarn-debug.log*
+/demo-front/yarn-error.log*
+/demo-front/.pnpm-debug.log*
 
 # local env files
-/demo-front2.env*.local
+/demo-front/.env*.local
 
 # vercel
-/demo-front2.vercel
+/demo-front/.vercel
 VDF-prover/__pycache__/web3_util.cpython-310.pyc
+
+.DS_Store
