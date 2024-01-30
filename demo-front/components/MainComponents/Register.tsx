@@ -11,13 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { useMoralis, useWeb3Contract } from "react-moralis"
+import { useMoralis } from "react-moralis"
 import { BackgroundImage } from "./BackgroundImage"
 import { Button } from "./Button"
 import { Container } from "./Container"
 import { abi, contractAddresses as contractAddressesJSON } from "../../constants"
 import { useNotification, Bell } from "web3uikit"
 import { ethers } from "ethers"
+import { useState } from "react"
+import { decodeError } from "ethers-decode-error"
 
 export function Register({
     participatedRoundsLength,
@@ -38,52 +40,44 @@ export function Register({
 }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
+    const [isFetching, setIsFetching] = useState<boolean>(false)
     const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+
     const randomAirdropAddress =
         chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
             : null
     const dispatch = useNotification()
-    const {
-        runContractFunction: registerForNextRound,
-        isLoading,
-        isFetching,
-    } = useWeb3Contract({
-        abi: abi,
-        contractAddress: randomAirdropAddress!,
-        functionName: "registerForNextRound",
-        params: {},
-    })
     async function registerFunction() {
-        await registerForNextRound({
-            onSuccess: handleSuccess,
-            onError: (error: any) => {
-                console.log(error)
-                const iface = new ethers.utils.Interface(abi)
-                let errorMessage = ""
-                if (error?.data?.data?.data) {
-                    errorMessage = iface.parseError(error?.data?.data?.data).name
-                }
-                dispatch({
-                    type: "error",
-                    message: error?.data?.data?.data
-                        ? errorMessage
-                        : error?.error?.message && error.error.message != "execution reverted"
-                        ? error.error.message
-                        : error?.data
-                        ? error?.data?.message
-                        : error?.message,
-                    title: "Error Message",
-                    position: "topR",
-                    icon: <Bell />,
-                })
-            },
-        })
-        await updateUI()
+        setIsFetching(true)
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
+        // Prompt user for account connections
+        await provider.send("eth_requestAccounts", [])
+        const signer = provider.getSigner()
+        const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+        try {
+            const tx = await randomAirdropContract
+                .connect(signer)
+                .registerForNextRound({ gasLimit: 150000 })
+            await handleSuccess(tx)
+            await updateUI()
+        } catch (error: any) {
+            console.log(error.message)
+            const decodedError = decodeError(decodeError(error))
+            dispatch({
+                type: "error",
+                message: decodedError.error,
+                title: "Error Message",
+                position: "topR",
+                icon: <Bell />,
+            })
+            setIsFetching(false)
+        }
     }
     const handleSuccess = async function (tx: any) {
         await tx.wait(1)
         handleNewNotification()
+        setIsFetching(false)
     }
     const handleNewNotification = function () {
         dispatch({
@@ -98,7 +92,7 @@ export function Register({
         <div className="relative py-20 sm:pb-24 sm:pt-36">
             <BackgroundImage className="-bottom-14 -top-36 " />
             <Container className="relative pb-3.5">
-                <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12 ">
+                <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
                     {randomAirdropAddress ? (
                         <>
                             {" "}
@@ -124,7 +118,11 @@ export function Register({
                                 disabled={isRegistrationOpen ? false : true}
                                 onClick={registerFunction}
                             >
-                                Register
+                                {isFetching ? (
+                                    <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+                                ) : (
+                                    <div>Register</div>
+                                )}
                             </Button>
                             <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 sm:mt-16 sm:gap-x-16 sm:gap-y-10 sm:text-center lg:auto-cols-auto lg:grid-flow-col lg:grid-cols-none lg:justify-start lg:text-left">
                                 {[
@@ -144,7 +142,7 @@ export function Register({
                         </>
                     ) : (
                         <h2 className="py-4 px-4 font-bold text-2xl text-red-600 h-60">
-                            Connect to Sepolia, Titan or Set Hardhat Local Node
+                            Connect to Sepolia, Titan, Titan-Goerli or Set Hardhat Local Node
                         </h2>
                     )}
                 </div>

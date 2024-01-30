@@ -19,6 +19,7 @@ import { createTestCases2 } from "../utils/testFunctions"
 import { Input, useNotification, Button, Bell } from "web3uikit"
 import SetModal from "./SetModal"
 import { ethers } from "ethers"
+import { decodeError } from "ethers-decode-error"
 
 export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
@@ -37,12 +38,13 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
     const [nValue, setNValue] = useState(JSON.stringify(setUpParams.n))
     const [setUpProofs, setSetUpProofs] = useState(JSON.stringify(setUpParams.setupProofs))
     const [commitDuration, setCommitDuration] = useState<string>("")
+    const [isFetching, setIsFetching] = useState<boolean>(false)
     const [commitDurationState, setCommitDurationState] = useState<
         "initial" | "error" | "disabled" | "confirmed"
     >("initial")
 
     // @ts-ignore
-    const { runContractFunction: setUp, isLoading, isFetching } = useWeb3Contract()
+    const { runContractFunction: setUp } = useWeb3Contract()
     function validation() {
         if (commitDuration == undefined || commitDuration == "" || commitDuration == "0") {
             setCommitDurationState("error")
@@ -53,6 +55,7 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
 
     async function setUpFunction() {
         if (validation()) {
+            setIsFetching(true)
             const setUpOptions = {
                 abi: abi,
                 contractAddress: randomAirdropAddress!,
@@ -64,38 +67,41 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
                     _proofs: JSON.parse(setUpProofs),
                 },
             }
-
-            await setUp({
-                params: setUpOptions,
-                onSuccess: handleSuccess,
-                onError: (error: any) => {
-                    console.log(error)
-                    const iface = new ethers.utils.Interface(abi)
-                    let errorMessage = ""
-                    if (error?.data?.data?.data) {
-                        errorMessage = iface.parseError(error?.data?.data?.data).name
-                    }
-                    dispatch({
-                        type: "error",
-                        message: error?.data?.data?.data
-                            ? errorMessage
-                            : error?.error?.message && error.error.message != "execution reverted"
-                            ? error.error.message
-                            : error?.data
-                            ? error?.data?.message
-                            : error?.message,
-                        title: "Error Message",
-                        position: "topR",
-                        icon: <Bell />,
-                    })
-                },
-            })
+            const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
+            // Prompt user for account connections
+            await provider.send("eth_requestAccounts", [])
+            const signer = provider.getSigner()
+            const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+            try {
+                const tx = await randomAirdropContract
+                    .connect(signer)
+                    .setUp(
+                        parseInt(commitDuration),
+                        parseInt(commitDuration) + 1,
+                        JSON.parse(nValue),
+                        JSON.parse(setUpProofs),
+                        { gasLimit: 14000000 }
+                    )
+                await handleSuccess(tx)
+            } catch (error: any) {
+                console.log(error.message)
+                const decodedError = decodeError(decodeError(error))
+                dispatch({
+                    type: "error",
+                    message: decodedError.error,
+                    title: "Error Message",
+                    position: "topR",
+                    icon: <Bell />,
+                })
+                setIsFetching(false)
+            }
             await updateUI()
         }
     }
     const handleSuccess = async function (tx: any) {
         await tx.wait(1)
         handleNewNotification()
+        setIsFetching(false)
     }
     const handleNewNotification = function () {
         dispatch({
@@ -135,7 +141,7 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
     return (
         <div className="p-5" key="1">
             <div
-                className="border-dashed border-amber-950 border-2 rounded-lg p-10"
+                className="border-dashed border-slate-300 border-2 rounded-lg p-10"
                 key="bordercontainer"
             >
                 <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr" key="h3">
@@ -182,11 +188,11 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
                 <button
                     id="set-up"
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
-                    disabled={isLoading || isFetching}
+                    disabled={isFetching}
                     type="button"
                     onClick={setUpFunction}
                 >
-                    {isLoading || isFetching ? (
+                    {isFetching ? (
                         <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                     ) : (
                         <div>SetUp</div>

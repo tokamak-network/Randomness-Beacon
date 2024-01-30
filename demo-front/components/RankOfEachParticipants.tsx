@@ -117,7 +117,7 @@ export default function RankOfEachParticipants({
     }
     return (
         <div className="p-5">
-            <div className="border-dashed border-amber-950 border-2 rounded-lg p-10">
+            <div className="border-dashed border-slate-300 border-2 rounded-lg p-10">
                 <div className="mb-2 font-bold">Get Results</div>
                 <div className="mt-5">
                     <Input

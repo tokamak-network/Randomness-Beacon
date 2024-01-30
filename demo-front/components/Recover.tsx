@@ -19,12 +19,14 @@ import { createTestCases2 } from "../utils/testFunctions"
 import { Input, useNotification, Button, Bell } from "web3uikit"
 import SetModal from "./SetModal"
 import { ethers } from "ethers"
+import { decodeError } from "ethers-decode-error"
 
 export default function Recover({ round: currentRound }: { round: string }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const [roundState, setRoundState] = useState<"error" | "initial" | "confirmed" | "disabled">(
         "initial"
     )
+    const [isFetching, setIsFetching] = useState<boolean>(false)
     const [round, setRound] = useState<string>("")
     const chainId = parseInt(chainIdHex!)
     const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
@@ -35,7 +37,7 @@ export default function Recover({ round: currentRound }: { round: string }) {
     const recoverParams = createTestCases2()[0]
     const dispatch = useNotification()
     // @ts-ignore
-    const { runContractFunction: recover, isLoading, isFetching } = useWeb3Contract()
+    const { runContractFunction: recover } = useWeb3Contract()
     const [editItem, setEditItem] = useState<string>("")
     const [modalInputValue, setModalInputValue] = useState("")
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -50,56 +52,36 @@ export default function Recover({ round: currentRound }: { round: string }) {
         return true
     }
     async function recoverFunction() {
-        // const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any");
-        // await provider.send("eth_requestAccounts", []);
-        // const signer = provider.getSigner();
-        // const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider);
-        //const estimateGas = await randomAirdropContract.connect(signer).estimateGas.recover(parseInt(round), JSON.parse(recoveryProofs))
-        // const tx = await randomAirdropContract.connect(signer).recover(parseInt(round), JSON.parse(recoveryProofs), {gasLimit:3000000})
-        // console.log(await tx.wait())
-
         if (validation()) {
-            const recoveryOptions = {
-                abi: abi,
-                contractAddress: randomAirdropAddress!,
-                functionName: "recover",
-                params: {
-                    _round: parseInt(round),
-                    proofs: JSON.parse(recoveryProofs),
-                },
+            setIsFetching(true)
+            const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
+            // Prompt user for account connections
+            await provider.send("eth_requestAccounts", [])
+            const signer = provider.getSigner()
+            const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+            try {
+                const tx = await randomAirdropContract
+                    .connect(signer)
+                    .recover(parseInt(round), JSON.parse(recoveryProofs), { gasLimit: 14000000 })
+                await handleSuccess(tx)
+            } catch (error: any) {
+                console.log(error.message)
+                const decodedError = decodeError(decodeError(error))
+                dispatch({
+                    type: "error",
+                    message: decodedError.error,
+                    title: "Error Message",
+                    position: "topR",
+                    icon: <Bell />,
+                })
+                setIsFetching(false)
             }
-
-            await recover({
-                params: recoveryOptions,
-                onSuccess: handleSuccess,
-                onError: (error: any) => {
-                    console.log(error)
-                    const iface = new ethers.utils.Interface(abi)
-                    let errorMessage = ""
-                    if (error?.data?.data?.data) {
-                        errorMessage = iface.parseError(error?.data?.data?.data).name
-                    }
-                    dispatch({
-                        type: "error",
-                        message: error?.data?.data?.data
-                            ? errorMessage
-                            : error?.error?.message && error.error.message != "execution reverted"
-                            ? error.error.message
-                            : error?.data
-                            ? error?.data?.message
-                            : error?.message,
-                        title: "Error Message",
-                        position: "topR",
-                        icon: <Bell />,
-                    })
-                },
-            })
         }
     }
     const handleSuccess = async function (tx: any) {
         await tx.wait(1)
         handleNewNotification()
-
+        setIsFetching(false)
         //updateUI()
     }
     //async function updateUI() {}
@@ -133,7 +115,7 @@ export default function Recover({ round: currentRound }: { round: string }) {
 
     return (
         <div className="p-5 mb-5">
-            <div className="border-dashed border-amber-950 border-2 rounded-lg p-10">
+            <div className="border-dashed border-slate-300 border-2 rounded-lg p-10">
                 <SetModal
                     editItem={editItem}
                     isModalOpen={isModalOpen}
@@ -173,11 +155,11 @@ export default function Recover({ round: currentRound }: { round: string }) {
                 </div>
                 <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-5"
-                    disabled={isLoading || isFetching}
+                    disabled={isFetching}
                     type="submit"
                     onClick={recoverFunction}
                 >
-                    {isLoading || isFetching ? (
+                    {isFetching ? (
                         <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                     ) : (
                         <div>Recover</div>
