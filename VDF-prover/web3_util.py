@@ -124,6 +124,10 @@ def parse_setup_values_at_round(values_at_round):
         "commitDuration": values_at_round[1],
         "commitRevealDuration": values_at_round[2],
         "T": values_at_round[3],
+<<<<<<< HEAD
+        "proofSize" : values_at_round[4],
+=======
+>>>>>>> deea78672507674db45c760ba8cfd18a60d10d2e
         "n": values_at_round[5],
         "g": values_at_round[6],
         "h": values_at_round[7]
@@ -149,7 +153,11 @@ def get_contract_values(round=None):
     else:
         round_info = round
 
+<<<<<<< HEAD
+    # valuesAtRound 정보 가져오기 및 파싱
+=======
     # getValuesAtRound 정보 가져오기 및 파싱
+>>>>>>> deea78672507674db45c760ba8cfd18a60d10d2e
     raw_general_values_at_round = contract.functions.getValuesAtRound(round_info).call()
     genearl_values_at_round = parse_general_values_at_round(raw_general_values_at_round)
     stage = get_stage(genearl_values_at_round['stage'])
