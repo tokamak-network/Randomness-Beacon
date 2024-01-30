@@ -136,12 +136,12 @@ export default function Home() {
             <div className="bg-slate-50	opacity-80 min-h-screen bg-repeat-y bg-cover bg-center py-10">
                 <div
                     style={{ minWidth: "852px" }}
-                    className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-amber-950 border-2"
+                    className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-slate-300 border-2"
                 >
                     <Round round={round} />
                     {randomAirdropAddress ? (
                         <div>
-                            <div className="border-dashed border-amber-950 border-2 rounded-lg m-5 truncate hover:text-clip ">
+                            <div className="border-dashed border-slate-300 border-2 rounded-lg m-5 truncate hover:text-clip ">
                                 <div className="mt-10 ml-10 font-bold">Current Round Info</div>
                                 {settedUpValues ? (
                                     <div
@@ -182,11 +182,16 @@ export default function Home() {
                                                 title="COMMIT DURATION"
                                             ></Widget>
                                             <Widget
-                                                info={new Date(
-                                                    Number(settedUpValues.setUpTime) * 1000
-                                                )
-                                                    .toLocaleString()
-                                                    .slice(5)}
+                                                info={
+                                                    settedUpValues.setUpTime
+                                                        ? new Date(
+                                                              Number(settedUpValues.setUpTime) *
+                                                                  1000
+                                                          )
+                                                              .toLocaleString()
+                                                              .slice(5)
+                                                        : "1. 1. 오전 9:00:00"
+                                                }
                                                 title="STARTED AT"
                                             />
                                         </section>

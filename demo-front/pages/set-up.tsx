@@ -14,7 +14,7 @@ import StartRegistration from "../components/StartRegistration"
 
 export default function SetUpPage() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
-    const [nowTime, setNowTime] = useState(new Date())
+    const [nowTime, setNowTime] = useState<Date>()
     const chainId = parseInt(chainIdHex!)
     const contractAddresses: { [key: string]: string[] } = randomAirdropAddressJSON
     const randomAirdropAddress =
@@ -90,11 +90,11 @@ export default function SetUpPage() {
         <>
             <Header />
             <div className="bg-slate-50 py-10">
-                <div className="w-6/12 container mx-auto bg-white rounded-3xl border-dashed border-amber-950 border-2">
+                <div className="w-6/12 container mx-auto bg-white rounded-3xl border-dashed border-slate-300 border-2">
                     <Round round={round} />
                     {randomAirdropAddress ? (
                         <div>
-                            <div className="border-dashed border-amber-950 border-2 rounded-lg p-10 m-5 truncate hover:text-clip">
+                            <div className="border-dashed border-slate-300 border-2 rounded-lg p-10 m-5 truncate hover:text-clip">
                                 <div key="Round">Round: {round}</div>
                                 <div key="T">T: {settedUpValues.T}</div>
                                 <div key="n">n: {settedUpValues.n}</div>
@@ -119,8 +119,8 @@ export default function SetUpPage() {
                                 </div>
                                 <div key="current date">
                                     current date
-                                    {nowTime.toLocaleDateString()}
-                                    {nowTime.toLocaleTimeString()}
+                                    {nowTime ? nowTime.toLocaleDateString() : ""}
+                                    {nowTime ? nowTime.toLocaleTimeString() : ""}
                                 </div>
                                 <div key="commitEndTime">
                                     commit end time

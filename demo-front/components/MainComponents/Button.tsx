@@ -2,8 +2,10 @@ import Link from "next/link"
 import clsx from "clsx"
 
 type ButtonProps =
-    | (React.ComponentPropsWithoutRef<"button"> & { href?: undefined; className?: string })
-    | (React.ComponentPropsWithoutRef<typeof Link> & { className?: string })
+    | React.ComponentPropsWithoutRef<"button"> & {
+          href?: undefined
+          className?: string
+      }
 
 export function Button({ className, ...props }: ButtonProps) {
     className = clsx(
