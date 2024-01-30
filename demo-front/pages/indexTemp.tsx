@@ -10,6 +10,7 @@ import { BigNumber, BigNumberish, ethers } from "ethers"
 import { SettedUpValues } from "../typechain-types/RandomAirdrop"
 import { ICommitRevealRecoverRNG } from "../typechain-types/RandomAirdrop"
 import Header from "../components/Header"
+import { decodeError } from "ethers-decode-error"
 
 export default function Home() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
@@ -40,8 +41,9 @@ export default function Home() {
     function str_pad_left(string: number, pad: string, length: number) {
         return (new Array(length + 1).join(pad) + string).slice(-length)
     }
+
     // @ts-ignore
-    const { runContractFunction: registerNextRound, isLoading } = useWeb3Contract()
+    const { runContractFunction: registerNextRound } = useWeb3Contract()
     const [isFetching, setIsFetching] = useState(false)
     // @ts-ignore
     const { runContractFunction: getParticipantsLengthAtRound } = useWeb3Contract()
@@ -59,30 +61,28 @@ export default function Home() {
             functionName: "registerNextRound",
             params: {},
         }
-        await registerNextRound({
-            params: registerNextRoundOptions,
-            onSuccess: handleSuccess,
-            onError: (error: any) => {
-                console.log(error)
-                setIsFetching(false)
-                dispatch({
-                    type: "error",
-                    message:
-                        error?.data && error.data.message?.includes("gas required exceeds")
-                            ? "already registered"
-                            : error?.error?.message && error.error.message != "execution reverted"
-                            ? error.error.message
-                            : error.error
-                            ? new ethers.utils.Interface(abi).parseError(
-                                  error.error.data.originalError.data
-                              ).name
-                            : error?.data?.message,
-                    title: "Error Message",
-                    position: "topR",
-                    icon: <Bell />, //"bell",
-                })
-            },
-        })
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
+        // Prompt user for account connections
+        await provider.send("eth_requestAccounts", [])
+        const signer = provider.getSigner()
+        const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+        try {
+            const tx = await randomAirdropContract
+                .connect(signer)
+                .registerNextRound({ gasLimit: 120000 })
+            await handleSuccess(tx)
+        } catch (error: any) {
+            console.log(error.message)
+            const decodedError = decodeError(decodeError(error))
+            dispatch({
+                type: "error",
+                message: decodedError.error,
+                title: "Error Message",
+                position: "topR",
+                icon: <Bell />,
+            })
+            setIsFetching(false)
+        }
     }
     const handleSuccess = async function (tx: any) {
         await tx.wait(1)
@@ -204,13 +204,13 @@ export default function Home() {
             <div className="bg-slate-50	opacity-80 min-h-screen bg-repeat-y bg-cover bg-center py-10">
                 <div
                     style={{ minWidth: "852px" }}
-                    className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-amber-950 border-2"
+                    className="bg-white	container mx-auto w-6/12 rounded-3xl border-dashed border-slate-300 border-2"
                 >
                     <Round round={round} />
                     {randomAirdropAddress ? (
                         <div>
                             <div className="p-5">
-                                <div className="border-dashed border-amber-950 border-2 rounded-lg p-10">
+                                <div className="border-dashed border-slate-300 border-2 rounded-lg p-10">
                                     <div className="mb-2 font-bold">
                                         Register For Round{" "}
                                         <span className="font-black">{nextRound}</span>
@@ -218,11 +218,11 @@ export default function Home() {
                                     <button
                                         id="enterEventByCommit"
                                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
-                                        disabled={isLoading || isFetching}
+                                        disabled={isFetching}
                                         type="button"
                                         onClick={getRankPointOfEachParticipantsFunction}
                                     >
-                                        {isLoading || isFetching ? (
+                                        {isFetching ? (
                                             <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                                         ) : (
                                             <div>Register</div>
