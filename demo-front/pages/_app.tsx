@@ -3,11 +3,10 @@ import { MoralisProvider } from "react-moralis"
 import { NotificationProvider } from "web3uikit"
 import type { AppProps } from "next/app"
 import Head from "next/head"
-import Header from "../components/Header"
 
 function MyApp({ Component, pageProps }: AppProps) {
     return (
-        <>       
+        <>
             <MoralisProvider initializeOnMount={false}>
                 <NotificationProvider>
                     <Head>
@@ -15,7 +14,6 @@ function MyApp({ Component, pageProps }: AppProps) {
                         <meta name="description" content="RandomAirdrop using Commit-Recover" />
                         <link rel="icon" href="../tokamaklogo.png" />
                     </Head>
-                    <Header />
                     <Component {...pageProps} />
                 </NotificationProvider>
             </MoralisProvider>

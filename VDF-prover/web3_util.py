@@ -150,7 +150,6 @@ def get_contract_values(round=None):
     else:
         round_info = round
 
-
     # getValuesAtRound 정보 가져오기 및 파싱
     raw_general_values_at_round = contract.functions.getValuesAtRound(round_info).call()
     genearl_values_at_round = parse_general_values_at_round(raw_general_values_at_round)

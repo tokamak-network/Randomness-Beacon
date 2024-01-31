@@ -6,13 +6,15 @@ import { useWeb3Contract } from "react-moralis"
 import { abi, contractAddresses as randomAirdropAddressJSON } from "../constants"
 import Recover from "../components/Recover"
 import { useInterval } from "use-interval"
-import {BigNumberish} from "ethers"
+import { BigNumberish } from "ethers"
 import { SettedUpValues } from "../typechain-types/RandomAirdrop"
-import {ICommitRevealRecoverRNG} from "../typechain-types/RandomAirdrop"
+import { ICommitRevealRecoverRNG } from "../typechain-types/RandomAirdrop"
+import Header from "../components/Header"
+import StartRegistration from "../components/StartRegistration"
 
 export default function SetUpPage() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
-    const [nowTime, setNowTime] = useState(new Date())
+    const [nowTime, setNowTime] = useState<Date>()
     const chainId = parseInt(chainIdHex!)
     const contractAddresses: { [key: string]: string[] } = randomAirdropAddressJSON
     const randomAirdropAddress =
@@ -21,8 +23,6 @@ export default function SetUpPage() {
             : null
 
     let [round, setRound] = useState<string>("")
-    const [isSetUp, setIsSetUp] = useState(false)
-    const [isCommit, setIsCommit] = useState(false)
     const [settedUpValues, setSettedUpValues] = useState<SettedUpValues>({
         T: "",
         n: "",
@@ -35,7 +35,6 @@ export default function SetUpPage() {
         commitRevealDuration: "",
         setUpTime: "",
     })
-    const [started, setStarted] = useState("")
     useInterval(() => {
         setNowTime(new Date())
     }, 1000)
@@ -55,32 +54,24 @@ export default function SetUpPage() {
     })
 
     async function updateUI() {
-        const roundFromCall = (
-            await randomAirdropRound({ onError: (error) => console.log(error) })
-        ) as BigNumberish
+        const roundFromCall = (await randomAirdropRound({
+            onError: (error) => console.log(error),
+        })) as BigNumberish
         setRound(roundFromCall.toString())
         await getGetSetUpValuesAtRound(roundFromCall)
-        if (settedUpValues.setUpTime !== undefined && settedUpValues.setUpTime != "0") {
-            setIsSetUp(true)
-            setIsCommit(true)
-            setStarted("Started!")
-        } else {
-            setIsSetUp(false)
-            setIsCommit(true)
-            setStarted("Not Started")
-        }
     }
-    async function getGetSetUpValuesAtRound(roundFromCall:BigNumberish) {
+    async function getGetSetUpValuesAtRound(roundFromCall: BigNumberish) {
         const setUpValuesAtRoundOptions = {
             abi: abi,
             contractAddress: randomAirdropAddress!,
             functionName: "getSetUpValuesAtRound",
             params: { _round: roundFromCall },
         }
-        const result:ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput = await getSetUpValuesAtRound({
-            params: setUpValuesAtRoundOptions,
-            onError: (error) => console.log(error),
-        }) as ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput
+        const result: ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput =
+            (await getSetUpValuesAtRound({
+                params: setUpValuesAtRoundOptions,
+                onError: (error) => console.log(error),
+            })) as ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput
         if (result === undefined) return
         setSettedUpValues({
             T: result["T"].toString(),
@@ -96,51 +87,62 @@ export default function SetUpPage() {
         })
     }
     return (
-        <div className="bg-slate-50 py-10">
-            <div className="w-6/12 container mx-auto bg-white rounded-3xl border-dashed border-amber-950 border-2">
-                <Round round={round} />
-                {randomAirdropAddress ? (
-                    <div>
-                        <div className="border-dashed border-amber-950 border-2 rounded-lg p-10 m-5 truncate hover:text-clip">
-                            <div key="Round">Round: {round}</div>
-                            <div key="T">T: {settedUpValues.T}</div>
-                            <div key="n">n: {settedUpValues.n}</div>
-                            <div key="g">g: {settedUpValues.g}</div>
-                            <div key="h">h: {settedUpValues.h}</div>
-                            <div key="commitDuration">commitDuration: {settedUpValues.commitDuration} seconds</div>
-                            <div key="commitRevealDuration">
-                                commitRevealDuration: {settedUpValues.commitRevealDuration} seconds
+        <>
+            <Header />
+            <div className="bg-slate-50 py-10">
+                <div className="w-6/12 container mx-auto bg-white rounded-3xl border-dashed border-slate-300 border-2">
+                    <Round round={round} />
+                    {randomAirdropAddress ? (
+                        <div>
+                            <div className="border-dashed border-slate-300 border-2 rounded-lg p-10 m-5 truncate hover:text-clip">
+                                <div key="Round">Round: {round}</div>
+                                <div key="T">T: {settedUpValues.T}</div>
+                                <div key="n">n: {settedUpValues.n}</div>
+                                <div key="g">g: {settedUpValues.g}</div>
+                                <div key="h">h: {settedUpValues.h}</div>
+                                <div key="commitDuration">
+                                    commitDuration: {settedUpValues.commitDuration} seconds
+                                </div>
+                                <div key="commitRevealDuration">
+                                    commitRevealDuration: {settedUpValues.commitRevealDuration}{" "}
+                                    seconds
+                                </div>
+                                <div key="setUpTime">setUpTime: {settedUpValues.setUpTime}</div>
+                                <div key="setUpDate">
+                                    setUp date -
+                                    {new Date(
+                                        parseInt(settedUpValues.setUpTime) * 1000
+                                    ).toLocaleDateString()}
+                                    {new Date(
+                                        parseInt(settedUpValues.setUpTime) * 1000
+                                    ).toLocaleTimeString()}
+                                </div>
+                                <div key="current date">
+                                    current date
+                                    {nowTime ? nowTime.toLocaleDateString() : ""}
+                                    {nowTime ? nowTime.toLocaleTimeString() : ""}
+                                </div>
+                                <div key="commitEndTime">
+                                    commit end time
+                                    {new Date(
+                                        parseInt(settedUpValues.setUpTime) * 1000 +
+                                            parseInt(settedUpValues.commitDuration) * 1000
+                                    ).toLocaleDateString()}
+                                    {new Date(
+                                        parseInt(settedUpValues.setUpTime) * 1000 +
+                                            parseInt(settedUpValues.commitDuration) * 1000
+                                    ).toLocaleTimeString()}
+                                </div>
                             </div>
-                            <div key="setUpTime">setUpTime: {settedUpValues.setUpTime}</div>
-                            <div key="setUpDate">
-                                setUp date -
-                                {new Date(parseInt(settedUpValues.setUpTime)* 1000).toLocaleDateString()}
-                                {new Date(parseInt(settedUpValues.setUpTime)* 1000).toLocaleTimeString()}
-                            </div>
-                            <div key="current date">
-                                current date
-                                {nowTime.toLocaleDateString()}
-                                {nowTime.toLocaleTimeString()}
-                            </div>
-                            <div key="commitEndTime">
-                                commit end time
-                                {new Date(
-                                    parseInt(settedUpValues.setUpTime) * 1000 +
-                                    parseInt(settedUpValues.commitDuration) * 1000
-                                ).toLocaleDateString()}
-                                {new Date(
-                                    parseInt(settedUpValues.setUpTime) * 1000 +
-                                    parseInt(settedUpValues.commitDuration) * 1000
-                                ).toLocaleTimeString()}
-                            </div>
+                            <StartRegistration updateUI={updateUI} />
+                            <SetUp updateUI={updateUI} key="Setup" />
+                            <Recover round={round} />
                         </div>
-                        <SetUp updateUI={updateUI} key="Setup"/>
-                        <Recover round={round} />
-                    </div>
-                ) : (
-                    <div>...</div>
-                )}
+                    ) : (
+                        <div>...</div>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     )
 }

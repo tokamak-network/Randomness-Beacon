@@ -14,7 +14,7 @@
 import { ConnectButton } from "web3uikit"
 import Link from "next/link"
 import Image from "next/image"
-const imageLoader = ({ src, width, quality }:any) => {
+const imageLoader = ({ src, width, quality }: any) => {
     return `../tokamaklogo.png`
 }
 
@@ -30,7 +30,7 @@ export default function Header() {
                         height={35}
                         alt="Picture of the author"
                     />
-                    <h1 className="py-4 px-4 font-bold text-3xl">TON Random Airdrop</h1>
+                    <h1 className="py-4 px-4 font-semibold text-3xl">TON Random Airdrop</h1>
                 </a>
             </Link>
 

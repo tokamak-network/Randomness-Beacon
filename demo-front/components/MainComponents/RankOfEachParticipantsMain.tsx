@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import { useWeb3Contract } from "react-moralis"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
+import { abi, contractAddresses as contractAddressesJSON } from "../../constants"
 import { useMoralis } from "react-moralis"
 import { useNotification, Input, Table, Bell } from "web3uikit"
 import { useState } from "react"
 import { ethers } from "ethers"
+import { Container } from "./Container"
 // define type [Array(1), Array(1), addresses: Array(1), rankPoints: Array(1)]
 interface Result {
     addresses: string[]
     rankPoints: string[]
 }
-export default function RankOfEachParticipants({
+export default function RankOfEachParticipantsMain({
     round: currentRound = "0",
     participatedRounds,
 }: {
@@ -116,59 +117,77 @@ export default function RankOfEachParticipants({
         setTableContents(_results)
     }
     return (
-        <div className="p-5">
-            <div className="border-dashed border-slate-300 border-2 rounded-lg p-10">
-                <div className="mb-2 font-bold">Get Results</div>
-                <div className="mt-5">
-                    <Input
-                        label="Round"
-                        type="number"
-                        placeholder={currentRound}
-                        id="round"
-                        validation={{ required: true, numberMax: Number(currentRound) }}
-                        onChange={(e) => setRound(e.target.value)}
-                        state={roundState}
-                        errorMessage="Round is required"
-                    />
-                </div>
-                {participatedRounds?.length > 0 ? (
-                    <div className="mt-4">
-                        Rounds you've participated in :{" "}
-                        <span className="font-bold">{participatedRounds.toString()}</span>
-                    </div>
-                ) : (
-                    <div></div>
-                )}
-
-                <button
-                    id="enterEventByCommit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
-                    disabled={isLoading || isFetching}
-                    type="button"
-                    onClick={getRankPointOfEachParticipantsFunction}
-                >
-                    {isLoading || isFetching ? (
-                        <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+        <>
+            <section id="speakers" aria-labelledby="speakers-title" className="py-20  sm:py-32">
+                <Container>
+                    {randomAirdropAddress ? (
+                        <div className="mx-auto max-w-2xl lg:mx-0">
+                            <h2
+                                id="speakers-title"
+                                className="font-display text-4xl font-medium tracking-tighter text-blue-600 sm:text-5xl"
+                            >
+                                Get Results
+                            </h2>
+                            <div className="mt-10 ml-1">
+                                <Input
+                                    label="Round"
+                                    type="number"
+                                    placeholder={currentRound}
+                                    id="round"
+                                    validation={{
+                                        required: true,
+                                        numberMax: Number(currentRound),
+                                    }}
+                                    onChange={(e) => setRound(e.target.value)}
+                                    state={roundState}
+                                    errorMessage="Round is required"
+                                />
+                            </div>
+                            {participatedRounds?.length > 0 ? (
+                                <div className="mt-6 ml-1 font-display text-xl tracking-tight text-blue-900">
+                                    Rounds you've participated in :{" "}
+                                    <span className="font-bold">
+                                        {participatedRounds.toString()}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div></div>
+                            )}
+                            <button
+                                id="enterEventByCommit"
+                                className="mt-7 inline-flex justify-center rounded-2xl bg-blue-600 p-4 text-base font-semibold text-white hover:bg-blue-500 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:text-white/70"
+                                disabled={isLoading || isFetching}
+                                type="button"
+                                onClick={getRankPointOfEachParticipantsFunction}
+                            >
+                                {isLoading || isFetching ? (
+                                    <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
+                                ) : (
+                                    <div>Get Rank Point For All Participants</div>
+                                )}
+                            </button>
+                        </div>
                     ) : (
-                        <div>Get Rank Point For All Participants</div>
+                        <div></div>
                     )}
-                </button>
-                {tableContents.length > 0 ? (
-                    <div className="mt-5">
-                        <Table
-                            columnsConfig="80px 450px 450px 450px 80px"
-                            data={tableContents}
-                            header={["#Rank", "Address", "Rank Point"]}
-                            maxPages={5}
-                            onPageNumberChanged={function noRefCheck() {}}
-                            onRowClick={function noRefCheck() {}}
-                            pageSize={5}
-                        />
-                    </div>
-                ) : (
-                    <div></div>
-                )}
-            </div>
-        </div>
+
+                    {tableContents.length > 0 ? (
+                        <div className="mt-7">
+                            <Table
+                                columnsConfig="80px 450px 450px 450px 80px"
+                                data={tableContents}
+                                header={["#Rank", "Address", "Rank Point"]}
+                                maxPages={5}
+                                onPageNumberChanged={function noRefCheck() {}}
+                                onRowClick={function noRefCheck() {}}
+                                pageSize={5}
+                            />
+                        </div>
+                    ) : (
+                        <div></div>
+                    )}
+                </Container>
+            </section>
+        </>
     )
 }

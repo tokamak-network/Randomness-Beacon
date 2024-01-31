@@ -14,18 +14,23 @@
 // import ReactJson from "react-json-view-with-toggle"
 import dynamic from "next/dynamic"
 import { createTestCases2 } from "../utils/testFunctions"
+import Header from "../components/Header"
 const ReactJson = dynamic(() => import("react-json-view-with-toggle"), {
     ssr: false,
 })
+//import ReactJson from "react-json-view-with-toggle"
 export default function TestCase() {
     const setUpParams = createTestCases2()[0]
     return (
-        <div className="container text-lg mx-5 mt-3">
-            <h1 className="text-2xl font-bold">Test Case Example</h1>
-            <div className="my-2">
-                n g h T setupProofs randomList commitList omega recoveredOmega recoveryProofs
+        <>
+            <Header />{" "}
+            <div className="container text-lg mx-5 mt-3">
+                <h1 className="text-2xl font-bold">Test Case Example</h1>
+                <div className="my-2">
+                    n g h T setupProofs randomList commitList omega recoveredOmega recoveryProofs
+                </div>
+                <ReactJson src={setUpParams} />
             </div>
-            <ReactJson src={setUpParams} />
-        </div>
+        </>
     )
 }

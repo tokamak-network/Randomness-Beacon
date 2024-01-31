@@ -14,13 +14,14 @@
 import { useWeb3Contract } from "react-moralis"
 import { abi, contractAddresses as contractAddressesJSON } from "../constants"
 import { useMoralis } from "react-moralis"
-import { useState, Dispatch, SetStateAction } from "react"
+import { useState } from "react"
 import { createTestCases2 } from "../utils/testFunctions"
 import { Input, useNotification, Button, Bell } from "web3uikit"
 import SetModal from "./SetModal"
+import { ethers } from "ethers"
+import { decodeError } from "ethers-decode-error"
 
-export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
-    const [, updateState] = useState()
+export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
     const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
@@ -37,10 +38,13 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
     const [nValue, setNValue] = useState(JSON.stringify(setUpParams.n))
     const [setUpProofs, setSetUpProofs] = useState(JSON.stringify(setUpParams.setupProofs))
     const [commitDuration, setCommitDuration] = useState<string>("")
-    const [commitDurationState, setCommitDurationState] = useState<"initial" | "error" | "disabled" | "confirmed">("initial")
+    const [isFetching, setIsFetching] = useState<boolean>(false)
+    const [commitDurationState, setCommitDurationState] = useState<
+        "initial" | "error" | "disabled" | "confirmed"
+    >("initial")
 
     // @ts-ignore
-    const { runContractFunction: setUp, isLoading, isFetching } = useWeb3Contract()
+    const { runContractFunction: setUp } = useWeb3Contract()
     function validation() {
         if (commitDuration == undefined || commitDuration == "" || commitDuration == "0") {
             setCommitDurationState("error")
@@ -51,6 +55,7 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
 
     async function setUpFunction() {
         if (validation()) {
+            setIsFetching(true)
             const setUpOptions = {
                 abi: abi,
                 contractAddress: randomAirdropAddress!,
@@ -62,27 +67,41 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
                     _proofs: JSON.parse(setUpProofs),
                 },
             }
-
-            await setUp({
-                params: setUpOptions,
-                onSuccess: handleSuccess,
-                onError: (error:any) => {
-                    dispatch({
-                        type: "error",
-                        message: error?.data?.message,
-                        title: "Error Message",
-                        position: "topR",
-                        icon: <Bell/>//"bell",
-                    })
-                    console.log(error)
-                },
-            })
+            const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
+            // Prompt user for account connections
+            await provider.send("eth_requestAccounts", [])
+            const signer = provider.getSigner()
+            const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+            try {
+                const tx = await randomAirdropContract
+                    .connect(signer)
+                    .setUp(
+                        parseInt(commitDuration),
+                        parseInt(commitDuration) + 1,
+                        JSON.parse(nValue),
+                        JSON.parse(setUpProofs),
+                        { gasLimit: 14000000 }
+                    )
+                await handleSuccess(tx)
+            } catch (error: any) {
+                console.log(error.message)
+                const decodedError = decodeError(decodeError(error))
+                dispatch({
+                    type: "error",
+                    message: decodedError.error,
+                    title: "Error Message",
+                    position: "topR",
+                    icon: <Bell />,
+                })
+                setIsFetching(false)
+            }
             await updateUI()
         }
     }
-    const handleSuccess = async function (tx:any) {
+    const handleSuccess = async function (tx: any) {
         await tx.wait(1)
         handleNewNotification()
+        setIsFetching(false)
     }
     const handleNewNotification = function () {
         dispatch({
@@ -90,11 +109,11 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
             message: "Transaction Completed",
             title: "Tx Notification",
             position: "topR",
-            icon: <Bell/>
+            icon: <Bell />,
         })
     }
 
-    const setValue = function (jsonString:string) {
+    const setValue = function (jsonString: string) {
         if (isModalOpen) {
             if (jsonString) {
                 if (editItem === "n value") {
@@ -121,7 +140,10 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
 
     return (
         <div className="p-5" key="1">
-            <div className="border-dashed border-amber-950 border-2 rounded-lg p-10" key="bordercontainer">
+            <div
+                className="border-dashed border-slate-300 border-2 rounded-lg p-10"
+                key="bordercontainer"
+            >
                 <h3 data-testid="test-form-title" className="sc-eXBvqI eGDBJr" key="h3">
                     Set Up
                 </h3>
@@ -166,11 +188,11 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
                 <button
                     id="set-up"
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded ml-auto mt-7"
-                    disabled={isLoading || isFetching}
+                    disabled={isFetching}
                     type="button"
                     onClick={setUpFunction}
                 >
-                    {isLoading || isFetching ? (
+                    {isFetching ? (
                         <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                     ) : (
                         <div>SetUp</div>
@@ -185,7 +207,7 @@ export default function SetUp({ updateUI }:{updateUI:()=>Promise<void>}) {
                     setValue={setValue}
                     setModalInputValue={setModalInputValue}
                     modalInputValue={modalInputValue}
-                    key = {editItem}
+                    key={editItem}
                 />
             </div>
         </div>
