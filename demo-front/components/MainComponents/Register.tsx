@@ -29,6 +29,7 @@ export function Register({
     round,
     updateUI,
     isRegistrationOpen,
+    isRegistered,
 }: {
     participatedRoundsLength: string
     timeRemaining: string
@@ -37,6 +38,7 @@ export function Register({
     round: string
     updateUI: () => Promise<void>
     isRegistrationOpen: boolean
+    isRegistered: boolean
 }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
@@ -113,15 +115,20 @@ export function Register({
                             )}
                             <Button
                                 className={
-                                    "mt-10 w-full " + (isRegistrationOpen ? "" : "opacity-20")
+                                    "mt-10 w-full " +
+                                    (!isRegistrationOpen
+                                        ? "opacity-20"
+                                        : isRegistered
+                                        ? "opacity-20"
+                                        : "")
                                 }
-                                disabled={isRegistrationOpen ? false : true}
+                                disabled={!isRegistrationOpen ? true : isRegistered ? true : false}
                                 onClick={registerFunction}
                             >
                                 {isFetching ? (
                                     <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                                 ) : (
-                                    <div>Register</div>
+                                    <div>{isRegistered ? "Registered!" : "Register"}</div>
                                 )}
                             </Button>
                             <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 sm:mt-16 sm:gap-x-16 sm:gap-y-10 sm:text-center lg:auto-cols-auto lg:grid-flow-col lg:grid-cols-none lg:justify-start lg:text-left">
