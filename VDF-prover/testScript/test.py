@@ -20,5 +20,14 @@ def mod_hash_eth(n, strings):
   r = r % n
   return r
 
+def generate_optimized_proof(N, x, τ, δ, s):
+  start_time = time.time()
+  checkpoints = make_checkpoints(τ, s)
+  powers = repeated_squarings(N, x, checkpoints)
+  y = powers[τ]
+  π = generate_proof(x, τ, δ, y, N)
+  print(f"Proof generated in {time.time() - start_time:.2f} seconds")
+  return y, π
+
 
 print(hex(mod_hash_eth(1099153, append_hex(5994085, 3615553))))
