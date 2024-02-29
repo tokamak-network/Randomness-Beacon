@@ -13,14 +13,14 @@
 // limitations under the License.
 // import ReactJson from "react-json-view-with-toggle"
 import dynamic from "next/dynamic"
-import { createTestCases2 } from "../utils/testFunctions"
 import Header from "../components/Header"
+import { createTestCaseV2 } from "../utils/testFunctions"
 const ReactJson = dynamic(() => import("react-json-view-with-toggle"), {
     ssr: false,
 })
 //import ReactJson from "react-json-view-with-toggle"
 export default function TestCase() {
-    const setUpParams = createTestCases2()[0]
+    const setUpParams = createTestCaseV2()
     return (
         <>
             <Header />{" "}

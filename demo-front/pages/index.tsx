@@ -11,22 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { MainHeader } from "../components/MainComponents/MainHeader"
-import { Register } from "../components/MainComponents/Register"
-import { useWeb3Contract } from "react-moralis"
+import { BigNumber, BigNumberish } from "ethers"
+import { useEffect, useState } from "react"
+import { useMoralis, useWeb3Contract } from "react-moralis"
 import { useInterval } from "use-interval"
-import { useNotification, Bell } from "web3uikit"
-import RankOfEachParticipantsMain from "../components/MainComponents/RankOfEachParticipantsMain"
-import { useMoralis } from "react-moralis"
+import { useNotification } from "web3uikit"
 import { Footer } from "../components/Footer"
-import { useState, useEffect } from "react"
-import { BigNumber, BigNumberish, ethers } from "ethers"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
+import { MainHeader } from "../components/MainComponents/MainHeader"
+import RankOfEachParticipantsMain from "../components/MainComponents/RankOfEachParticipantsMain"
+import { Register } from "../components/MainComponents/Register"
+import {
+    airdropConsumerAbi,
+    consumerContractAddress as consumerContractAddressJson,
+} from "../constants"
 export default function TempMain() {
     const { chainId: chainIdHex, isWeb3Enabled, account } = useMoralis()
     const chainId = parseInt(chainIdHex!)
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
-    const randomAirdropAddress =
+    const contractAddresses: { [key: string]: string[] } = consumerContractAddressJson
+    const consumerContractAddress =
         chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
             : null
@@ -43,36 +45,34 @@ export default function TempMain() {
     const [prettyRegistrationDurationForNextRound, setPrettyRegistrationDurationForNextRound] =
         useState<string>("00hrs 00min 00sec")
     const [registrationDurationForNextRound, setRegistrationDurationForNextRound] =
-        useState<string>("")
+        useState<string>("0")
+    const [withdrawedRounds, setWithdrawedRounds] = useState<string[]>([])
     const dispatch = useNotification()
     function str_pad_left(string: number, pad: string, length: number) {
         return (new Array(length + 1).join(pad) + string).slice(-length)
     }
     // @ts-ignore
-    const { runContractFunction: registerNextRound, isLoading } = useWeb3Contract()
-    const [isFetching, setIsFetching] = useState(false)
+    const { runContractFunction: registerNextRound } = useWeb3Contract()
     // @ts-ignore
-    const { runContractFunction: getParticipantsLengthAtRound } = useWeb3Contract()
-    const { runContractFunction: getNextRound } = useWeb3Contract({
-        abi: abi,
-        contractAddress: randomAirdropAddress!, //,
-        functionName: "getNextRound", //,
+    const { runContractFunction: getWithdrawedRounds } = useWeb3Contract()
+    // @ts-ignore
+    const { runContractFunction: getNumOfParticipants } = useWeb3Contract()
+    const { runContractFunction: getNextRandomAirdropRound } = useWeb3Contract({
+        abi: airdropConsumerAbi,
+        contractAddress: consumerContractAddress!, //,
+        functionName: "getNextRandomAirdropRound", //,
         params: {},
     })
     const {
-        runContractFunction: getRegistrationDurationForNextRound, //
+        runContractFunction: getRegistrationTimeAndDuration, //
     } = useWeb3Contract({
-        abi: abi,
-        contractAddress: randomAirdropAddress!, //,
-        functionName: "getRegistrationDurationForNextRound", //,
+        abi: airdropConsumerAbi,
+        contractAddress: consumerContractAddress!, //,
+        functionName: "getRegistrationTimeAndDuration", //,
         params: {},
     })
-    const { runContractFunction: getStartRegistrationTimeForNextRound } = useWeb3Contract({
-        abi: abi,
-        contractAddress: randomAirdropAddress!, //,
-        functionName: "getStartRegistrationTimeForNextRound", //,
-        params: {},
-    })
+    // @ts-ignore
+    const { runContractFunction: getParticipatedRounds } = useWeb3Contract()
     useInterval(() => {
         let registrationDurationForNextRoundInt = parseInt(registrationDurationForNextRound)
         if (registrationDurationForNextRoundInt > 0) {
@@ -104,45 +104,26 @@ export default function TempMain() {
     useInterval(() => {
         updateUI()
     }, 11000)
-    const { runContractFunction: randomAirdropRound } = useWeb3Contract({
-        abi: abi,
-        contractAddress: randomAirdropAddress!, //,
-        functionName: "randomAirdropRound", //,
-        params: {},
-    })
-    const { runContractFunction: getParticipatedRounds } = useWeb3Contract({
-        abi: abi,
-        contractAddress: randomAirdropAddress!, //,
-        functionName: "getParticipatedRounds", //,
-        params: {},
-    })
 
     async function updateUI() {
-        if (randomAirdropAddress) {
-            let registrationDurationForNextRoundFromCall =
-                (await getRegistrationDurationForNextRound()) as BigNumberish
-            let startRegistrationTimeForNextRoundFromCall =
-                (await getStartRegistrationTimeForNextRound()) as BigNumberish
-            let roundFromCall = (await randomAirdropRound({
+        if (consumerContractAddress) {
+            let registrationTimeAndDurationfromCall: [BigNumberish, BigNumberish] =
+                (await getRegistrationTimeAndDuration()) as [BigNumberish, BigNumberish]
+            let registrationStartTime: BigNumberish = registrationTimeAndDurationfromCall[0]
+            let registrationDuration: BigNumberish = registrationTimeAndDurationfromCall[1]
+            let nextRoundFromCall = (await getNextRandomAirdropRound({
                 onError: (error) => console.log(error),
             })) as BigNumberish
-            let nextRoundFromCall = (await getNextRound({
-                onError: (error) => console.log(error),
-            })) as BigNumberish
-            setRegistrationDurationForNextRound(
-                registrationDurationForNextRoundFromCall?.toString()
-            )
-            const hours = Math.floor(
-                parseInt(registrationDurationForNextRoundFromCall?.toString()) / 3600
-            )
+            let currentRound: Number =
+                Number(nextRoundFromCall.toString()) == 0
+                    ? 0
+                    : Number(nextRoundFromCall.toString()) - 1
+            setRegistrationDurationForNextRound(registrationDuration.toString())
+            const hours = Math.floor(parseInt(registrationDuration.toString()) / 3600)
             const minutes = Math.floor(
-                (parseInt(registrationDurationForNextRoundFromCall?.toString()) - hours * 3600) /
-                    60
+                (parseInt(registrationDuration.toString()) - hours * 3600) / 60
             )
-            const seconds =
-                parseInt(registrationDurationForNextRoundFromCall?.toString()) -
-                hours * 3600 -
-                minutes * 60
+            const seconds = parseInt(registrationDuration.toString()) - hours * 3600 - minutes * 60
             setPrettyRegistrationDurationForNextRound(
                 str_pad_left(hours, "0", 2) +
                     "hrs " +
@@ -151,38 +132,57 @@ export default function TempMain() {
                     str_pad_left(seconds, "0", 2) +
                     "sec"
             )
-            setStartRegistrationTimeForNextRound(
-                startRegistrationTimeForNextRoundFromCall.toString()
-            )
+            setStartRegistrationTimeForNextRound(registrationStartTime.toString())
             setPrettyStartRegistrationTimeForNextRound(
-                new Date(Number(startRegistrationTimeForNextRoundFromCall.toString()) * 1000)
-                    .toLocaleString()
-                    .slice(5)
+                new Date(Number(registrationStartTime.toString()) * 1000).toLocaleString().slice(5)
             )
-            setNextRound(nextRoundFromCall.toString())
-            if (roundFromCall === undefined) roundFromCall = 0
-            setRound(roundFromCall.toString())
+            setNextRound(currentRound.toString())
+            setRound(currentRound.toString())
             const participantsLengthfromCallOptions = {
-                abi: abi,
-                contractAddress: randomAirdropAddress!,
-                functionName: "getParticipantsLengthAtRound",
-                params: { _round: nextRoundFromCall },
+                abi: airdropConsumerAbi,
+                contractAddress: consumerContractAddress!,
+                functionName: "getNumOfParticipants",
+                params: { round: currentRound },
             }
-            const participantsLengthfromCall = (await getParticipantsLengthAtRound({
+            const participantsLengthfromCall = (await getNumOfParticipants({
                 params: participantsLengthfromCallOptions,
                 onError: (error) => console.log(error),
             })) as BigNumberish
             setParticipatedRoundsLength(participantsLengthfromCall?.toString())
+            const participatedRoundsfromCallOptions = {
+                abi: airdropConsumerAbi,
+                contractAddress: consumerContractAddress!,
+                functionName: "getParticipatedRounds",
+                params: { participantAddress: account },
+            }
             const participatedRoundsfromCall = (await getParticipatedRounds({
+                params: participatedRoundsfromCallOptions,
                 onError: (error) => console.log(error),
             })) as BigNumber[]
+            const getWithdrawedRoundsOptions = {
+                abi: airdropConsumerAbi,
+                contractAddress: consumerContractAddress!,
+                functionName: "getWithdrawedRounds",
+                params: { participant: account },
+            }
+            const getWithdrawedRoundsOptionsfromCall = (await getWithdrawedRounds({
+                params: getWithdrawedRoundsOptions,
+                onError: (error) => console.log(error),
+            })) as BigNumberish[]
             let temp = []
+            let temp2 = []
 
             if (participatedRoundsfromCall) {
                 for (let i = 0; i < participatedRoundsfromCall.length; i++) {
                     temp.push(participatedRoundsfromCall[i].toString())
                 }
                 setParticipatedRounds(temp)
+            }
+            if (getWithdrawedRoundsOptionsfromCall) {
+                for (let i = 0; i < getWithdrawedRoundsOptionsfromCall.length; i++) {
+                    temp2.push(getWithdrawedRoundsOptionsfromCall[i].toString())
+                }
+                setWithdrawedRounds(temp2)
             }
         }
     }
@@ -205,6 +205,8 @@ export default function TempMain() {
                 <RankOfEachParticipantsMain
                     round={round}
                     participatedRounds={participatedRounds}
+                    withdrawedRounds={withdrawedRounds}
+                    updateUI={updateUI}
                 />
             </div>
             <Footer />

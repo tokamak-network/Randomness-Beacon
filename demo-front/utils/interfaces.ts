@@ -20,14 +20,14 @@ export interface BigNumber {
 export interface VDFClaim {
     x: BigNumber
     y: BigNumber
-    T: BigNumberish
     v: BigNumber
+    n?: BigNumber
+    T?: BigNumberish
 }
 
 export interface VDFClaimJson {
     x: BigNumberish
     y: BigNumberish
-    T: BigNumberish
     v: BigNumberish
 }
 

@@ -1,8 +1,20 @@
-import { ethers, BigNumberish } from "ethers"
+import { BigNumberish, ethers } from "ethers"
 
-import { VDFClaim, TestCase, BigNumber } from "./interfaces"
 import testData from "./data_20231212_150019.json"
-
+import { BigNumber, TestCase, VDFClaim } from "./interfaces"
+import twoMinutesLengthData from "./twoMinutesLengthData.json"
+export const createTestCaseV2 = (): TestCase => {
+    const jsonData: TestCase = twoMinutesLengthData
+    for (let i: number = 0; i < jsonData.setupProofs.length; i++) {
+        delete jsonData.setupProofs[i].n
+        delete jsonData.setupProofs[i].T
+    }
+    for (let i: number = 0; i < jsonData.recoveryProofs.length; i++) {
+        delete jsonData.recoveryProofs[i].n
+        delete jsonData.recoveryProofs[i].T
+    }
+    return jsonData
+}
 export const createTestCases2 = () => {
     const result: TestCase[] = []
     let ts: TestCase

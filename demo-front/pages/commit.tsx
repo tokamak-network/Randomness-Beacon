@@ -1,36 +1,57 @@
-import Round from "../components/Round"
-import Commit from "../components/Commit"
-import { useMoralis } from "react-moralis"
-import { useState, useEffect } from "react"
-import { useWeb3Contract } from "react-moralis"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
+import { BigNumber, BigNumberish } from "ethers"
+import { useEffect, useState } from "react"
+import { useMoralis, useWeb3Contract } from "react-moralis"
 import { useInterval } from "use-interval"
 import { Widget } from "web3uikit"
-import { ICommitRevealRecoverRNG } from "../typechain-types/RandomAirdrop"
-import { BigNumber, BigNumberish } from "ethers"
+import Commit from "../components/Commit"
 import Header from "../components/Header"
-import { SettedUpValues } from "../typechain-types/RandomAirdrop"
+import Round from "../components/Round"
+import {
+    airdropConsumerAbi,
+    consumerContractAddress as consumerContractAddressJSON,
+    coordinatorContractAddress as coordinatorContractAddressJSON,
+    crrngAbi,
+} from "../constants"
+interface ValueAtRound {
+    startTime: BigNumberish
+    numOfPariticipants: BigNumberish
+    count: BigNumberish
+    consumer: string
+    bStar: string
+    commitsString: string
+    omega: BigNumberish
+    stage: BigNumberish
+    isCompleted: boolean
+    isAllRevealed: boolean
+}
 
 export default function Home() {
-    const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
+    const { chainId: chainIdHex, isWeb3Enabled, account } = useMoralis()
     const chainId = parseInt(chainIdHex!).toString()
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+    const consumerContractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
+    const coordinatorContractAddress: { [key: string]: string[] } = coordinatorContractAddressJSON
     const randomAirdropAddress =
-        chainId in contractAddresses
-            ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
+        chainId in consumerContractAddresses
+            ? consumerContractAddresses[chainId][consumerContractAddresses[chainId].length - 1]
+            : null
+    const coordinatorAddress =
+        chainId in coordinatorContractAddress
+            ? coordinatorContractAddress[chainId][coordinatorContractAddress[chainId].length - 1]
             : null
     let [round, setRound] = useState<string>("")
-    const [settedUpValues, setSettedUpValues] = useState<SettedUpValues>({
-        T: "",
-        n: "",
-        nl: "",
-        g: "",
-        gl: "",
-        h: "",
-        hl: "",
-        commitDuration: "",
-        commitRevealDuration: "",
-        setUpTime: "",
+    // @ts-ignore
+    const { runContractFunction: getValuesAtRound } = useWeb3Contract()
+    const [valuesAtRound, setValuesAtRound] = useState<ValueAtRound>({
+        startTime: BigNumber.from(0),
+        numOfPariticipants: BigNumber.from(0),
+        count: BigNumber.from(0),
+        consumer: "",
+        bStar: "",
+        commitsString: "",
+        omega: BigNumber.from(0),
+        stage: BigNumber.from(0),
+        isCompleted: false,
+        isAllRevealed: false,
     })
     const [timeRemaining, setTimeRemaining] = useState<string>(
         str_pad_left(0, "0", 2) + ":" + str_pad_left(0, "0", 2)
@@ -42,20 +63,14 @@ export default function Home() {
     }
     useInterval(() => {
         let commitDurationInt
-        if (settedUpValues.commitDuration) {
-            commitDurationInt = parseInt(settedUpValues.commitDuration.toString())
-            if (commitDurationInt > 0) {
-                let _timeRemaing =
-                    commitDurationInt -
-                    (Math.floor(Date.now() / 1000) - parseInt(settedUpValues.setUpTime.toString()))
-                const minutes = Math.floor(_timeRemaing / 60)
-                const seconds = _timeRemaing - minutes * 60
-                if (_timeRemaing > -1)
-                    setTimeRemaining(
-                        str_pad_left(minutes, "0", 2) + ":" + str_pad_left(seconds, "0", 2)
-                    )
-            }
-        }
+        commitDurationInt = 120
+        let _timeRemaing =
+            commitDurationInt -
+            (Math.floor(Date.now() / 1000) - parseInt(valuesAtRound.startTime.toString()))
+        const minutes = Math.floor(_timeRemaing / 60)
+        const seconds = _timeRemaing - minutes * 60
+        if (_timeRemaing > -1)
+            setTimeRemaining(str_pad_left(minutes, "0", 2) + ":" + str_pad_left(seconds, "0", 2))
     }, 1000)
     useEffect(() => {
         if (isWeb3Enabled) {
@@ -67,26 +82,43 @@ export default function Home() {
     }, 12000)
     // @ts-ignore
     const { runContractFunction: getSetUpValuesAtRound } = useWeb3Contract()
-    const { runContractFunction: randomAirdropRound } = useWeb3Contract({
-        abi: abi,
+    const { runContractFunction: getNextRandomAirdropRound } = useWeb3Contract({
+        abi: airdropConsumerAbi,
         contractAddress: randomAirdropAddress!, //,
-        functionName: "randomAirdropRound", //,
+        functionName: "getNextRandomAirdropRound", //,
         params: {},
     })
-    const { runContractFunction: getParticipatedRounds } = useWeb3Contract({
-        abi: abi,
-        contractAddress: randomAirdropAddress!, //,
-        functionName: "getParticipatedRounds", //,
-        params: {},
-    })
+    // @ts-ignore
+    const { runContractFunction: getParticipatedRounds } = useWeb3Contract()
 
     async function updateUI() {
-        let roundFromCall = (await randomAirdropRound({
+        let roundFromCall = (await getNextRandomAirdropRound({
             onError: (error) => console.log(error),
         })) as BigNumberish
-        if (roundFromCall === undefined) roundFromCall = BigNumber.from(0)
+        roundFromCall =
+            parseInt(roundFromCall.toString()) == 0 ? 0 : parseInt(roundFromCall.toString()) - 1
         setRound(roundFromCall.toString())
+        const valuesAtRoundFromCallOptions = {
+            abi: crrngAbi,
+            contractAddress: coordinatorAddress!,
+            functionName: "getValuesAtRound",
+            params: {
+                _round: roundFromCall,
+            },
+        }
+        const valuesAtRoundFromCall = (await getValuesAtRound({
+            params: valuesAtRoundFromCallOptions,
+            onError: (error) => console.log(error),
+        })) as ValueAtRound
+        setValuesAtRound(valuesAtRoundFromCall)
+        const participatedRoundsfromCallOptions = {
+            abi: airdropConsumerAbi,
+            contractAddress: randomAirdropAddress!,
+            functionName: "getParticipatedRounds",
+            params: { participantAddress: account },
+        }
         const participatedRoundsfromCall: BigNumber[] = (await getParticipatedRounds({
+            params: participatedRoundsfromCallOptions,
             onError: (error) => console.log(error),
         })) as BigNumber[]
         let temp = []
@@ -96,38 +128,14 @@ export default function Home() {
             }
             setParticipatedRounds(temp)
         }
-        await getGetSetUpValuesAtRound(roundFromCall)
-        if (settedUpValues.setUpTime !== undefined && settedUpValues.setUpTime != "0") {
+        if (
+            valuesAtRoundFromCall.startTime !== undefined &&
+            valuesAtRoundFromCall.startTime != "0"
+        ) {
             setStarted("Started!")
         } else {
             setStarted("Not Started")
         }
-    }
-    async function getGetSetUpValuesAtRound(roundFromCall: BigNumberish) {
-        const setUpValuesAtRoundOptions = {
-            abi: abi,
-            contractAddress: randomAirdropAddress!,
-            functionName: "getSetUpValuesAtRound",
-            params: { _round: roundFromCall },
-        }
-        const result: ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput =
-            (await getSetUpValuesAtRound({
-                params: setUpValuesAtRoundOptions,
-                onError: (error) => console.log(error),
-            })) as ICommitRevealRecoverRNG.SetUpValueAtRoundStructOutput
-        if (result === undefined) return
-        setSettedUpValues({
-            T: result["T"].toString(),
-            n: result["n"]["val"].toString(),
-            nl: result["n"]["bitlen"].toString(),
-            g: result["g"]["val"].toString(),
-            gl: result["g"]["bitlen"].toString(),
-            h: result["h"]["val"].toString(),
-            hl: result["h"]["bitlen"].toString(),
-            commitDuration: result["commitDuration"].toString(),
-            commitRevealDuration: result["commitRevealDuration"].toString(),
-            setUpTime: result["setUpTime"].toString(),
-        })
     }
 
     return (
@@ -143,7 +151,7 @@ export default function Home() {
                         <div>
                             <div className="border-dashed border-slate-300 border-2 rounded-lg m-5 truncate hover:text-clip ">
                                 <div className="mt-10 ml-10 font-bold">Current Round Info</div>
-                                {settedUpValues ? (
+                                {valuesAtRound ? (
                                     <div
                                         style={{
                                             display: "grid",
@@ -156,24 +164,10 @@ export default function Home() {
 
                                             <Widget
                                                 info={
-                                                    str_pad_left(
-                                                        Math.floor(
-                                                            parseInt(
-                                                                settedUpValues.commitDuration
-                                                            ) / 60
-                                                        ),
-                                                        "0",
-                                                        2
-                                                    ) +
+                                                    str_pad_left(Math.floor(120 / 60), "0", 2) +
                                                     " min, " +
                                                     str_pad_left(
-                                                        parseInt(settedUpValues.commitDuration) -
-                                                            Math.floor(
-                                                                parseInt(
-                                                                    settedUpValues.commitDuration
-                                                                ) / 60
-                                                            ) *
-                                                                60,
+                                                        120 - Math.floor(120 / 60) * 60,
                                                         "0",
                                                         2
                                                     ) +
@@ -183,9 +177,9 @@ export default function Home() {
                                             ></Widget>
                                             <Widget
                                                 info={
-                                                    settedUpValues.setUpTime
+                                                    valuesAtRound.startTime
                                                         ? new Date(
-                                                              Number(settedUpValues.setUpTime) *
+                                                              Number(valuesAtRound.startTime) *
                                                                   1000
                                                           )
                                                               .toLocaleString()
