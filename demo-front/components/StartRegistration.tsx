@@ -11,19 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { useWeb3Contract } from "react-moralis"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
-import { useMoralis } from "react-moralis"
-import { useState } from "react"
-import { Input, useNotification, Bell } from "web3uikit"
-import { ethers } from "ethers"
+import { BigNumber, ethers } from "ethers"
 import { decodeError } from "ethers-decode-error"
+import { useState } from "react"
+import { useMoralis, useWeb3Contract } from "react-moralis"
+import { Bell, Input, useNotification } from "web3uikit"
+import {
+    airdropConsumerAbi,
+    consumerContractAddress as consumerContractAddressJSON,
+} from "../constants"
 //import titanSDK from "@tokamak-network/titan-sdk"
 
 export default function StartRegistration({ updateUI }: { updateUI: () => Promise<void> }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+    const contractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
     const randomAirdropAddress =
         chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
@@ -31,6 +33,10 @@ export default function StartRegistration({ updateUI }: { updateUI: () => Promis
     const dispatch = useNotification()
 
     const [registrationDuration, setRegistrationDuration] = useState<string>("")
+    const [totalPrizeAmount, setTotalPrizeAmount] = useState<string>("")
+    const [totalPrizeAmountState, setTotalPrizeAmountState] = useState<
+        "initial" | "error" | "disabled" | "confirmed"
+    >("initial")
     const [registrationDurationState, setRegistrationDurationState] = useState<
         "initial" | "error" | "disabled" | "confirmed"
     >("initial")
@@ -42,9 +48,13 @@ export default function StartRegistration({ updateUI }: { updateUI: () => Promis
         if (
             registrationDuration == undefined ||
             registrationDuration == "" ||
-            registrationDuration == "0"
+            registrationDuration == "0" ||
+            totalPrizeAmount == undefined ||
+            totalPrizeAmount == "" ||
+            totalPrizeAmount == "0"
         ) {
             setRegistrationDurationState("error")
+            setTotalPrizeAmountState("error")
             return false
         }
         return true
@@ -57,14 +67,24 @@ export default function StartRegistration({ updateUI }: { updateUI: () => Promis
             // Prompt user for account connections
             await provider.send("eth_requestAccounts", [])
             const signer = provider.getSigner()
-            const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+            const randomAirdropContract = new ethers.Contract(
+                randomAirdropAddress!,
+                airdropConsumerAbi,
+                provider
+            )
             try {
                 const tx = await randomAirdropContract
                     .connect(signer)
-                    .startRegistration(parseInt(registrationDuration), { gasLimit: 150000 })
+                    .startRegistration(
+                        parseInt(registrationDuration),
+                        BigNumber.from(totalPrizeAmount).mul(
+                            BigNumber.from("1000000000000000000")
+                        ),
+                        { gasLimit: 150000 }
+                    )
                 await handleSuccess(tx)
             } catch (error: any) {
-                console.log(error.message)
+                console.log(error)
                 const decodedError = decodeError(decodeError(error))
                 dispatch({
                     type: "error",
@@ -74,14 +94,16 @@ export default function StartRegistration({ updateUI }: { updateUI: () => Promis
                     icon: <Bell />,
                 })
                 setRegistrationDurationState("initial")
+                setTotalPrizeAmountState("initial")
                 setIsFetching(false)
             }
             await updateUI()
         }
     }
     const handleSuccess = async (tx: any) => {
-        await tx.wait(1)
+        await tx.wait()
         setRegistrationDurationState("confirmed")
+        setTotalPrizeAmountState("confirmed")
         setIsFetching(false)
         handleNewNotification()
     }
@@ -113,6 +135,18 @@ export default function StartRegistration({ updateUI }: { updateUI: () => Promis
                         value={registrationDuration}
                         onChange={(e) => setRegistrationDuration(e.target.value)}
                         state={registrationDurationState}
+                    />
+                </div>
+                <div className="mt-10">
+                    <Input
+                        label="total prize amount"
+                        placeholder="1000 (=1000 * 1e18)"
+                        type="number"
+                        id="TotalPrizeAmount"
+                        validation={{ required: true, numberMin: 0 }}
+                        value={totalPrizeAmount}
+                        onChange={(e) => setTotalPrizeAmount(e.target.value)}
+                        state={totalPrizeAmountState}
                     />
                 </div>
                 <button

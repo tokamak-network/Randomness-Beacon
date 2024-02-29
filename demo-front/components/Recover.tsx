@@ -11,15 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { useWeb3Contract } from "react-moralis"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
-import { useMoralis } from "react-moralis"
-import { useState } from "react"
-import { createTestCases2 } from "../utils/testFunctions"
-import { Input, useNotification, Button, Bell } from "web3uikit"
-import SetModal from "./SetModal"
 import { ethers } from "ethers"
 import { decodeError } from "ethers-decode-error"
+import { useState } from "react"
+import { useMoralis, useWeb3Contract } from "react-moralis"
+import { Bell, Button, Input, useNotification } from "web3uikit"
+import {
+    consumerContractAddress as consumerContractAddressJSON,
+    coordinatorContractAddress as coordinatorContractAddressJSON,
+    crrngAbi,
+} from "../constants"
+import { createTestCases2 } from "../utils/testFunctions"
+import SetModal from "./SetModal"
 
 export default function Recover({ round: currentRound }: { round: string }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
@@ -29,10 +32,15 @@ export default function Recover({ round: currentRound }: { round: string }) {
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const [round, setRound] = useState<string>("")
     const chainId = parseInt(chainIdHex!)
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+    const contractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
     const randomAirdropAddress =
         chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
+            : null
+    const coordinatorContractAddress: { [key: string]: string[] } = coordinatorContractAddressJSON
+    const coordinatorAddress =
+        chainId in coordinatorContractAddress
+            ? coordinatorContractAddress[chainId][coordinatorContractAddress[chainId].length - 1]
             : null
     const recoverParams = createTestCases2()[0]
     const dispatch = useNotification()
@@ -58,11 +66,15 @@ export default function Recover({ round: currentRound }: { round: string }) {
             // Prompt user for account connections
             await provider.send("eth_requestAccounts", [])
             const signer = provider.getSigner()
-            const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+            const coordinatorContract = new ethers.Contract(
+                coordinatorAddress!,
+                crrngAbi,
+                provider
+            )
             try {
-                const tx = await randomAirdropContract
+                const tx = await coordinatorContract
                     .connect(signer)
-                    .recover(parseInt(round), JSON.parse(recoveryProofs), { gasLimit: 14000000 })
+                    .recover(parseInt(round), JSON.parse(recoveryProofs), { gasLimit: 9000000 })
                 await handleSuccess(tx)
             } catch (error: any) {
                 console.log(error.message)
@@ -79,7 +91,7 @@ export default function Recover({ round: currentRound }: { round: string }) {
         }
     }
     const handleSuccess = async function (tx: any) {
-        await tx.wait(1)
+        await tx.wait()
         handleNewNotification()
         setIsFetching(false)
         //updateUI()

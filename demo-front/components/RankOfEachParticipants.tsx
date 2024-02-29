@@ -11,12 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { useWeb3Contract } from "react-moralis"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
-import { useMoralis } from "react-moralis"
-import { useNotification, Input, Table, Bell } from "web3uikit"
-import { useState } from "react"
 import { ethers } from "ethers"
+import { useState } from "react"
+import { useMoralis, useWeb3Contract } from "react-moralis"
+import { Bell, Input, Table, useNotification } from "web3uikit"
+import {
+    airdropConsumerAbi,
+    consumerContractAddress as consumerContractAddressJSON,
+} from "../constants"
 // define type [Array(1), Array(1), addresses: Array(1), rankPoints: Array(1)]
 interface Result {
     addresses: string[]
@@ -35,7 +37,7 @@ export default function RankOfEachParticipants({
         "initial"
     )
     const [round, setRound] = useState<string>("")
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+    const contractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
     const randomAirdropAddress =
         chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
@@ -58,11 +60,11 @@ export default function RankOfEachParticipants({
     async function getRankPointOfEachParticipantsFunction() {
         if (validation()) {
             const Options = {
-                abi: abi,
+                abi: airdropConsumerAbi,
                 contractAddress: randomAirdropAddress!,
                 functionName: "getRankPointOfEachParticipants",
                 params: {
-                    _round: round,
+                    round: round,
                 },
             }
 
@@ -70,7 +72,7 @@ export default function RankOfEachParticipants({
                 params: Options,
                 onError: (error: any) => {
                     console.log(error)
-                    const iface = new ethers.utils.Interface(abi)
+                    const iface = new ethers.utils.Interface(airdropConsumerAbi)
                     let errorMessage = ""
                     if (error?.data?.data?.data) {
                         errorMessage = iface.parseError(error?.data?.data?.data).name

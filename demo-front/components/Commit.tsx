@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //import { useWeb3Contract } from "react-moralis"
-import { decodeError } from "ethers-decode-error"
 import { Switch } from "@headlessui/react"
+import { BigNumberish, ethers } from "ethers"
+import { decodeError } from "ethers-decode-error"
 import dynamic from "next/dynamic"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
-import { useMoralis } from "react-moralis"
 import { useEffect, useState } from "react"
-import { Input, useNotification, Button, Bell } from "web3uikit"
+import { useMoralis } from "react-moralis"
+import { Bell, Button, Input, useNotification } from "web3uikit"
+import {
+    consumerContractAddress as consumerContractAddressJSON,
+    coordinatorContractAddress as coordinatorContractAddressJSON,
+    crrngAbi,
+} from "../constants"
 import { getBitLenth2, getLength } from "../utils/testFunctions"
-import { ethers } from "ethers"
-import { BigNumberStruct } from "../typechain-types/RandomAirdrop"
-import React from "react"
+interface BigNumberStruct {
+    val: string
+    bitlen: BigNumberish
+}
 const ReactJson = dynamic(() => import("react-json-view-with-toggle"), {
     ssr: false,
 })
@@ -33,11 +39,16 @@ function classNames(...classes: string[]) {
 }
 export default function Commit({ round }: { round: string }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+    const consumerContractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
     const chainId = parseInt(chainIdHex!)
     const randomAirdropAddress =
-        chainId in contractAddresses
-            ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
+        chainId in consumerContractAddresses
+            ? consumerContractAddresses[chainId][consumerContractAddresses[chainId].length - 1]
+            : null
+    const crrrngContractAddresses: { [key: string]: string[] } = coordinatorContractAddressJSON
+    const crrngAddress =
+        chainId in crrrngContractAddresses
+            ? crrrngContractAddresses[chainId][crrrngContractAddresses[chainId].length - 1]
             : null
     const [commitCalldata, setCommitCalldata] = useState<BigNumberStruct>()
     const [commitData, setCommitData] = useState<string>()
@@ -73,9 +84,19 @@ export default function Commit({ round }: { round: string }) {
             // Prompt user for account connections
             await provider.send("eth_requestAccounts", [])
             const signer = provider.getSigner()
-            const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+            // const randomAirdropContract = new ethers.Contract(
+            //     randomAirdropAddress!,
+            //     airdropConsumerAbi,
+            //     provider
+            // )
+
+            const coordinatorContract = new ethers.Contract(
+                crrngAddress as string,
+                crrngAbi,
+                provider
+            )
             try {
-                const tx = await randomAirdropContract
+                const tx = await coordinatorContract
                     .connect(signer)
                     .commit(parseInt(round), commitCalldata, { gasLimit: 810000 })
                 await handleSuccess(tx)
@@ -94,7 +115,7 @@ export default function Commit({ round }: { round: string }) {
         }
     }
     const handleSuccess = async function (tx: any) {
-        await tx.wait(1)
+        await tx.wait()
         handleNewNotification()
         setIsFetching(false)
         //updateUI()

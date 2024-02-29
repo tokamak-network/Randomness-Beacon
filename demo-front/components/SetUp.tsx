@@ -11,20 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { useWeb3Contract } from "react-moralis"
-import { abi, contractAddresses as contractAddressesJSON } from "../constants"
-import { useMoralis } from "react-moralis"
-import { useState } from "react"
-import { createTestCases2 } from "../utils/testFunctions"
-import { Input, useNotification, Button, Bell } from "web3uikit"
-import SetModal from "./SetModal"
 import { ethers } from "ethers"
 import { decodeError } from "ethers-decode-error"
+import { useState } from "react"
+import { useMoralis, useWeb3Contract } from "react-moralis"
+import { Bell, Button, Input, useNotification } from "web3uikit"
+import {
+    airdropConsumerAbi,
+    consumerContractAddress as consumerContractAddressJSON,
+} from "../constants"
+import { createTestCases2 } from "../utils/testFunctions"
+import SetModal from "./SetModal"
 
 export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+    const contractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
     const randomAirdropAddress =
         chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
@@ -57,21 +59,25 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
         if (validation()) {
             setIsFetching(true)
             const setUpOptions = {
-                abi: abi,
+                abi: airdropConsumerAbi,
                 contractAddress: randomAirdropAddress!,
                 functionName: "setUp",
                 params: {
-                    _commitDuration: parseInt(commitDuration),
-                    _commitRevealDuration: parseInt(commitDuration) + 1,
-                    _n: JSON.parse(nValue),
-                    _proofs: JSON.parse(setUpProofs),
+                    commitDuration: parseInt(commitDuration),
+                    commitRevealDuration: parseInt(commitDuration) + 1,
+                    n: JSON.parse(nValue),
+                    proofs: JSON.parse(setUpProofs),
                 },
             }
             const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
             // Prompt user for account connections
             await provider.send("eth_requestAccounts", [])
             const signer = provider.getSigner()
-            const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+            const randomAirdropContract = new ethers.Contract(
+                randomAirdropAddress!,
+                airdropConsumerAbi,
+                provider
+            )
             try {
                 const tx = await randomAirdropContract
                     .connect(signer)
@@ -99,7 +105,7 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
         }
     }
     const handleSuccess = async function (tx: any) {
-        await tx.wait(1)
+        await tx.wait()
         handleNewNotification()
         setIsFetching(false)
     }
