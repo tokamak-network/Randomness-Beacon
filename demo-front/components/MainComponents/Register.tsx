@@ -11,15 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import { ethers } from "ethers"
+import { decodeError } from "ethers-decode-error"
+import { useState } from "react"
 import { useMoralis } from "react-moralis"
+import { Bell, useNotification } from "web3uikit"
+import {
+    airdropConsumerAbi,
+    consumerContractAddress as consumerContractAddressJSON,
+} from "../../constants"
 import { BackgroundImage } from "./BackgroundImage"
 import { Button } from "./Button"
 import { Container } from "./Container"
-import { abi, contractAddresses as contractAddressesJSON } from "../../constants"
-import { useNotification, Bell } from "web3uikit"
-import { ethers } from "ethers"
-import { useState } from "react"
-import { decodeError } from "ethers-decode-error"
 
 export function Register({
     participatedRoundsLength,
@@ -43,10 +46,10 @@ export function Register({
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
     const [isFetching, setIsFetching] = useState<boolean>(false)
-    const contractAddresses: { [key: string]: string[] } = contractAddressesJSON
+    const contractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
 
     const randomAirdropAddress =
-        chainId in contractAddresses
+        !isNaN(chainId) && chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
             : null
     const dispatch = useNotification()
@@ -56,11 +59,13 @@ export function Register({
         // Prompt user for account connections
         await provider.send("eth_requestAccounts", [])
         const signer = provider.getSigner()
-        const randomAirdropContract = new ethers.Contract(randomAirdropAddress!, abi, provider)
+        const randomAirdropContract = new ethers.Contract(
+            randomAirdropAddress!,
+            airdropConsumerAbi,
+            provider
+        )
         try {
-            const tx = await randomAirdropContract
-                .connect(signer)
-                .registerForNextRound({ gasLimit: 150000 })
+            const tx = await randomAirdropContract.connect(signer).register({ gasLimit: 150000 })
             await handleSuccess(tx)
             await updateUI()
         } catch (error: any) {
@@ -77,7 +82,7 @@ export function Register({
         }
     }
     const handleSuccess = async function (tx: any) {
-        await tx.wait(1)
+        await tx.wait()
         handleNewNotification()
         setIsFetching(false)
     }
@@ -149,7 +154,7 @@ export function Register({
                         </>
                     ) : (
                         <h2 className="py-4 px-4 font-bold text-2xl text-red-600 h-60">
-                            Connect to Sepolia, Titan, Titan-Goerli or Set Hardhat Local Node
+                            Connect to Titan, Titan-Goerli or Set Hardhat Local Node
                         </h2>
                     )}
                 </div>
