@@ -16,7 +16,6 @@ def mod_hash_eth(n, *strings):
   toHex = [format(int(x), '02x') for x in strings]
   padToEvenLen = [pad_hex(x) for x in toHex]
   input = ''.join(padToEvenLen)
-  # print("input", input)
   r = Web3.keccak(hexstr=input)
   # print(r.hex())
   r = int(r.hex(), 16)
@@ -26,7 +25,8 @@ def mod_hash_eth(n, *strings):
 # return last 128 bit from keccack 256 hash function outputs int for strings 
 def mod_hash_eth_128(n, *strings):
   r = mod_hash_eth(n, *strings)
-  r = r % pow(2, 128)
+  #r = r % pow(2, 128)
+  r = r >> 128
   return r
 
 def read_config():
@@ -102,7 +102,21 @@ def parse_commits(commit_reveal_values):
     for value in commit_reveal_values:
         parsed_data.append(value[0])
     return parsed_data
-    
+
+def parse_general_values_at_round_v2(values_at_round):
+    """Parse a ValueAtRound struct and return as a dictionary."""
+    return {
+        "startTime": values_at_round[0],
+        "numOfPariticipants": values_at_round[1],
+        "count": values_at_round[2],
+        "consumer": values_at_round[3],
+        "bStar": values_at_round[4],
+        "commitsString": values_at_round[5],
+        "omega": values_at_round[6],
+        "stage": values_at_round[7],
+        "isCompleted": values_at_round[8],
+        "isAllRevealed": values_at_round[9]
+    }
     
 def parse_general_values_at_round(values_at_round):
     """Parse a ValueAtRound struct and return as a dictionary."""
@@ -115,6 +129,18 @@ def parse_general_values_at_round(values_at_round):
         "stage": values_at_round[5],
         "isCompleted": values_at_round[6],
         "isAllRevealed": values_at_round[7]
+    }
+
+##(NBITLEN, GBITLEN, HBITLEN, NVAL, GVAL, HVAL);
+def parse_setup_values_at_round_v2(values_at_round):
+    """Parse a ValueAtRound struct and return as a dictionary."""
+    return {
+        "nBitLen": values_at_round[0],
+        "gBitLen": values_at_round[1],
+        "hBitLen": values_at_round[2],
+        "nVal": values_at_round[3],
+        "gVal": values_at_round[4],
+        "hVal": values_at_round[5]
     }
     
 def parse_setup_values_at_round(values_at_round):
@@ -130,7 +156,38 @@ def parse_setup_values_at_round(values_at_round):
         "h": values_at_round[7]
     }
 
+def get_contract_values_v2(round=None):
+    networks, contract_details = read_config()
 
+    print('The setting from config.ini:')
+    print('\t Network: ', contract_details['network'])
+    print('\t Contract Address: ', contract_details['address'])
+    web3 = Web3(Web3.HTTPProvider(networks[contract_details['network']]))
+    contract = setup_contract(web3, contract_details)
+
+    if(round==None):
+        """Read and return specific values from the smart contract."""
+        print('\n[+] There no input for option \'round\' so fetch the round information from the contract .... \n')
+        round_info = contract.functions.getNextRound().call()
+        if round_info > 0:
+            round_info = round_info - 1
+    else:
+        round_info = round
+    raw_general_values_at_round = contract.functions.getValuesAtRound(round_info).call()
+    genearl_values_at_round = parse_general_values_at_round_v2(raw_general_values_at_round)
+    stage = get_stage(genearl_values_at_round['stage'])
+    print("stage", stage)
+
+    
+    raw_setup_values_at_round = contract.functions.getSetUpValues().call()
+    setup_values_at_round = parse_setup_values_at_round_v2(raw_setup_values_at_round)
+    genearl_values_at_round.update(setup_values_at_round)
+    values_at_round = genearl_values_at_round
+
+    commit_reveal_values = get_commit_reveal_values(contract, round_info)
+    commits = parse_commits(commit_reveal_values)
+
+    return round_info, stage, values_at_round, commits
 
 def get_contract_values(round=None):
     networks, contract_details = read_config()

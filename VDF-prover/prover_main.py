@@ -8,7 +8,7 @@ import sys
 import logging as log
 import json
 
-from web3_util import  get_contract_values, mod_hash_eth
+from web3_util import  get_contract_values, get_contract_values_v2, mod_hash_eth
 
 from log_data import log_session_data
 
@@ -17,6 +17,42 @@ from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halv
 from Commit_Reveal_Recover import setup_without_verif, recover_without_verif, setup, commit, reveal, recover, generate_divisor, GGen
 
 
+def select_fixed_setup_recover_mode(round):
+    round_info, stage, value_at_round, commits = get_contract_values_v2(round)
+
+    if stage != "Finished":
+        print()
+        print(f'[+] Round {round_info} is active with Stage {stage}')
+        ans = input(f'Do you want to recover RANDOM for Round {round_info}? (y or n):')
+
+        if ans.lower() == 'y':
+            n = value_at_round['nVal']
+            g = value_at_round['gVal']
+            T = 4194304
+            h = value_at_round['hVal']
+            bStar = value_at_round['bStar']
+            commits = commits
+
+            return {
+                "mode": "fixed-setup-recover",
+                "n": n,
+                "g": g,
+                "T": T,
+                "h": h,
+                "bstar": bStar,
+                "commits": commits
+            }
+        elif ans.lower() == 'n':
+            print('\n\n')
+            print('[+] Then this script terminates.') 
+            exit()
+            
+        else:
+            print("Invalid selection. Please try again.")
+            select_automatic_mode()
+    
+    print(f'[+] Round {round_info} of the contract does not need recovery.') 
+    exit() 
 
 
 def select_automatic_mode(round):
@@ -64,7 +100,7 @@ def select_automatic_mode(round):
 def command_parser():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the script based on the provided mode and configuration.")
-    parser.add_argument('-m', '--mode', choices=['auto', 'setup', 'test'], required=True, help="Mode of operation: auto, setup, or test.")
+    parser.add_argument('-m', '--mode', choices=['auto', 'setup', 'test', 'fixedSetupRecover'], required=True, help="Mode of operation: auto, setup, or test.")
     parser.add_argument('-r', '--round', type=int, help="Round number for auto mode.")
     parser.add_argument('-b', '--bit_size', type=int, help="Modulo bit size for setup mode.")
     parser.add_argument('-d', '--time_delay', type=int, help="VDF time delay for setup mode.")
@@ -73,6 +109,9 @@ def command_parser():
     # Read configuration file if mode is auto
     if args.mode == 'auto':
         return select_automatic_mode(args.round)
+    
+    elif args.mode == 'fixedSetupRecover':
+        return select_fixed_setup_recover_mode(args.round)
 
     elif args.mode == 'setup':
         if not all([args.bit_size, args.time_delay]):
@@ -92,7 +131,7 @@ def command_parser():
     elif args.mode == 'test':
         n = generate_divisor(2048)
         g = GGen(n)
-        T = 100000
+        T = 4194304
         member = 3
         return {
                 "mode": "test",
@@ -153,6 +192,29 @@ if __name__=='__main__':
         # so it can be imported to js test scripts directly
         log_session_data(mode_info["mode"], sessionData)
     
+    elif mode_info["mode"] == "fixed-setup-recover":
+        n, g, T, commitListHex = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['commits']
+        
+        # binary in array to int decimal
+        # i.e., n = {b'\x01\x02', 9}
+        n = int.from_bytes(n, 'big')
+        g = int.from_bytes(g, 'big')
+        T = T
+        commitList = []
+        for i in commitListHex:
+            commitList.append(int.from_bytes(i[0], 'big'))
+        
+        recoveredOmega, recoveryProofs = recover_without_verif(n, g, T, commitList)
+        
+        sessionData = {
+            'recoveryProofs': recoveryProofs
+        }
+        
+        # the log is printed in two ways
+        # 1. print on terminal
+        # 2. print as a JSON file
+        # so it can be imported to js test scripts directly
+        log_session_data(mode_info["mode"], sessionData)
 
     
     elif mode_info["mode"] == "setup":
