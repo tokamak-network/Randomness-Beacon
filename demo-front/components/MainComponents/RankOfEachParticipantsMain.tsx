@@ -111,14 +111,16 @@ export default function RankOfEachParticipantsMain({
     }
     const handleWithdrawAirdropTokenSuccess = async (tx: any) => {
         await tx.wait()
+        setTimeout(() => {
+            dispatch({
+                type: "success",
+                message: "Withdrawal Successful",
+                title: "Success",
+                position: "topR",
+                icon: <Bell />,
+            })
+        }, 2000)
         await updateUI()
-        dispatch({
-            type: "success",
-            message: "Withdrawal Successful",
-            title: "Success",
-            position: "topR",
-            icon: <Bell />,
-        })
     }
 
     async function getWinnersIndexAndAddressAtRoundFunction() {
