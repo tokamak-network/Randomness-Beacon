@@ -14,6 +14,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import numpy as np
+from matplotlib.ticker import FuncFormatter
 ts = ["2^{22}", "2^{23}", "2^{24}"]
 data = [
   [ 0, 4340674, 'λ2048', 'T2^22' ],
@@ -66,20 +67,25 @@ for i in range(len(data)):
     y[i%3].append(data[i][1])
 for i in range(3):
     plt.plot(x[i], y[i], color=colors[i], label="$"+ts[i]+"$", marker=markers[i])
-plt.axvline(x=7.00000001, linestyle='dotted', color='black')
+plt.axvline(x=7.00000001, color='black')
 plt.text(7.8, 15900000, 'Minimum', ha='right', fontsize=11)
 # plt.annotate('Minimum', xy=(10.00000001, 4200000), xytext=(0, 50), 
 #              textcoords='offset points', ha='right', va='bottom',
 #              arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
 
 plt.legend(title="T", fontsize=13, title_fontsize=13)
-plt.xlabel('Delta', labelpad= 15, fontsize=13)
+plt.xlabel('Number of Skipped Proof', labelpad= 15, fontsize=13, y=-0.1)
 plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize=13)
 plt.gca().yaxis.get_offset_text().set_visible(False)
+def custom_formatter(x, pos):
+    return '{:.0f}'.format(x * 1e-6)
+plt.gca().yaxis.set_major_formatter(FuncFormatter(custom_formatter))
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 
 # Adjust the bottom margin
-plt.subplots_adjust(left=0.15)
+plt.subplots_adjust(left=0.17)
 plt.subplots_adjust(bottom=0.2)
+plt.grid(True, linestyle="--")
+plt.savefig('delta repeated.png', dpi=500)
 plt.show()

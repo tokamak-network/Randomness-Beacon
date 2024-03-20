@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import numpy as np
 from matplotlib.lines import Line2D
+from matplotlib.ticker import FuncFormatter
 NTXYVInProof = [
   [ 1948075, 'λ1024', 'T2^20' ],
   [ 2055287, 'λ1024', 'T2^21' ],
@@ -62,40 +63,43 @@ markers = ['o', '^', 's']  # circle, triangle, square
 ts = ["$2^{20}$", "$2^{21}$", "$2^{22}$", "$2^{23}$", "$2^{24}$", "$2^{25}$"]
 lineStyles = ['-', '--']
 
-xNTXYVInProof = [[],[],[]]
-yNTXYVInProof = [[],[],[]]
-xSkippingN = [[],[],[]]
-ySkippingN = [[],[],[]]
+x = [[],[],[]]
+y = [[],[],[]]
 
 for i in range(0,len(NTXYVInProof),6):
     for j in range(0,6):
-        xNTXYVInProof[i//6].append(ts[j])
-        yNTXYVInProof[i//6].append(NTXYVInProof[i+j][0])
-        xSkippingN[i//6].append(ts[j])
-        ySkippingN[i//6].append(SkippingN[i+j][0])
+        x[i//6].append(ts[j])
+        y[i//6].append(NTXYVInProof[i+j][0] - SkippingN[i+j][0])
 
 for i in range(0,3):
-    plt.plot(xNTXYVInProof[i], yNTXYVInProof[i], color=colors[i], marker=markers[i], label=str(BitSize[i])+" λ")
-    plt.plot(xSkippingN[i], ySkippingN[i], color=colors[i], marker=markers[i], linestyle='--', label=str(BitSize[i])+" λ, Skipped repeated elements")
+    plt.plot(x[i], y[i], color=colors[i], marker=markers[i], label=str(BitSize[i])+" λ")
 
 plt.xlabel('T', labelpad= 15, fontsize = 13)
-plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize = 13)
+plt.ylabel('Gas Used Difference ($10^4$)', labelpad= 15, fontsize = 13)
+
 
 custom_lines = [Line2D([0], [0], color='red', marker='o', lw=1.5),
                 Line2D([0], [0], color='green', marker='^', lw=1.5),
                 Line2D([0], [0], color='blue', marker='s', lw=1.5),
                 Line2D([0], [0], color='black', linestyle='--', lw=1)]
 
-plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072', 'Skipped Repeated Elements'], prop={'size': 10}, bbox_to_anchor=(0.46, 0.7796))
+plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072'], prop={'size': 11.5})
+#bbox_to_anchor=(0.2048870555555555555555, 0.4)
 #plt.legend(bbox_to_anchor=(1.05, 0), loc='lower left', borderaxespad=0., fontsize = 13)
 
 # custom_lines = [Line2D([0], [0], color=colors[i], lw=2) for i in range(3)] + [Line2D([0], [0], color='black', linestyle=lineStyles[i], lw=2) for i in range(2)]
 # plt.legend(custom_lines, [str(BitSize[i]) + ' Bits' for i in range(3)] + ['One N', 'N in Proof'])
 
 plt.gca().yaxis.get_offset_text().set_visible(False)
+
+
+def custom_formatter(x, pos):
+    return '{:.0f}'.format(x * 1e-4)
+plt.gca().yaxis.set_major_formatter(FuncFormatter(custom_formatter))
+
 plt.yticks(fontsize=12)
 plt.xticks(fontsize=12)
-plt.subplots_adjust(left=0.15, bottom=0.2) #, right=0.65)  # Adjust the right space as needed)
+plt.subplots_adjust(left=0.17, bottom=0.2) #, right=0.65)  # Adjust the right space as needed)
 plt.grid(True, linestyle="--")
-plt.savefig('5.5 N deletion.png', dpi=500)
+plt.savefig('5. N diff.png', dpi=500)
 plt.show()

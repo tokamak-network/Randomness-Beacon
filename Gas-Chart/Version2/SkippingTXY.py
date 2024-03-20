@@ -81,12 +81,12 @@ for i in range(0,3):
 plt.xlabel('T', labelpad= 15, fontsize = 13)
 plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize = 13)
 
-custom_lines = [Line2D([0], [0], color='red', lw=2),
-                Line2D([0], [0], color='green', lw=2),
-                Line2D([0], [0], color='blue', lw=2),
-                Line2D([0], [0], color='black', linestyle='--', lw=2)]
+custom_lines = [Line2D([0], [0], color='red', marker='o', lw=1.5),
+                Line2D([0], [0], color='green', marker='^', lw=1.5),
+                Line2D([0], [0], color='blue', marker='s', lw=1.5),
+                Line2D([0], [0], color='black', linestyle='--', lw=1)]
 
-plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072', 'Skipped deterministic Elements'], fontsize=12)
+plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072', 'Skipped Deterministic Elements'], prop={'size': 9.5}, bbox_to_anchor=(0.43, 0.7596))
 #plt.legend(bbox_to_anchor=(1.05, 0), loc='lower left', borderaxespad=0., fontsize = 13)
 
 # custom_lines = [Line2D([0], [0], color=colors[i], lw=2) for i in range(3)] + [Line2D([0], [0], color='black', linestyle=lineStyles[i], lw=2) for i in range(2)]
@@ -96,5 +96,6 @@ plt.gca().yaxis.get_offset_text().set_visible(False)
 plt.yticks(fontsize=12)
 plt.xticks(fontsize=12)
 plt.subplots_adjust(left=0.15, bottom=0.2) #, right=0.65)  # Adjust the right space as needed)
-
+plt.grid(True, linestyle="--")
+plt.savefig('6.5 T deletion.png', dpi=500)
 plt.show()

@@ -71,20 +71,22 @@ for i in range(len(data)):
     y[i%3].append(data[i][1])
 for i in range(3):
     plt.plot(x[i], y[i], color=colors[i], label="$"+ts[i]+"$", marker=markers[i])
-plt.axvline(x=9.00000001, linestyle='dotted', color='black')
-plt.text(9.9, 9290000, 'Minimum', ha='right', fontsize=11)
+plt.axvline(x=9.00000001, color='black')
+plt.text(9.9, 9090000, 'Minimum', ha='right', fontsize=11)
 # plt.annotate('Minimum', xy=(10.00000001, 4200000), xytext=(0, 50), 
 #              textcoords='offset points', ha='right', va='bottom',
 #              arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
 
 plt.legend(title="T", fontsize=13, title_fontsize=13)
-plt.xlabel('Delta', labelpad= 15, fontsize=13)
+plt.xlabel('Number of Skipped Proof', labelpad= 15, fontsize=13, y=-0.1)
 plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize=13)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 plt.xticks(fontsize=12)
 plt.yticks(fontsize=12)
 
 # Adjust the bottom margin
-plt.subplots_adjust(left=0.15)
+plt.subplots_adjust(left=0.17)
 plt.subplots_adjust(bottom=0.2)
+plt.grid(True, linestyle="--")
+plt.savefig('8. Delta Chart when Proof Length And Element Pruning Applied.png', dpi=500)
 plt.show()
