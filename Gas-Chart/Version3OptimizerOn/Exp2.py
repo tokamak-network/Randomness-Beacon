@@ -61,26 +61,25 @@ x = ["$x^{2^{300}}$", "$x^{2^{600}}$", "$x^{2^{900}}$", "$x^{2^{1200}}$", "$x^{2
 expBySquareIterative = [1226396, 2730094, 4571128, 6749650, 9265294, 12119852, 15315802, 18848994, 22719401, 26927315]
 expBySquareAndMultiply = [980023, 2145516, 3530228, 5135291, 6959573, 9004518, 11268411, 13752645, 16456097, 19379901]
 precompileModExp = [136827, 241084, 345504, 449446, 553389, 658107, 762162, 866205, 970236, 1075323]
-colors = ['#ff0000', '#008800', '#0000ff']
+colors = ["tab:red", "tab:green", "tab:blue"]
 markers = ['o', '^', 's']  # circle, triangle, square
 
 plt.plot(x, expBySquareIterative, color=colors[0], marker=markers[0], label="Baseline Model")
 plt.plot(x, expBySquareAndMultiply, color=colors[1], marker=markers[1], label="Square And Multiply")
 plt.plot(x, precompileModExp, color=colors[2], marker=markers[2], label="Precompile ModExp")
 
-plt.legend(fontsize=13)
-plt.xlabel('Exponentiation', labelpad= 15, fontsize=13)
-plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize=13)
+plt.legend(fontsize=14)
+plt.xlabel('Exponentiation', labelpad= 15, fontsize=14)
+plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize=14)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 
 def custom_formatter(x, pos):
     return '{:.0f}'.format(x * 1e-6)
 plt.gca().yaxis.set_major_formatter(FuncFormatter(custom_formatter))
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
+plt.xticks(fontsize=13.2)
+plt.yticks(fontsize=13)
 # margin
-plt.subplots_adjust(left=0.17)
-plt.subplots_adjust(bottom=0.2)
 plt.grid(True, linestyle="--")
+plt.tight_layout()
 plt.savefig('1. modexp.png', dpi=500)
 plt.show()

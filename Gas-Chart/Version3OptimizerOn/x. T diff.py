@@ -74,7 +74,7 @@ for i in range(0,len(NTXYVInProof),6):
 for i in range(0,3):
     plt.plot(x[i], y[i], color=colors[i], marker=markers[i], label=str(BitSize[i])+" λ")
 
-plt.xlabel('T', labelpad= 15, fontsize = 13)
+plt.xlabel(r'Exponentiation ($\tau$)', labelpad= 15, fontsize = 13)
 plt.ylabel('Gas Used Difference ($10^4$)', labelpad= 15, fontsize = 13)
 
 custom_lines = [Line2D([0], [0], color='red', marker='o', lw=1.5),
@@ -97,4 +97,5 @@ plt.xticks(fontsize=12)
 plt.subplots_adjust(left=0.17, bottom=0.2) #, right=0.65)  # Adjust the right space as needed)
 plt.grid(True, linestyle="--")
 plt.savefig('6. T diff.png', dpi=500)
+plt.tight_layout()
 plt.show()

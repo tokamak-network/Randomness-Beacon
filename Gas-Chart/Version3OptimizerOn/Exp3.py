@@ -61,31 +61,37 @@ import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import numpy as np
 from matplotlib.ticker import FuncFormatter
-x = ["$x^{2^2}$", "$x^{2^4}$", "$x^{2^8}$", "$x^{2^{16}}$", "$x^{2^{32}}$", "$x^{2^{64}}$", "$x^{2^{128}}$", "$x^{2^{256}}$", "$x^{2^{512}}$", "$x^{2^{1024}}$", "$x^{2^{2048}}$"]
+#x = ["$x^{2^2}$", "$x^{2^4}$", "$x^{2^8}$", "$x^{2^{16}}$", "$x^{2^{32}}$", "$x^{2^{64}}$", "$x^{2^{128}}$", "$x^{2^{256}}$", "$x^{2^{512}}$", "$x^{2^{1024}}$", "$x^{2^{2048}}$"]
+x = ['2', '4', '8', '16', '32', '64', '128', '256', '512', '1024', '2048']
 expBySquareIterative = [66801, 73603, 87278, 114614, 169895, 283000, 519121, 1032461, 2250934, 5427134, 14735446]
 expBySquareAndMultiply = [40302, 45744, 57225, 79736, 125228, 218087, 411306, 827913, 1780996, 4167310, 10860551]
 precompileModExp = [34441, 35135, 36521, 39144, 44669, 55505, 77520, 121691, 210694, 388551, 744152]
 
 
-colors = ['#ff0000', '#008800', '#0000ff']
+colors = ["tab:red", "tab:green", "tab:blue"]
 markers = ['o', '^', 's']  # circle, triangle, square
 
 plt.plot(x, expBySquareIterative, color=colors[0], marker=markers[0], label="Baseline Model")
 plt.plot(x, expBySquareAndMultiply, color=colors[1], marker=markers[1], label="Square And Multiply")
 plt.plot(x, precompileModExp, color=colors[2], marker=markers[2], label="Precompile ModExp")
 
-plt.legend(fontsize=13)
-plt.xlabel('Exponentiation', labelpad= 15, fontsize=13)
-plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize=13)
+plt.legend(fontsize=17)
+plt.xlabel('Exponentiation ($\\tau$ of $x^{2^\\tau}$)', fontsize=22.5)
+plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=21)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 def custom_formatter(x, pos):
     return '{:.0f}'.format(x * 1e-6)
 plt.gca().yaxis.set_major_formatter(FuncFormatter(custom_formatter))
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
+x_numerical = np.array([2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048])
+plt.xticks(fontsize=16, rotation = 45)
+plt.yticks(fontsize=17)
 # margin
-plt.subplots_adjust(left=0.17)
-plt.subplots_adjust(bottom=0.2)
 plt.grid(True, linestyle="--")
+plt.tight_layout()
+# Add text 'x^{2^t}' to the plot
+# Adjust 'x_coord' and 'y_coord' to position the text appropriately
+# x_coord = len(x) - 0.6  # Position at the end of the x-axis
+# y_coord = min(min(expBySquareIterative), min(expBySquareAndMultiply), min(precompileModExp)) * -150  # Adjust this as needed
+# plt.text(x_coord, y_coord, r'$x^{2^t}$', fontsize=15, ha='right', va='bottom')
 plt.savefig('2. modexp(log).png', dpi=500)
 plt.show()

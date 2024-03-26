@@ -16,48 +16,48 @@ import matplotlib.lines as mlines
 import numpy as np
 from matplotlib.lines import Line2D
 NTXYVInProof = [
-[ 1891828, 'λ1024', 'T2^20' ],
-[ 1993090, 'λ1024', 'T2^21' ],
-[ 2096346, 'λ1024', 'T2^22' ],
-[ 2198301, 'λ1024', 'T2^23' ],
-[ 2295138, 'λ1024', 'T2^24' ],
-[ 2407067, 'λ1024', 'T2^25' ],
-[ 3854404, 'λ2048', 'T2^20' ],
-[ 4060607, 'λ2048', 'T2^21' ],
-[ 4264504, 'λ2048', 'T2^22' ],
-[ 4480256, 'λ2048', 'T2^23' ],
-[ 4672532, 'λ2048', 'T2^24' ],
-[ 4897782, 'λ2048', 'T2^25' ],
-[ 6803677, 'λ3072', 'T2^20' ],
-[ 7155541, 'λ3072', 'T2^21' ],
-[ 7522241, 'λ3072', 'T2^22' ],
-[ 7875852, 'λ3072', 'T2^23' ],
-[ 8241395, 'λ3072', 'T2^24' ],
-[ 8630845, 'λ3072', 'T2^25' ]
+[ 1793639, 'λ1024', 'T2^20' ],
+[ 1885927, 'λ1024', 'T2^21' ],
+[ 1983777, 'λ1024', 'T2^22' ],
+[ 2070565, 'λ1024', 'T2^23' ],
+[ 2168214, 'λ1024', 'T2^24' ],
+[ 2270274, 'λ1024', 'T2^25' ],
+[ 3746113, 'λ2048', 'T2^20' ],
+[ 3937877, 'λ2048', 'T2^21' ],
+[ 4127804, 'λ2048', 'T2^22' ],
+[ 4334579, 'λ2048', 'T2^23' ],
+[ 4520732, 'λ2048', 'T2^24' ],
+[ 4735860, 'λ2048', 'T2^25' ],
+[ 6671421, 'λ3072', 'T2^20' ],
+[ 7006711, 'λ3072', 'T2^21' ],
+[ 7374009, 'λ3072', 'T2^22' ],
+[ 7701888, 'λ3072', 'T2^23' ],
+[ 8093851, 'λ3072', 'T2^24' ],
+[ 8456547, 'λ3072', 'T2^25' ]
 ]
 SkippingN = [
-[ 1813561, 'λ1024', 'T2^20' ],
-[ 1910626, 'λ1024', 'T2^21' ],
-[ 2009638, 'λ1024', 'T2^22' ],
-[ 2107358, 'λ1024', 'T2^23' ],
-[ 2199660, 'λ1024', 'T2^24' ],
-[ 2307523, 'λ1024', 'T2^25' ],
-[ 3730519, 'λ2048', 'T2^20' ],
-[ 3928939, 'λ2048', 'T2^21' ],
-[ 4126229, 'λ2048', 'T2^22' ],
-[ 4335577, 'λ2048', 'T2^23' ],
-[ 4519867, 'λ2048', 'T2^24' ],
-[ 4738946, 'λ2048', 'T2^25' ],
-[ 6630470, 'λ3072', 'T2^20' ],
-[ 6972153, 'λ3072', 'T2^21' ],
-[ 7328887, 'λ3072', 'T2^22' ],
-[ 7672763, 'λ3072', 'T2^23' ],
-[ 8028420, 'λ3072', 'T2^24' ],
-[ 8408997, 'λ3072', 'T2^25' ]
+[ 1717527, 'λ1024', 'T2^20' ],
+[ 1805756, 'λ1024', 'T2^21' ],
+[ 1899500, 'λ1024', 'T2^22' ],
+[ 1982221, 'λ1024', 'T2^23' ],
+[ 2075445, 'λ1024', 'T2^24' ],
+[ 2173609, 'λ1024', 'T2^25' ],
+[ 3623872, 'λ2048', 'T2^20' ],
+[ 3808993, 'λ2048', 'T2^21' ],
+[ 3991757, 'λ2048', 'T2^22' ],
+[ 4191712, 'λ2048', 'T2^23' ],
+[ 4371969, 'λ2048', 'T2^24' ],
+[ 4579959, 'λ2048', 'T2^25' ],
+[ 6500116, 'λ3072', 'T2^20' ],
+[ 6825692, 'λ3072', 'T2^21' ],
+[ 7183687, 'λ3072', 'T2^22' ],
+[ 7502263, 'λ3072', 'T2^23' ],
+[ 7884119, 'λ3072', 'T2^24' ],
+[ 8237084, 'λ3072', 'T2^25' ]
 ]
 
 BitSize = [1024, 2048, 3072]
-colors = ['#ff0000', '#008800', '#0000ff']
+colors = ["tab:red", "tab:green", "tab:blue"]
 markers = ['o', '^', 's']  # circle, triangle, square
 ts = ["$2^{20}$", "$2^{21}$", "$2^{22}$", "$2^{23}$", "$2^{24}$", "$2^{25}$"]
 lineStyles = ['-', '--']
@@ -78,24 +78,24 @@ for i in range(0,3):
     plt.plot(xNTXYVInProof[i], yNTXYVInProof[i], color=colors[i], marker=markers[i], label=str(BitSize[i])+" λ")
     plt.plot(xSkippingN[i], ySkippingN[i], color=colors[i], marker=markers[i], linestyle='--', label=str(BitSize[i])+" λ, Skipped repeated elements")
 
-plt.xlabel('T', labelpad= 15, fontsize = 13)
-plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize = 13)
+plt.xlabel(r'Exponentiation ($\tau$)', labelpad= 15, fontsize = 14)
+plt.ylabel('Gas Used ($10^6$)', labelpad= 15, fontsize = 15)
 
-custom_lines = [Line2D([0], [0], color='red', marker='o', lw=1.5),
-                Line2D([0], [0], color='green', marker='^', lw=1.5),
-                Line2D([0], [0], color='blue', marker='s', lw=1.5),
+custom_lines = [Line2D([0], [0], color='tab:red', marker='o', lw=1.5),
+                Line2D([0], [0], color='tab:green', marker='^', lw=1.5),
+                Line2D([0], [0], color='tab:blue', marker='s', lw=1.5),
                 Line2D([0], [0], color='black', linestyle='--', lw=1)]
 
-plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072', 'Skipped Repeated Elements'], prop={'size': 10}, bbox_to_anchor=(0.46, 0.7796))
+plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072', 'Deleted Static Elements'], prop={'size': 11.5}, bbox_to_anchor=(0.497, 0.7838))
 #plt.legend(bbox_to_anchor=(1.05, 0), loc='lower left', borderaxespad=0., fontsize = 13)
 
 # custom_lines = [Line2D([0], [0], color=colors[i], lw=2) for i in range(3)] + [Line2D([0], [0], color='black', linestyle=lineStyles[i], lw=2) for i in range(2)]
 # plt.legend(custom_lines, [str(BitSize[i]) + ' Bits' for i in range(3)] + ['One N', 'N in Proof'])
 
 plt.gca().yaxis.get_offset_text().set_visible(False)
-plt.yticks(fontsize=12)
-plt.xticks(fontsize=12)
-plt.subplots_adjust(left=0.15, bottom=0.2) #, right=0.65)  # Adjust the right space as needed)
+plt.yticks(fontsize=13)
+plt.xticks(fontsize=13)
 plt.grid(True, linestyle="--")
+plt.tight_layout()
 plt.savefig('5.5 N deletion.png', dpi=500)
 plt.show()

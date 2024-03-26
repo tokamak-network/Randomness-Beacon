@@ -17,38 +17,38 @@ import numpy as np
 from matplotlib.lines import Line2D
 from matplotlib.ticker import FuncFormatter
 AppliedNothing = NTXYVInProof = [
-  [ 3854404, 'λ2048', 'T2^20' ],
-  [ 4060607, 'λ2048', 'T2^21' ],
-  [ 4264504, 'λ2048', 'T2^22' ],
-  [ 4480256, 'λ2048', 'T2^23' ],
-  [ 4672532, 'λ2048', 'T2^24' ],
-  [ 4897782, 'λ2048', 'T2^25' ],
+[ 3746113, 'λ2048', 'T2^20' ],
+[ 3937877, 'λ2048', 'T2^21' ],
+[ 4127804, 'λ2048', 'T2^22' ],
+[ 4334579, 'λ2048', 'T2^23' ],
+[ 4520732, 'λ2048', 'T2^24' ],
+[ 4735860, 'λ2048', 'T2^25' ]
 ]
 AppliedEverything = [
-  [ 8, 2108114, 'λ2048', 'T2^20' ],
-  [ 8, 2280332, 'λ2048', 'T2^21' ],
-  [ 8, 2454169, 'λ2048', 'T2^22' ],
-  [ 8, 2630345, 'λ2048', 'T2^23' ],
-  [ 8, 2792191, 'λ2048', 'T2^24' ],
-  [ 8, 2979396, 'λ2048', 'T2^25' ],
-  [ 9, 2025089, 'λ2048', 'T2^20' ],
-  [ 9, 2196864, 'λ2048', 'T2^21' ],
-  [ 9, 2369604, 'λ2048', 'T2^22' ],
-  [ 9, 2544054, 'λ2048', 'T2^23' ],
-  [ 9, 2705219, 'λ2048', 'T2^24' ],
-  [ 9, 2891220, 'λ2048', 'T2^25' ],
-  [ 10, 2041779, 'λ2048', 'T2^20' ],
-  [ 10, 2213052, 'λ2048', 'T2^21' ],
-  [ 10, 2385327, 'λ2048', 'T2^22' ],
-  [ 10, 2558241, 'λ2048', 'T2^23' ],
-  [ 10, 2715319, 'λ2048', 'T2^24' ],
-  [ 10, 2899217, 'λ2048', 'T2^25' ],
+[ 8, 2041688, 'λ2048', 'T2^20' ],
+[ 8, 2205528, 'λ2048', 'T2^21' ],
+[ 8, 2369185, 'λ2048', 'T2^22' ],
+[ 8, 2543717, 'λ2048', 'T2^23' ],
+[ 8, 2698784, 'λ2048', 'T2^24' ],
+[ 8, 2879220, 'λ2048', 'T2^25' ],
+[ 9, 1964917, 'λ2048', 'T2^20' ],
+[ 9, 2127046, 'λ2048', 'T2^21' ],
+[ 9, 2290828, 'λ2048', 'T2^22' ],
+[ 9, 2463480, 'λ2048', 'T2^23' ],
+[ 9, 2618446, 'λ2048', 'T2^24' ],
+[ 9, 2797229, 'λ2048', 'T2^25' ],
+[ 10, 1987078, 'λ2048', 'T2^20' ],
+[ 10, 2148986, 'λ2048', 'T2^21' ],
+[ 10, 2311847, 'λ2048', 'T2^22' ],
+[ 10, 2483847, 'λ2048', 'T2^23' ],
+[ 10, 2637298, 'λ2048', 'T2^24' ],
+[ 10, 2812165, 'λ2048', 'T2^25' ],
 ]
 
 # 4 colors for 4 lines
-colors = ['#ff0000', '#008800', '#0000ff', 'orange']
+colors = ["tab:red", "tab:green", "tab:blue", "tab:orange"]
 # 4 markers for 4 lines
-markers = ['o', '^', 's', 'D']  # circle, triangle, square, diamond
+markers = ['o', 'P', 's', 'D']  # circle, triangle, square, diamond
 ts = ["$2^{20}$", "$2^{21}$", "$2^{22}$", "$2^{23}$", "$2^{24}$", "$2^{25}$"]
 x = [[],[],[],[]]
 y = [[],[],[],[]]
@@ -65,21 +65,21 @@ plt.plot(x[0], y[0], color=colors[0], marker=markers[0], linestyle="--")
 plt.plot(x[1], y[1], color=colors[1], marker=markers[1], label="δ = 8")
 plt.plot(x[3], y[3], color=colors[3], marker=markers[3], label="δ = 10")
 plt.plot(x[2], y[2], color=colors[2], marker=markers[2], label="δ = 9")
-custom_lines = [Line2D([0], [0], color='red', linestyle='--', marker='o', lw=1),
+custom_lines = [Line2D([0], [0], color='tab:red', linestyle='--', marker='o', lw=1),
                 Line2D([0], [0], color='black', linestyle='-', lw=1),
-                Line2D([0], [0], color='green', marker='D', lw=1.5),
-                Line2D([0], [0], color='blue', marker='s', lw=1.5),
-                Line2D([0], [0], color='orange', marker='^', lw=1.5)]
-plt.legend(custom_lines, ['Baseline Model', "Optimized",'δ = 8', 'δ = 9', 'δ = 10'], prop={'size': 11.5},bbox_to_anchor=(0.43, 0.4))
-plt.xlabel('T', labelpad= 15, fontsize = 13)
-plt.ylabel('Gas Used ($10^5$)', labelpad= 15, fontsize = 13)
+                Line2D([0], [0], color='tab:green', marker='P', lw=1.5),
+                Line2D([0], [0], color='tab:blue', marker='s', lw=1.5),
+                Line2D([0], [0], color='tab:orange', marker='^', lw=1.5)]
+plt.legend(custom_lines, ['Baseline Model', "Optimized",'δ = 8', 'δ = 9', 'δ = 10'], prop={'size': 12},bbox_to_anchor=(0.39, 0.4))
+plt.xlabel(r'Exponentiation ($\tau$)', labelpad= 15, fontsize = 14)
+plt.ylabel('Gas Used ($10^5$)', labelpad= 15, fontsize = 14)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 def custom_formatter(x, pos):
     return '{:.0f}'.format(x * 1e-5)
 plt.gca().yaxis.set_major_formatter(FuncFormatter(custom_formatter))
-plt.yticks(fontsize=12)
-plt.xticks(fontsize=12)
-plt.subplots_adjust(left=0.17, bottom=0.2) #, right=0.65)  # Adjust the right space as needed)
+plt.yticks(fontsize=13)
+plt.xticks(fontsize=13)
 plt.grid(True, linestyle="--")
+plt.tight_layout()
 plt.savefig('7. AllAndNoneApplied.png', dpi=500)  # Adjust the dpi as needed
 plt.show()

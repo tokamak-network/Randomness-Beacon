@@ -74,8 +74,8 @@ for i in range(0,len(NTXYVInProof),6):
 for i in range(0,3):
     plt.plot(x[i], y[i], color=colors[i], marker=markers[i], label=str(BitSize[i])+" λ")
 
-plt.xlabel('T', labelpad= 15, fontsize = 13)
-plt.ylabel('Gas Used Difference ($10^4$)', labelpad= 15, fontsize = 13)
+plt.xlabel(r'Exponentiation ($\tau$)', labelpad= 15, fontsize = 15)
+plt.ylabel('Gas Used Difference ($10^4$)', labelpad= 15, fontsize = 15)
 
 
 custom_lines = [Line2D([0], [0], color='red', marker='o', lw=1.5),
@@ -83,7 +83,7 @@ custom_lines = [Line2D([0], [0], color='red', marker='o', lw=1.5),
                 Line2D([0], [0], color='blue', marker='s', lw=1.5),
                 Line2D([0], [0], color='black', linestyle='--', lw=1)]
 
-plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072'], prop={'size': 11.5})
+plt.legend(custom_lines, ['λ = 1024', 'λ = 2048', 'λ = 3072'], prop={'size': 13})
 #bbox_to_anchor=(0.2048870555555555555555, 0.4)
 #plt.legend(bbox_to_anchor=(1.05, 0), loc='lower left', borderaxespad=0., fontsize = 13)
 
@@ -97,9 +97,10 @@ def custom_formatter(x, pos):
     return '{:.0f}'.format(x * 1e-4)
 plt.gca().yaxis.set_major_formatter(FuncFormatter(custom_formatter))
 
-plt.yticks(fontsize=12)
-plt.xticks(fontsize=12)
+plt.yticks(fontsize=14)
+plt.xticks(fontsize=14)
 plt.subplots_adjust(left=0.17, bottom=0.2) #, right=0.65)  # Adjust the right space as needed)
 plt.grid(True, linestyle="--")
 plt.savefig('5. N diff.png', dpi=500)
+plt.tight_layout()
 plt.show()
