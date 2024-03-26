@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from web3 import Web3
 
-from web3_util import  get_contract_values, mod_hash_eth
+from web3_util import  get_contract_values, hash_eth
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
@@ -62,7 +62,7 @@ def construct_claim(exp_list, N, g, y, T):
     # v = get_exp(exp_list, pow(2,T_half), N)    
     v = VDF(N, g, T_half)
     
-    return (N, g, y, T, v)
+    return (N, g, y, T, v[0])
 
 
 # Returns N=p*q where p and q are primes
@@ -191,7 +191,7 @@ def commit(N, g, member):
     ### Finalize({a'_i, c_i, d_i, pi_i)}^n_i=1
     
     # b* <- H(c_1||...||c_n)
-    b_star = mod_hash_eth(N, *c)
+    b_star = hash_eth(*c)
     
     # print('[+] Input commits: ', commits)
     # b_star = int(b_star, 16)
@@ -219,7 +219,7 @@ def reveal(N, h, a, c, b_star):
     omega = 1
     
     for i in range(len(a)):
-        omega = ( omega*pow(pow(h, mod_hash_eth(N, c[i], b_star), N), a[i], N) ) % N
+        omega = ( omega*pow(pow(h, hash_eth(c[i], b_star), N), a[i], N) ) % N
         
     print('[+] Revealed Random: ', omega, '\n')
 
@@ -229,7 +229,7 @@ def recover_without_verif(N, g, T, c, b_star=None):
 
     if b_star == None:
         # b* <- H(c_1||...||c_n)
-        b_star = mod_hash_eth(N, *c)
+        b_star = hash_eth(*c)
         
     ##### recovery scenario #####
     
@@ -256,7 +256,7 @@ def recover_without_verif(N, g, T, c, b_star=None):
     recov = 1
     
     for i in c:
-        temp = pow(i, mod_hash_eth(N, i, b_star), N)
+        temp = pow(i, hash_eth(i, b_star), N)
         recov = (recov * temp) % N
        
     # recov = simple_VDF(recov, N, T)
@@ -283,7 +283,7 @@ def recover(N, g, T, c, b_star=None):
 
     if b_star == None:
         # b* <- H(c_1||...||c_n)
-        b_star = mod_hash_eth(N, *c)
+        b_star = hash_eth(*c)
         
     ##### recovery scenario #####
     
@@ -310,7 +310,7 @@ def recover(N, g, T, c, b_star=None):
     recov = 1
     
     for i in c:
-        temp = pow(i, mod_hash_eth(N, i, b_star), N)
+        temp = pow(i, hash_eth(i, b_star), N)
         recov = (recov * temp) % N
        
     # recov = simple_VDF(recov, N, T)

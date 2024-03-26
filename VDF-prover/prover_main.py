@@ -8,7 +8,7 @@ import sys
 import logging as log
 import json
 
-from web3_util import  get_contract_values, get_contract_values_v2, mod_hash_eth
+from web3_util import  get_contract_values, get_contract_values_v2
 
 from log_data import log_session_data
 
@@ -131,7 +131,7 @@ def command_parser():
     elif args.mode == 'test':
         n = generate_divisor(2048) #1024, 2048, 3072
         g = GGen(n)
-        T = 4194304 #1048576, 2097152, 4194304, 8388608, 16777216, 33554432
+        T = 33554432 #1048576, 2097152, 4194304, 8388608, 16777216, 33554432
         member = 3
         return {
                 "mode": "test",

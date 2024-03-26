@@ -12,7 +12,7 @@ import pickle
 import os
 from sympy import *
 
-from web3_util import mod_hash_eth, mod_hash_eth_128
+from web3_util import hash_eth_128
 from log_data import to_session_data_format, get_file_name_with_time
 
 logging.basicConfig(level=logging.INFO) # 기본 로깅 레벨 설정
@@ -111,7 +111,7 @@ def gen_single_halving_proof(claim):
     n, x, y, T, v = claim
 
     # Use security parameter k as 128 bit
-    r = mod_hash_eth_128(x, y, v)
+    r = hash_eth_128(x, y, v)
 
     x_prime = pow(x, r, n) * v % n
     # As T increased by one, y should multiplied by the same amount (2^1)
@@ -131,7 +131,7 @@ def gen_single_halving_proof(claim):
 
 # Construct a full Proof-of-Exponentiation, Log2(T) size
 def gen_recursive_halving_proof(claim):
-    log.info(f"[+] Start to generate a proof for the claim \n{claim} \n")
+    #log.info(f"[+] Start to generate a proof for the claim \n{claim} \n")
 
     proof_list = [claim]
     T = claim[3]
@@ -142,7 +142,7 @@ def gen_recursive_halving_proof(claim):
         proof_list.append(claim)
 
         T = claim[3]
-        log.info(f"[+] Proof for T={T} is generated: {claim}")
+        #log.info(f"[+] Proof for T={T} is generated: {claim}")
 
     return proof_list
 
@@ -165,11 +165,9 @@ def process_single_halving_proof(VDF_claim):
     else:
         # check if the random value 'r' is well generated
         # r = sha(x, y, v) mod n
-        # print('mod hash: ', mod_hash_eth(x, y, v))
-        # print('mod hash / 2^128: ', int(mod_hash_eth(x, y, v) % pow(2, 128)))
         # test = input('stop: ')
         # Use security parameter k as 128 bit
-        r = mod_hash_eth_128(x, y, v)
+        r = hash_eth_128(x, y, v)
 
         # check if the next proof is well contructed
         x_prime = pow(x, r, n) * v % n
@@ -250,7 +248,7 @@ if __name__ == '__main__':
         T_half = int((T + 1) / 2)
 
     v = get_exp(exp_list, pow(2, T_half), N)
-    r = mod_hash_eth_128(g, y, v)
+    r = hash_eth_128(g, y, v)
 
     end_VDF_evaluation = time.time()
     execution_VDF_evaluation = end_VDF_evaluation - start_VDF_evaluation

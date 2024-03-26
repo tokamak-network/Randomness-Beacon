@@ -10,7 +10,7 @@ def pad_hex(x):
     return ('0' * n) + x
     
 # keccack 256 hash function outputs int for strings 
-def mod_hash_eth(n, *strings):
+def hash_eth(*strings):
   # concatenate integer strings as even bytes
   # for example, [10, 17] -> 0x0a, 0x11 -> 0x0a11
   toHex = [format(int(x), '02x') for x in strings]
@@ -19,12 +19,11 @@ def mod_hash_eth(n, *strings):
   r = Web3.keccak(hexstr=input)
   # print(r.hex())
   r = int(r.hex(), 16)
-  r = r % n
   return r
   
 # return last 128 bit from keccack 256 hash function outputs int for strings 
-def mod_hash_eth_128(n, *strings):
-  r = mod_hash_eth(n, *strings)
+def hash_eth_128(*strings):
+  r = hash_eth(*strings)
   #r = r % pow(2, 128)
   r = r >> 128
   return r
@@ -233,5 +232,4 @@ if __name__ == "__main__":
     c = ['10', '11']
     # c = even_hex_concat(c)
     print(c)
-    print(mod_hash_eth(100000, *c))
     # get_contract_values()
