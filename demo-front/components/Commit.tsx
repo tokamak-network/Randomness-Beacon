@@ -183,7 +183,7 @@ export default function Commit({ round }: { round: string }) {
                             let stringVal = e.target.value
                             if (e.target.value.length == 0) stringVal = "0"
 
-                            const hexValue: string = ethers.utils.hexlify(stringVal)
+                            const hexValue: string = ethers.utils.hexlify(BigInt(stringVal))
                             setCommitCalldata({
                                 val: ethers.utils.hexZeroPad(
                                     hexValue,
