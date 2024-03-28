@@ -14,13 +14,13 @@
 // import ReactJson from "react-json-view-with-toggle"
 import dynamic from "next/dynamic"
 import Header from "../components/Header"
-import { createTestCaseV2 } from "../utils/testFunctions"
+import { createTestCase } from "../utils/testFunctions"
 const ReactJson = dynamic(() => import("react-json-view-with-toggle"), {
     ssr: false,
 })
 //import ReactJson from "react-json-view-with-toggle"
 export default function TestCase() {
-    const setUpParams = createTestCaseV2()
+    const setUpParams = createTestCase()
     return (
         <>
             <Header />{" "}

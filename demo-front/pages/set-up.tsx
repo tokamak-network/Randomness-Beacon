@@ -7,10 +7,10 @@ import Recover from "../components/Recover"
 import Round from "../components/Round"
 import StartRegistration from "../components/StartRegistration"
 import {
-    airdropConsumerAbi,
     consumerContractAddress as consumerContractAddressJSON,
     coordinatorContractAddress as coordinatorContractAddressJSON,
     crrngAbi,
+    cryptoDiceConsumerAbi,
 } from "../constants"
 /*
         uint256 startTime;
@@ -86,10 +86,10 @@ export default function SetUpPage() {
         params: {},
     })
 
-    const { runContractFunction: getNextRandomAirdropRound } = useWeb3Contract({
-        abi: airdropConsumerAbi,
+    const { runContractFunction: getNextCryptoDiceRound } = useWeb3Contract({
+        abi: cryptoDiceConsumerAbi,
         contractAddress: randomAirdropAddress!, //,
-        functionName: "getNextRandomAirdropRound", //,
+        functionName: "getNextCryptoDiceRound", //,
         params: {},
     })
 
@@ -97,7 +97,7 @@ export default function SetUpPage() {
     const { runContractFunction: getValuesAtRound } = useWeb3Contract()
 
     async function updateUI() {
-        const roundFromCall = (await getNextRandomAirdropRound({
+        const roundFromCall = (await getNextCryptoDiceRound({
             onError: (error) => console.log(error),
         })) as BigNumberish
         const roundInt =
@@ -138,9 +138,9 @@ export default function SetUpPage() {
                             <div className="border-dashed border-slate-300 border-2 rounded-lg p-10 m-5 truncate hover:text-clip">
                                 <div key="Round">Round: {round}</div>
                                 <div key="T">T: 4194304</div>
-                                <div key="n">n: {setUpValues[3]}</div>
-                                <div key="g">g: {setUpValues[4]}</div>
-                                <div key="h">h: {setUpValues[5]}</div>
+                                <div key="n">n: {setUpValues[3].toString()}</div>
+                                <div key="g">g: {setUpValues[4].toString()}</div>
+                                <div key="h">h: {setUpValues[5].toString()}</div>
                                 <div key="commitDuration">commitDuration: 120 seconds</div>
                                 <div key="commitRevealDuration">
                                     commitRevealDuration: 240 seconds

@@ -21,9 +21,10 @@ import { MainHeader } from "../components/MainComponents/MainHeader"
 import RankOfEachParticipantsMain from "../components/MainComponents/RankOfEachParticipantsMain"
 import { Register } from "../components/MainComponents/Register"
 import {
-    airdropConsumerAbi,
     consumerContractAddress as consumerContractAddressJson,
+    cryptoDiceConsumerAbi,
 } from "../constants"
+
 export default function TempMain() {
     const { chainId: chainIdHex, isWeb3Enabled, account } = useMoralis()
     const chainId = parseInt(chainIdHex!)
@@ -52,21 +53,19 @@ export default function TempMain() {
         return (new Array(length + 1).join(pad) + string).slice(-length)
     }
     // @ts-ignore
-    const { runContractFunction: registerNextRound } = useWeb3Contract()
-    // @ts-ignore
     const { runContractFunction: getWithdrawedRounds } = useWeb3Contract()
     // @ts-ignore
-    const { runContractFunction: getNumOfParticipants } = useWeb3Contract()
-    const { runContractFunction: getNextRandomAirdropRound } = useWeb3Contract({
-        abi: airdropConsumerAbi,
+    const { runContractFunction: getRegisteredCount } = useWeb3Contract()
+    const { runContractFunction: getNextCryptoDiceRound } = useWeb3Contract({
+        abi: cryptoDiceConsumerAbi,
         contractAddress: consumerContractAddress!, //,
-        functionName: "getNextRandomAirdropRound", //,
+        functionName: "getNextCryptoDiceRound", //,
         params: {},
     })
     const {
         runContractFunction: getRegistrationTimeAndDuration, //
     } = useWeb3Contract({
-        abi: airdropConsumerAbi,
+        abi: cryptoDiceConsumerAbi,
         contractAddress: consumerContractAddress!, //,
         functionName: "getRegistrationTimeAndDuration", //,
         params: {},
@@ -111,13 +110,13 @@ export default function TempMain() {
                 (await getRegistrationTimeAndDuration()) as [BigNumberish, BigNumberish]
             let registrationStartTime: BigNumberish = registrationTimeAndDurationfromCall[0]
             let registrationDuration: BigNumberish = registrationTimeAndDurationfromCall[1]
-            let nextRoundFromCall = (await getNextRandomAirdropRound({
+            let nextRoundFromCall = (await getNextCryptoDiceRound({
                 onError: (error) => console.log(error),
             })) as BigNumberish
             let currentRound: Number =
-                Number(nextRoundFromCall.toString()) == 0
+                Number(nextRoundFromCall?.toString()) == 0
                     ? 0
-                    : Number(nextRoundFromCall.toString()) - 1
+                    : Number(nextRoundFromCall?.toString()) - 1
             setRegistrationDurationForNextRound(registrationDuration.toString())
             const hours = Math.floor(parseInt(registrationDuration.toString()) / 3600)
             const minutes = Math.floor(
@@ -139,28 +138,28 @@ export default function TempMain() {
             setNextRound(currentRound.toString())
             setRound(currentRound.toString())
             const participantsLengthfromCallOptions = {
-                abi: airdropConsumerAbi,
+                abi: cryptoDiceConsumerAbi,
                 contractAddress: consumerContractAddress!,
-                functionName: "getNumOfParticipants",
+                functionName: "getRegisteredCount",
                 params: { round: currentRound },
             }
-            const participantsLengthfromCall = (await getNumOfParticipants({
+            const participantsLengthfromCall = (await getRegisteredCount({
                 params: participantsLengthfromCallOptions,
                 onError: (error) => console.log(error),
             })) as BigNumberish
             setParticipatedRoundsLength(participantsLengthfromCall?.toString())
             const participatedRoundsfromCallOptions = {
-                abi: airdropConsumerAbi,
+                abi: cryptoDiceConsumerAbi,
                 contractAddress: consumerContractAddress!,
                 functionName: "getParticipatedRounds",
-                params: { participantAddress: account },
+                params: { participant: account },
             }
             const participatedRoundsfromCall = (await getParticipatedRounds({
                 params: participatedRoundsfromCallOptions,
                 onError: (error) => console.log(error),
             })) as BigNumber[]
             const getWithdrawedRoundsOptions = {
-                abi: airdropConsumerAbi,
+                abi: cryptoDiceConsumerAbi,
                 contractAddress: consumerContractAddress!,
                 functionName: "getWithdrawedRounds",
                 params: { participant: account },

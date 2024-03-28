@@ -7,10 +7,10 @@ import Commit from "../components/Commit"
 import Header from "../components/Header"
 import Round from "../components/Round"
 import {
-    airdropConsumerAbi,
     consumerContractAddress as consumerContractAddressJSON,
     coordinatorContractAddress as coordinatorContractAddressJSON,
     crrngAbi,
+    cryptoDiceConsumerAbi,
 } from "../constants"
 interface ValueAtRound {
     startTime: BigNumberish
@@ -80,19 +80,17 @@ export default function Home() {
     useInterval(() => {
         updateUI()
     }, 12000)
-    // @ts-ignore
-    const { runContractFunction: getSetUpValuesAtRound } = useWeb3Contract()
-    const { runContractFunction: getNextRandomAirdropRound } = useWeb3Contract({
-        abi: airdropConsumerAbi,
+    const { runContractFunction: getNextCryptoDiceRound } = useWeb3Contract({
+        abi: cryptoDiceConsumerAbi,
         contractAddress: randomAirdropAddress!, //,
-        functionName: "getNextRandomAirdropRound", //,
+        functionName: "getNextCryptoDiceRound", //,
         params: {},
     })
     // @ts-ignore
     const { runContractFunction: getParticipatedRounds } = useWeb3Contract()
 
     async function updateUI() {
-        let roundFromCall = (await getNextRandomAirdropRound({
+        let roundFromCall = (await getNextCryptoDiceRound({
             onError: (error) => console.log(error),
         })) as BigNumberish
         roundFromCall =
@@ -112,10 +110,10 @@ export default function Home() {
         })) as ValueAtRound
         setValuesAtRound(valuesAtRoundFromCall)
         const participatedRoundsfromCallOptions = {
-            abi: airdropConsumerAbi,
+            abi: cryptoDiceConsumerAbi,
             contractAddress: randomAirdropAddress!,
             functionName: "getParticipatedRounds",
-            params: { participantAddress: account },
+            params: { participant: account },
         }
         const participatedRoundsfromCall: BigNumber[] = (await getParticipatedRounds({
             params: participatedRoundsfromCallOptions,
