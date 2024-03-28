@@ -134,12 +134,13 @@ def parse_general_values_at_round(values_at_round):
 def parse_setup_values_at_round_v2(values_at_round):
     """Parse a ValueAtRound struct and return as a dictionary."""
     return {
-        "nBitLen": values_at_round[0],
-        "gBitLen": values_at_round[1],
-        "hBitLen": values_at_round[2],
-        "nVal": values_at_round[3],
-        "gVal": values_at_round[4],
-        "hVal": values_at_round[5]
+        "T": values_at_round[0],
+        "nBitLen": values_at_round[1],
+        "gBitLen": values_at_round[2],
+        "hBitLen": values_at_round[3],
+        "nVal": values_at_round[4],
+        "gVal": values_at_round[5],
+        "hVal": values_at_round[6]
     }
     
 def parse_setup_values_at_round(values_at_round):
