@@ -17,8 +17,8 @@ import { useState } from "react"
 import { useMoralis, useWeb3Contract } from "react-moralis"
 import { Bell, Input, useNotification } from "web3uikit"
 import {
-    airdropConsumerAbi,
     consumerContractAddress as consumerContractAddressJSON,
+    cryptoDiceConsumerAbi,
 } from "../constants"
 //import titanSDK from "@tokamak-network/titan-sdk"
 
@@ -69,7 +69,7 @@ export default function StartRegistration({ updateUI }: { updateUI: () => Promis
             const signer = provider.getSigner()
             const randomAirdropContract = new ethers.Contract(
                 randomAirdropAddress!,
-                airdropConsumerAbi,
+                cryptoDiceConsumerAbi,
                 provider
             )
             try {

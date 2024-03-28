@@ -17,8 +17,8 @@ import { useState } from "react"
 import { useMoralis, useWeb3Contract } from "react-moralis"
 import { Bell, Button, Input, useNotification } from "web3uikit"
 import {
-    airdropConsumerAbi,
     consumerContractAddress as consumerContractAddressJSON,
+    cryptoDiceConsumerAbi,
 } from "../constants"
 import { createTestCases2 } from "../utils/testFunctions"
 import SetModal from "./SetModal"
@@ -59,7 +59,7 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
         if (validation()) {
             setIsFetching(true)
             const setUpOptions = {
-                abi: airdropConsumerAbi,
+                abi: cryptoDiceConsumerAbi,
                 contractAddress: randomAirdropAddress!,
                 functionName: "setUp",
                 params: {
@@ -75,7 +75,7 @@ export default function SetUp({ updateUI }: { updateUI: () => Promise<void> }) {
             const signer = provider.getSigner()
             const randomAirdropContract = new ethers.Contract(
                 randomAirdropAddress!,
-                airdropConsumerAbi,
+                cryptoDiceConsumerAbi,
                 provider
             )
             try {

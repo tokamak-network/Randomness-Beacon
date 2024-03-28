@@ -16,8 +16,8 @@ import { useState } from "react"
 import { useMoralis, useWeb3Contract } from "react-moralis"
 import { Bell, Input, Table, useNotification } from "web3uikit"
 import {
-    airdropConsumerAbi,
     consumerContractAddress as consumerContractAddressJSON,
+    cryptoDiceConsumerAbi,
 } from "../constants"
 // define type [Array(1), Array(1), addresses: Array(1), rankPoints: Array(1)]
 interface Result {
@@ -60,7 +60,7 @@ export default function RankOfEachParticipants({
     async function getRankPointOfEachParticipantsFunction() {
         if (validation()) {
             const Options = {
-                abi: airdropConsumerAbi,
+                abi: cryptoDiceConsumerAbi,
                 contractAddress: randomAirdropAddress!,
                 functionName: "getRankPointOfEachParticipants",
                 params: {
@@ -72,7 +72,7 @@ export default function RankOfEachParticipants({
                 params: Options,
                 onError: (error: any) => {
                     console.log(error)
-                    const iface = new ethers.utils.Interface(airdropConsumerAbi)
+                    const iface = new ethers.utils.Interface(cryptoDiceConsumerAbi)
                     let errorMessage = ""
                     if (error?.data?.data?.data) {
                         errorMessage = iface.parseError(error?.data?.data?.data).name
