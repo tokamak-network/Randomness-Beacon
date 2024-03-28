@@ -1,5 +1,6 @@
 import { BigNumberish, ethers } from "ethers"
 
+import correctData from "./correct.json"
 import testData from "./data_20231212_150019.json"
 import { BigNumber, TestCase, VDFClaim } from "./interfaces"
 import twoMinutesLengthData from "./twoMinutesLengthData.json"
@@ -13,6 +14,10 @@ export const createTestCaseV2 = (): TestCase => {
         delete jsonData.recoveryProofs[i].n
         delete jsonData.recoveryProofs[i].T
     }
+    return jsonData
+}
+export const createTestCase = () => {
+    const jsonData = correctData
     return jsonData
 }
 export const createTestCases2 = () => {
