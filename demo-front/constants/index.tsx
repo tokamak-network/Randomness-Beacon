@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export { default as airdropConsumerAbi } from "./airdropConsumerAbi.json"
 export { default as consumerContractAddress } from "./consumerContractAddress.json"
 export { default as coordinatorContractAddress } from "./coordinatorContractAddress.json"
 export { default as crrngAbi } from "./crrngAbi.json"
+export { default as cryptoDiceConsumerAbi } from "./cryptoDiceConsumerAbi.json"
