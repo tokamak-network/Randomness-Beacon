@@ -10,7 +10,7 @@ import json
 
 from web3_util import  get_contract_values, get_contract_values_v2
 
-from log_data import log_session_data
+from log_data import log_session_data, log_session_data2
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
@@ -100,7 +100,7 @@ def select_automatic_mode(round):
 def command_parser():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the script based on the provided mode and configuration.")
-    parser.add_argument('-m', '--mode', choices=['auto', 'setup', 'test', 'fixedSetupRecover', 'testDiffCommitLen'], required=True, help="Mode of operation: auto, setup, or test.")
+    parser.add_argument('-m', '--mode', choices=['auto', 'setup', 'test', 'recover', 'testDiffCommitLen'], required=True, help="Mode of operation: auto, setup, or test.")
     parser.add_argument('-r', '--round', type=int, help="Round number for auto mode.")
     parser.add_argument('-b', '--bit_size', type=int, help="Modulo bit size for setup mode.")
     parser.add_argument('-d', '--time_delay', type=int, help="VDF time delay for setup mode.")
@@ -111,7 +111,7 @@ def command_parser():
     if args.mode == 'auto':
         return select_automatic_mode(args.round)
     
-    elif args.mode == 'fixedSetupRecover':
+    elif args.mode == 'recover':
         return select_fixed_setup_recover_mode(args.round)
 
     elif args.mode == 'setup':
@@ -225,7 +225,7 @@ if __name__=='__main__':
         # 1. print on terminal
         # 2. print as a JSON file
         # so it can be imported to js test scripts directly
-        log_session_data(mode_info["mode"], sessionData)
+        log_session_data2(mode_info["mode"], sessionData)
 
     
     elif mode_info["mode"] == "setup":

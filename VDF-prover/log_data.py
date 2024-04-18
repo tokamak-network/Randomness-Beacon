@@ -136,3 +136,53 @@ def log_session_data(mode, sessionData):
         file.write(json.dumps(sessionData, indent=2))
     
     print(f'[+] logs are saved as {file_name}')
+
+
+def log_session_data2(mode, sessionData):
+    
+    # change the proof list to dictionary
+    keys = ['n', 'x', 'y', 'T', 'v']
+    
+    if 'setupProofs' in sessionData:
+        for i in range(len(sessionData['setupProofs'])):
+            new_element = dict(zip(keys, sessionData['setupProofs'][i]))
+            sessionData['setupProofs'][i] = new_element
+        
+    if 'recoveryProofs' in sessionData:
+        for i in range(len(sessionData['recoveryProofs'])):
+            new_element = dict(zip(keys, sessionData['recoveryProofs'][i]))
+            sessionData['recoveryProofs'][i] = new_element
+        
+    # change the big decimal numbers as a hex-string 
+    # in the nested dictionary except for the key 't'
+    for key in sessionData:
+
+        if key == 'T':
+            pass
+        elif key == 'setupProofs' or key == 'recoveryProofs':
+            for i in range(len(sessionData[key])):
+                for innerKey in sessionData[key][i]:
+                    if innerKey != 'T':
+                        sessionData[key][i][innerKey] = val_to_big_number_dictionary(sessionData[key][i][innerKey])
+                        
+        elif key == 'randomList' or key == 'commitList':
+            for i in range(len(sessionData[key])):
+                sessionData[key][i] = val_to_big_number_dictionary(sessionData[key][i])
+                
+        else: # key == 'n' or key == 'x' or key == 'y' or key == 'v':
+            sessionData[key] = val_to_big_number_dictionary(sessionData[key])
+        
+    
+    # 1. print data on terminal
+    # print('\n\n\n[+] Game Data: ', json.dumps(sessionData, indent=2))
+    
+    # Format the current time as YYYYMMDD_HHMMSS
+    # file_name = get_file_name_with_time(mode)
+    # file_name = f"./testLog/data_{current_time}_{mode}.json"
+    file_name = "../VDF-RNG-verifier/scripts/recover.json"
+
+    # Writing the data to a JSON file
+    with open(file_name, 'w') as file:
+        file.write(json.dumps(sessionData, indent=2))
+    
+    print(f'[+] logs are saved as {file_name}')
