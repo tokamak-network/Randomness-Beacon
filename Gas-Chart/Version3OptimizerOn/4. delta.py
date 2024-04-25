@@ -81,7 +81,7 @@ plt.text(10.9, 9290000, 'Minimum', ha='right', fontsize=15)
 
 plt.legend(title=r'$\tau$', fontsize=18, title_fontsize=18)
 plt.xlabel('Number of Skipped Proof',labelpad= 10.9,fontsize=21 ) #y=-0.1
-plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=21)
+plt.ylabel('Gas Used ($10^6$)', labelpad= 18, fontsize=21)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 plt.xticks(fontsize=17)
 plt.yticks(fontsize=17)
