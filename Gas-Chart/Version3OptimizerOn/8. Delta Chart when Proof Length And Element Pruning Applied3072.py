@@ -72,20 +72,20 @@ for i in range(len(data)):
 for i in range(3):
     plt.plot(x[i], y[i], color=colors[i], label="$"+ts[i]+"$", marker=markers[i])
 plt.axvline(x=9.00285,  color='black')
-plt.text(9.9, 18000000, 'Minimum', ha='right', fontsize=15)
+plt.text(9.9, 18000000, 'Minimum', ha='right', fontsize=13)
 # plt.annotate('Minimum', xy=(10.00000001, 4200000), xytext=(0, 50), 
 #              textcoords='offset points', ha='right', va='bottom',
 #              arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'))
 
-plt.legend(title=r'$\tau$', fontsize=18, title_fontsize=18)
-plt.xlabel('Number of Skipped Proof', labelpad= 10.9,fontsize=21 ) #y=-0.1
-plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=21)
+plt.legend(title=r'$\tau$', fontsize=13, title_fontsize=13)
+plt.xlabel('Number of Skipped Proof', labelpad= 10.9,fontsize=15 ) #y=-0.1
+plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=15)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 def custom_formatter(x, _):
     return '{:.0f}'.format(x * 1e-6)
 plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(custom_formatter))
-plt.xticks(fontsize=17)
-plt.yticks(fontsize=17)
+plt.xticks(fontsize=13)
+plt.yticks(fontsize=13)
 
 plt.subplots_adjust(bottom=0.1)
 plt.grid(True, linestyle="--")

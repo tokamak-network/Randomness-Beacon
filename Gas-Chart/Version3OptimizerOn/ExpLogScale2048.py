@@ -71,20 +71,20 @@ precompileModExp = [34441, 35135, 36521, 39144, 44669, 55505, 77520, 121691, 210
 colors = ["tab:red", "tab:green", "tab:blue"]
 markers = ['o', '^', 's']  # circle, triangle, square
 
-plt.plot(x, expBySquareIterative, color=colors[0], marker=markers[0], label="Baseline Model")
-plt.plot(x, expBySquareAndMultiply, color=colors[1], marker=markers[1], label="Square And Multiply")
+plt.plot(x, expBySquareIterative, color=colors[0], marker=markers[0], label="Exponentiation by Squaring")
+plt.plot(x, expBySquareAndMultiply, color=colors[1], marker=markers[1], label="Square and Multiply")
 plt.plot(x, precompileModExp, color=colors[2], marker=markers[2], label="Precompile ModExp")
 
-plt.legend(fontsize=17)
-plt.xlabel('Exponentiation ($\\tau$ of $x^{2^\\tau}$)', fontsize=22.5)
-plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=21)
+plt.legend(fontsize=13)
+plt.xlabel('Exponentiation ($\\tau$ of $x^{2^\\tau}$)', fontsize=15)
+plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=15)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 def custom_formatter(x, pos):
     return '{:.0f}'.format(x * 1e-6)
 plt.gca().yaxis.set_major_formatter(FuncFormatter(custom_formatter))
 x_numerical = np.array([2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048])
-plt.xticks(fontsize=16, rotation = 45)
-plt.yticks(fontsize=17)
+plt.xticks(fontsize=13, rotation = 45)
+plt.yticks(fontsize=13)
 # margin
 plt.grid(True, linestyle="--")
 plt.tight_layout()

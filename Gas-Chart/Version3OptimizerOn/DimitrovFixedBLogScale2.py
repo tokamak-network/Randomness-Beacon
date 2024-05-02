@@ -63,13 +63,13 @@ markers = ['o', 's']
 plt.plot(x, dimitrov, color=colors[0], marker=markers[0], label="Dimitrov")
 plt.plot(x, precompile, color=colors[1], marker=markers[1], label="Precompile")
 
-plt.legend(fontsize=17)
-plt.xlabel('Multi Exponentiation ($\\tau$ of ${x^{2^\\tau}}{y^{2}}$)',  fontsize=22.5)
-plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=21)
+plt.legend(fontsize=13)
+plt.xlabel('Multi Exponentiation ($\\tau$ of ${x^{2^\\tau}}{y^{2}}$)',  fontsize=15)
+plt.ylabel('Gas Used ($10^6$)', labelpad= 7, fontsize=15)
 
 # Turn off the offset text and add a custom text annotation
-plt.xticks(fontsize=16, rotation = 45)
-plt.yticks(fontsize=17)
+plt.xticks(fontsize=13, rotation = 45)
+plt.yticks(fontsize=13)
 plt.gca().yaxis.get_offset_text().set_visible(False)
 # plt.text(0, 1.01, '$10^7$', transform=plt.gca().transAxes, va='bottom')
 def custom_formatter(x, pos):
