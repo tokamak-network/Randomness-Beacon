@@ -1,10 +1,7 @@
 import math
 
-# first word is fixed to 00000000000000000000000000000000000000000000000000000000000000e0
-parameterCount = 7
-offSetOfFirstParam = parameterCount * 32
-
-# 여기는 무조건 0x00..e0 값으로 고정이다 왜냐하면, 7개의 파라미터값이 고정이기 때문. 7 * 0x20 을 하면 0xe0이 된다. 그래서 32byte중에서 1바이트만 Non-zero, 나머지는 zero이기 때문에 상수다
+# first word is fixed to 00000000000000000000000000000000000000000000000000000000000000c0
+# This is always fixed to 0x00..c0 because the number 6 parameter values are fixed. 6 * 0x20 will be 0xc0. So out of 32 bytes, only 1 byte is non-zero and the rest are zero, so it is constant.
 offSetOfFirstParamGasUsed = 31 * 4 + 1 * 16
 
 
@@ -31,10 +28,10 @@ def getByteWordOfWholeBigNumber(l):
 
 def getOffsetValueOfithParam(t, d, l, i):
   # 32를 곱하는 것은 32bytes 라는 뜻. 즉 Offset은 bytes 단위다.
-  # 32*8 에서 8은, 앞에 8개 word가 fixed, spreadsheet의 index 0~7, 즉 8개가 고정이다.
-  # 32*8(t - d)은 offset to start of data part of the element of array 부분, spreadsheet index 8~20에 해당한다. t-d는 Proof의 길이다.
+  # 32*7 에서 7은, 앞에 7개 word가 fixed, spreadsheet의 index 0~6, 즉 7개가 고정이다.
+  # 32*(t - d)은 offset to start of data part of the element of array 부분, spreadsheet index 7~19에 해당한다. t-d는 Proof의 길이다.
   # 32 * (getByteWordOfWholeBigNumber(l) * (t - d + i - 1)), getByteWordOfWholeBigNumber는 1개의 BigNumber struct의 총 byte개수, (t - d + i - 1)에서 t-d는 proof의 길이, i - 1은 몇번째의 offset을 구하는 건지
-  return (32 * 8) + 32 * (t - d) + 32 * (getByteWordOfWholeBigNumber(l) *
+  return (32 * 7) + 32 * (t - d) + 32 * (getByteWordOfWholeBigNumber(l) *
                                          (t - d + i - 1))
 
 
@@ -52,6 +49,8 @@ def getHex(t):
 
 def getBigLength(value):
   # print("dd", math.log2(value) + 1)
+  if value == 0:
+    return 0
   return math.log2(value) + 1
 
 
@@ -132,30 +131,26 @@ def totalGasUsed(delta):
   #print(t - delta)
 
   gasUsed = offSetOfFirstParamGasUsed
-  for i in range(1, 5):  # i는 1~4, spreadsheet의 index 1~4에 해당한다.
+
+  for i in range(1, 4):  # i는 1~3, spreadsheet의 index 1~3에 해당한다.
     gasUsed += getGasUsedOfOffset(t, delta, lambd, i)
 
-  gasUsedOftowPowerOfDelta = 31 * 4 + 1 * 16  #2의 거듭제곱 형태이기 때문에 1byte만 non-zero
+  gasUsedOfDelta = 31 * 4 + 1 * 16  #delta값은 decimal로 0~25사이의 값, 1byte로 충분하다.
   gasUsedOfT = 31 * 4 + 1 * 16  #2의 거듭제곱 형태이기 때문에 1byte만 non-zero
-  gasUsed += gasUsedOftowPowerOfDelta
+  gasUsed += gasUsedOfDelta
   gasUsed += gasUsedOfT
 
-  gasUsed += getGasUsedOf32BytesValue(t - delta)
-  for i in range(t - delta):  # i는 0~proof의 길이, spreadsheet의 index 8~20에 해당한다.
+  gasUsed += getGasUsedOf32BytesValue(t - delta)  # length of v array
+
+  for i in range(t - delta):  # i는 0~proof의 길이, spreadsheet의 index 7~19에 해당한다.
     gasUsed += getGasUsedOf32BytesValue(
         getOffsetValueOfithElementOfArray(t, delta, lambd, i))
-  # t - delta (=proof의 길이) + 3(3은 x,y,n를 뜻함), spreadsheet에서 index 21~199에 해당한다.
+  # t - delta (=proof의 길이) + 3(3은 x,y,n를 뜻함), spreadsheet에서 index 20~195에 해당한다.
   gasUsed += (getGasUsedOfBigNumber(lambd) * (t - delta + 3))
-
-  gasUsedOfLengthOfTwoPowerOfDeltaBytes = 31 * 4 + 1 * 16  # 이 값은 twoPowerOfDeltaBytes의 bytes길이를 나타내는 값으로 무조건 0x20으로 고정이다. 그러므로 1byte만 non-zero, spreadsheet index의 197
-  gasUsedOfDataOfTwoPowerOfDeltaBytes = 31 * 4 + 1 * 16  # 이 값은 twoPowerOfDeltaBytes의 값으로 2의 거듭제곱 형태이므로 무조건 1byte만 Non-zero다.
-
-  gasUsed += gasUsedOfLengthOfTwoPowerOfDeltaBytes
-  gasUsed += gasUsedOfDataOfTwoPowerOfDeltaBytes
   return gasUsed
 
 
-for delta in range(0, 25):  #delta를 21부터 0까지 테스트
+for delta in range(0, 26):  #delta를 21부터 0까지 테스트
   Gtransaction = 21000  # 고정 가스비
   functionSelectorGasUsed = 16 * 4  #함수 셀렉터 고정 가스비, zero-byte가 포함될 수도 있지만 저희 테스트케이스에서는 모두 non-zero
   # print("intrinsic gas when delta:", delta, "= ",
