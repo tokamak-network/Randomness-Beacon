@@ -15,19 +15,19 @@ def getByteWordsfromBytesLength(bytesLength):
   return (bytesLength + 31) // 32
 
 
-def getByteWordOfBigNumberValData(l):  #l은 Lambda, Eg. 2048의 byteWord는 8.
+def getByteWordOfBigNumberValData(l):  #l is Lambda, Eg. byteWord of 2048bits is 8. 
   return getByteWordsfromBytesLength(getBytesLengthfromBitLength(l))
 
 
-#word는 EVM 메모리 단위, 1word=32bytes, 2word = 64bytes...
+# let's say word is a unit of EVM memory 1word=32bytes, 2word = 64bytes...
 def getByteWordOfWholeBigNumber(l):
-  offSetAndBitlenAndLength = 3  # offset, bitlen, length는 무조건 3 bytesword로 고정이다.
+  offSetAndBitlenAndLength = 3  # offset, bitlen, length are fixed to 3 bytesword
   return 3 + getByteWordOfBigNumberValData(
-      l)  # lambda bit에 따라서 해당 data의 bytesword를 구한다.
+      l)  # Get the bytesword of the data according to the lambda bit.
 
 
 def getOffsetValueOfithParam(t, d, l, i):
-  # 32를 곱하는 것은 32bytes 라는 뜻. 즉 Offset은 bytes 단위다.
+  #  * 32 => offset is in bytes.
   # 32*7 에서 7은, 앞에 7개 word가 fixed, spreadsheet의 index 0~6, 즉 7개가 고정이다.
   # 32*(t - d)은 offset to start of data part of the element of array 부분, spreadsheet index 7~19에 해당한다. t-d는 Proof의 길이다.
   # 32 * (getByteWordOfWholeBigNumber(l) * (t - d + i - 1)), getByteWordOfWholeBigNumber는 1개의 BigNumber struct의 총 byte개수, (t - d + i - 1)에서 t-d는 proof의 길이, i - 1은 몇번째의 offset을 구하는 건지
