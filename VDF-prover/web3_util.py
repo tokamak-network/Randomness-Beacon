@@ -173,6 +173,7 @@ def get_contract_values_v2(round=None):
             round_info = round_info - 1
     else:
         round_info = round
+    print("round_info", round_info)
     raw_general_values_at_round = contract.functions.getValuesAtRound(round_info).call()
     genearl_values_at_round = parse_general_values_at_round_v2(raw_general_values_at_round)
     stage = get_stage(genearl_values_at_round['stage'])
