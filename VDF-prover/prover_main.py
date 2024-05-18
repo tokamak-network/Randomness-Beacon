@@ -30,7 +30,6 @@ def select_fixed_setup_recover_mode(round):
             g = value_at_round['gVal']
             T = 4194304
             h = value_at_round['hVal']
-            bStar = value_at_round['bStar']
             commits = commits
 
             return {
@@ -39,7 +38,6 @@ def select_fixed_setup_recover_mode(round):
                 "g": g,
                 "T": T,
                 "h": h,
-                "bstar": bStar,
                 "commits": commits
             }
         elif ans.lower() == 'n':

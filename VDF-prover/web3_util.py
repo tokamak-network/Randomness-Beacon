@@ -73,9 +73,9 @@ def get_commit_reveal_values(contract, round_number):
     commit_reveal_values = []
     index = 0
     while True:
-        value = contract.functions.getCommitRevealValues(round_number, index).call()
+        value = contract.functions.getCommitValue(round_number, index).call()
         # participantAddress가 '0x000...'인 경우 더 이상의 유효한 값이 없다고 간주
-        if value[2] == '0x0000000000000000000000000000000000000000':
+        if value[1] == '0x0000000000000000000000000000000000000000':
             break
         commit_reveal_values.append(value)
         index += 1
@@ -106,15 +106,12 @@ def parse_general_values_at_round_v2(values_at_round):
     """Parse a ValueAtRound struct and return as a dictionary."""
     return {
         "startTime": values_at_round[0],
-        "numOfPariticipants": values_at_round[1],
-        "count": values_at_round[2],
-        "consumer": values_at_round[3],
-        "bStar": values_at_round[4],
-        "commitsString": values_at_round[5],
-        "omega": values_at_round[6],
-        "stage": values_at_round[7],
-        "isCompleted": values_at_round[8],
-        "isAllRevealed": values_at_round[9]
+        "commitCounts": values_at_round[1],
+        "consumer": values_at_round[2],
+        "commitsString": values_at_round[3],
+        "omega": values_at_round[4],
+        "stage": values_at_round[5],
+        "isCompleted": values_at_round[6],
     }
     
 def parse_general_values_at_round(values_at_round):
