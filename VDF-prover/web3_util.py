@@ -106,12 +106,13 @@ def parse_general_values_at_round_v2(values_at_round):
     """Parse a ValueAtRound struct and return as a dictionary."""
     return {
         "startTime": values_at_round[0],
-        "commitCounts": values_at_round[1],
-        "consumer": values_at_round[2],
-        "commitsString": values_at_round[3],
-        "omega": values_at_round[4],
-        "stage": values_at_round[5],
-        "isCompleted": values_at_round[6],
+        "requestedTime": values_at_round[1],
+        "commitCounts": values_at_round[2],
+        "consumer": values_at_round[3],
+        "commitsString": values_at_round[4],
+        "omega": values_at_round[5],
+        "stage": values_at_round[6],
+        "isCompleted": values_at_round[7],
     }
     
 def parse_general_values_at_round(values_at_round):

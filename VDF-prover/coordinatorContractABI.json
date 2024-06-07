@@ -112,12 +112,12 @@
   },
   {
     "inputs": [],
-    "name": "InvalidProofsLength",
+    "name": "NotCommittedParticipant",
     "type": "error"
   },
   {
     "inputs": [],
-    "name": "NotCommittedParticipant",
+    "name": "NotConsumer",
     "type": "error"
   },
   {
@@ -189,6 +189,11 @@
   },
   {
     "inputs": [],
+    "name": "PreviousRoundNotRecovered",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "RecovNotMatchX",
     "type": "error"
   },
@@ -219,54 +224,13 @@
   },
   {
     "inputs": [],
-    "name": "TOneNotAtLast",
+    "name": "TooEarlyToRefund",
     "type": "error"
   },
   {
     "inputs": [],
     "name": "TwoOrMoreCommittedPleaseRecover",
     "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "XPrimeNotEqualAtIndex",
-    "type": "error"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "index",
-        "type": "uint256"
-      }
-    ],
-    "name": "YPrimeNotEqualAtIndex",
-    "type": "error"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "round",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "omega",
-        "type": "bytes"
-      }
-    ],
-    "name": "CalculateOmega",
-    "type": "event"
   },
   {
     "anonymous": false,
@@ -307,6 +271,12 @@
         "internalType": "bool",
         "name": "success",
         "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "leader",
+        "type": "address"
       }
     ],
     "name": "FulfillRandomness",
@@ -362,20 +332,8 @@
       {
         "indexed": false,
         "internalType": "bytes",
-        "name": "recov",
-        "type": "bytes"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes",
         "name": "omega",
         "type": "bytes"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "success",
-        "type": "bool"
       }
     ],
     "name": "Recovered",
@@ -426,19 +384,6 @@
       }
     ],
     "name": "commit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "round",
-        "type": "uint256"
-      }
-    ],
-    "name": "disputeLeadershipAfterFulfill",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -610,9 +555,28 @@
             "type": "address"
           }
         ],
-        "internalType": "struct VDFCRRNGPoFForTitan.CommitValue",
+        "internalType": "struct VDFCRRNGPoF.CommitValue",
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "round",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCommittedOperatorsAtRound",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -787,7 +751,7 @@
             "type": "bool"
           }
         ],
-        "internalType": "struct VDFCRRNGPoFForTitan.FulfillStatus",
+        "internalType": "struct VDFCRRNGPoF.FulfillStatus",
         "name": "",
         "type": "tuple"
       }
@@ -905,7 +869,7 @@
             "type": "bool"
           }
         ],
-        "internalType": "struct VDFCRRNGPoFForTitan.OperatorStatusAtRound",
+        "internalType": "struct VDFCRRNGPoF.OperatorStatusAtRound",
         "name": "",
         "type": "tuple"
       }
@@ -928,6 +892,11 @@
           {
             "internalType": "uint256",
             "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "requestedTime",
             "type": "uint256"
           },
           {
@@ -963,7 +932,7 @@
             "type": "tuple"
           },
           {
-            "internalType": "enum VDFCRRNGPoFForTitan.Stages",
+            "internalType": "enum VDFCRRNGPoF.Stages",
             "name": "stage",
             "type": "uint8"
           },
@@ -978,7 +947,7 @@
             "type": "bool"
           }
         ],
-        "internalType": "struct VDFCRRNGPoFForTitan.ValueAtRound",
+        "internalType": "struct VDFCRRNGPoF.ValueAtRound",
         "name": "",
         "type": "tuple"
       }
@@ -1149,6 +1118,19 @@
       }
     ],
     "name": "recover",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "round",
+        "type": "uint256"
+      }
+    ],
+    "name": "refundAtRound",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
