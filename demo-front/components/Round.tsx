@@ -30,7 +30,7 @@ export default function Round({ round }: { round: string }) {
                 </h2>
             ) : (
                 <h2 className="py-4 px-4 font-bold text-2xl text-red-600">
-                    Connect to Titan, Titan-Goerli or Set Hardhat Local Node
+                    Connect to Titan-Sepolia, Titan
                 </h2>
             )}
         </div>

@@ -11,15 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { ethers } from "ethers"
+import { BigNumberish, ethers } from "ethers"
 import { decodeError } from "ethers-decode-error"
 import { useRef, useState } from "react"
-import Dice from "react-dice-roll"
 import { useMoralis } from "react-moralis"
-import { Bell, Input, useNotification } from "web3uikit"
+import { Bell, useNotification } from "web3uikit"
 import {
     consumerContractAddress as consumerContractAddressJSON,
-    cryptoDiceConsumerAbi,
+    crrngCoordinatorAbi,
+    crrngCoordinatorAddress as crrngCoordinatorAddressJSON,
+    randomDayAbi,
 } from "../../constants"
 import { BackgroundImage } from "./BackgroundImage"
 import { Button } from "./Button"
@@ -29,23 +30,19 @@ declare type TDiceRef = {
     rollDice: (value: TValue) => void
 }
 export function Register({
-    participatedRoundsLength,
     timeRemaining,
     registrationDurationForNextRound,
     startRegistrationTimeForNextRound,
-    round,
     updateUI,
-    isRegistrationOpen,
-    isRegistered,
+    isEventOpen,
+    averageNumber,
 }: {
-    participatedRoundsLength: string
     timeRemaining: string
     registrationDurationForNextRound: string
     startRegistrationTimeForNextRound: string
-    round: string
     updateUI: () => Promise<void>
-    isRegistrationOpen: boolean
-    isRegistered: boolean
+    isEventOpen: boolean
+    averageNumber: BigNumberish
 }) {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis()
     const chainId = parseInt(chainIdHex!)
@@ -54,55 +51,59 @@ export function Register({
     >("initial")
     const [isFetching, setIsFetching] = useState<boolean>(false)
     const contractAddresses: { [key: string]: string[] } = consumerContractAddressJSON
-    const [diceNumber, setDiceNumber] = useState<number>()
     const randomAirdropAddress =
         !isNaN(chainId) && chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
             : null
+    const crrrngCoordinatorAddresses: { [key: string]: string[] } = crrngCoordinatorAddressJSON
+    const getCrrngCoordinatorAddress =
+        !isNaN(chainId) && chainId in crrrngCoordinatorAddresses
+            ? crrrngCoordinatorAddresses[chainId][crrrngCoordinatorAddresses[chainId].length - 1]
+            : null
     const dispatch = useNotification()
-    function validation() {
-        if (diceNumber == undefined || diceNumber < 1 || diceNumber > 6) {
-            setDiceDataState("error")
+
+    async function registerFunction() {
+        setIsFetching(true)
+        const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
+        // Prompt user for account connections
+        await provider.send("eth_requestAccounts", [])
+        const signer = provider.getSigner()
+        const randomAirdropContract = new ethers.Contract(
+            randomAirdropAddress!,
+            randomDayAbi,
+            provider
+        )
+
+        const crrrngCoordinator = new ethers.Contract(
+            getCrrngCoordinatorAddress!,
+            crrngCoordinatorAbi,
+            provider
+        )
+        try {
+            const feeData = await provider.getFeeData()
+            let gasPrice = feeData.maxFeePerGas
+            if (gasPrice == null) gasPrice = feeData.gasPrice
+            const directFundingCost = await crrrngCoordinator.estimateDirectFundingPrice(
+                210000,
+                gasPrice?.toString()
+            )
+
+            const directFundingCostInt = Math.floor(Number(directFundingCost.toString()))
+            const tx = await randomAirdropContract
+                .connect(signer)
+                .requestRandomWord({ gasLimit: 318111, value: directFundingCostInt })
+            await handleSuccess(tx)
+        } catch (error: any) {
+            console.log(error.message)
+            const decodedError = decodeError(decodeError(error))
             dispatch({
                 type: "error",
-                message: "Invalid Dice Number Value",
+                message: decodedError.error,
                 title: "Error Message",
                 position: "topR",
                 icon: <Bell />,
             })
-            return false
-        }
-        return true
-    }
-    async function registerFunction() {
-        if (validation()) {
-            setIsFetching(true)
-            const provider = new ethers.providers.Web3Provider((window as any).ethereum, "any")
-            // Prompt user for account connections
-            await provider.send("eth_requestAccounts", [])
-            const signer = provider.getSigner()
-            const randomAirdropContract = new ethers.Contract(
-                randomAirdropAddress!,
-                cryptoDiceConsumerAbi,
-                provider
-            )
-            try {
-                const tx = await randomAirdropContract
-                    .connect(signer)
-                    .register(diceNumber, { gasLimit: 150000 })
-                await handleSuccess(tx)
-            } catch (error: any) {
-                console.log(error.message)
-                const decodedError = decodeError(decodeError(error))
-                dispatch({
-                    type: "error",
-                    message: decodedError.error,
-                    title: "Error Message",
-                    position: "topR",
-                    icon: <Bell />,
-                })
-                setIsFetching(false)
-            }
+            setIsFetching(false)
         }
     }
     const handleSuccess = async function (tx: any) {
@@ -129,7 +130,7 @@ export function Register({
         diceRef.current?.rollDice(diceNum as TValue)
     }
     return (
-        <div className="relative py-20 sm:pb-24 sm:pt-36">
+        <div className="relative py-20 sm:pb-24 sm:pt-36 mb-16">
             <BackgroundImage className="-bottom-14 -top-36 " />
             <Container className="relative pb-3.5">
                 <div className="mx-auto max-w-2xl lg:max-w-4xl lg:px-12">
@@ -137,82 +138,46 @@ export function Register({
                         <>
                             {" "}
                             <h1 className="font-display text-5xl font-bold tracking-tighter text-blue-600 sm:text-7xl ">
-                                Join TON Airdrop Event
+                                Crypto Target 700 🎯
                             </h1>
-                            {isRegistrationOpen ? (
+                            {isEventOpen ? (
                                 <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-blue-900">
                                     <div>
-                                        You are submitting for round :{" "}
-                                        <span className="font-semibold">{round}</span> , dice
-                                        number :{" "}
-                                        <span className="font-semibold">{diceNumber}</span>
+                                        Your current average number is{": "}
+                                        <span className="font-bold text-4xl">
+                                            {" "}
+                                            {averageNumber.toString()}
+                                        </span>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-red-900">
-                                    The submission of the dice number is closed
+                                    The event is Not in progress.
                                 </div>
                             )}
                             <div className="mt-2 flex" style={{ alignItems: "center" }}>
-                                <div className="flex-none mr-3">
-                                    <Input
-                                        label={"Enter a number of dice (1~6)"}
-                                        type="number"
-                                        placeholder="or roll the dice -------->"
-                                        id="CommitValue"
-                                        validation={{ required: true, numberMin: 1, numberMax: 6 }}
-                                        value={diceNumber}
-                                        onChange={(e) => {
-                                            setDiceNumber(Number(e.target.value))
-                                            setDiceDataState("initial")
-                                            rollDice(Number(e.target.value) as TValue)
-                                        }}
-                                        state={diceDataState}
-                                        errorMessage="Commit Value is required"
-                                        width="13.5rem"
-                                    />
-                                </div>
-                                <div className="flex-initial">
-                                    <Dice
-                                        faceBg="blue"
-                                        size={65}
-                                        ref={diceRef}
-                                        onRoll={(value) => setDiceNumber(value)}
-                                    />
-                                </div>
-                                {/* <button className="flex-1" onClick={rollDice}>
-                                    Roll Dice
-                                </button> */}
-                                <div className="flex-1 ml-10 mb-11">
+                                <div className="flex-1 mb-11">
                                     <Button
                                         className={
-                                            "mt-10 w-full " +
-                                            (!isRegistrationOpen
-                                                ? "opacity-20"
-                                                : isRegistered
-                                                ? "opacity-20"
-                                                : "")
+                                            "mt-10 w-full " + (!isEventOpen ? "opacity-20" : "")
                                         }
-                                        disabled={
-                                            !isRegistrationOpen
-                                                ? true
-                                                : isRegistered
-                                                ? true
-                                                : false
-                                        }
+                                        disabled={!isEventOpen || isFetching ? true : false}
                                         onClick={registerFunction}
                                     >
                                         {isFetching ? (
                                             <div className="animate-spin spinner-border h-8 w-8 border-b-2 rounded-full"></div>
                                         ) : (
-                                            <div>{isRegistered ? "Submitted!" : "Submit"}</div>
+                                            <div>{"Request RandomWord"}</div>
                                         )}
                                     </Button>
                                 </div>
                             </div>
+                            {/* <div className="mt-6 space-y-6 font-display text-2xl tracking-tight text-blue-900">
+                                <div>RequestIds: {requestIds.toString()}</div>
+                                <div>RandomNumbers: {randomNums.toString()}</div>
+                            </div> */}
                             <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 sm:mt-16 sm:gap-x-16 sm:gap-y-10 sm:text-center lg:auto-cols-auto lg:grid-flow-col lg:grid-cols-none lg:justify-start lg:text-left">
                                 {[
-                                    ["Submitted", participatedRoundsLength],
                                     ["Time Remaining", timeRemaining],
                                     ["Duration", registrationDurationForNextRound],
                                     [`Started At`, startRegistrationTimeForNextRound],
@@ -228,7 +193,7 @@ export function Register({
                         </>
                     ) : (
                         <h2 className="py-4 px-4 font-bold text-2xl text-red-600 h-60">
-                            Connect to Titan, Titan-Goerli or Set Hardhat Local Node
+                            Connect to Titan-Sepolia, Titan
                         </h2>
                     )}
                 </div>

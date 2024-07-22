@@ -1,14 +1,14 @@
-import Link from "next/link"
 import Image from "next/image"
+import Link from "next/link"
+import { Container } from "./MainComponents/Container"
 const imageLoader = ({ src, width, quality }: any) => {
     return `../tokamaklogo.png`
 }
-import { Container } from "./MainComponents/Container"
 
 export function Footer() {
     return (
         <Container>
-            <div className="flex flex-col items-center border-t border-slate-400/10 py-9 sm:flex-row-reverse sm:justify-between">
+            <div className="flex flex-col items-center border-t border-slate-400/10 py-9 sm:flex-row-reverse sm:justify-between mt-16">
                 <div className="flex py-1">
                     <Link href="https://github.com/tokamak-network/Commit-Reveal-Recover-RNG">
                         <a className="group" aria-label="TaxPal on GitHub" target="_blank">

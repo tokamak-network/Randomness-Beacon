@@ -11,19 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { BigNumber, BigNumberish } from "ethers"
+import { BigNumberish } from "ethers"
 import { useEffect, useState } from "react"
 import { useMoralis, useWeb3Contract } from "react-moralis"
 import { useInterval } from "use-interval"
-import { useNotification } from "web3uikit"
 import { Footer } from "../components/Footer"
 import { MainHeader } from "../components/MainComponents/MainHeader"
-import RankOfEachParticipantsMain from "../components/MainComponents/RankOfEachParticipantsMain"
 import { Register } from "../components/MainComponents/Register"
-import {
-    consumerContractAddress as consumerContractAddressJson,
-    cryptoDiceConsumerAbi,
-} from "../constants"
+import { RequestTables } from "../components/MainComponents/RequestTables"
+import { consumerContractAddress as consumerContractAddressJson, randomDayAbi } from "../constants"
 
 export default function TempMain() {
     const { chainId: chainIdHex, isWeb3Enabled, account } = useMoralis()
@@ -33,12 +29,12 @@ export default function TempMain() {
         chainId in contractAddresses
             ? contractAddresses[chainId][contractAddresses[chainId].length - 1]
             : null
-    let [round, setRound] = useState<string>("")
     const [timeRemaining, setTimeRemaining] = useState<string>("00:00:00")
-    const [participatedRoundsLength, setParticipatedRoundsLength] = useState<string>("0")
-    const [participatedRounds, setParticipatedRounds] = useState<string[]>([])
-    const [nextRound, setNextRound] = useState<string>("")
-    const [isRegistrationOpen, setIsRegistrationOpen] = useState<boolean>(false)
+    const [isEventOpen, setIsEventOpen] = useState<boolean>(false)
+    const [avgNumber, setAvgNumber] = useState<BigNumberish>(0)
+    const [requestIds, setRequestIds] = useState<BigNumberish[]>([])
+    const [randomNums, setRandomNums] = useState<BigNumberish[]>([])
+    const [threeClosestToSevenHundred, setThreeClosestToSevenHundred] = useState<any>([])
     const [startRegistrationTimeForNextRound, setStartRegistrationTimeForNextRound] =
         useState<string>("0")
     const [prettyStartRegistrationTimeForNextRound, setPrettyStartRegistrationTimeForNextRound] =
@@ -47,34 +43,36 @@ export default function TempMain() {
         useState<string>("00hrs 00min 00sec")
     const [registrationDurationForNextRound, setRegistrationDurationForNextRound] =
         useState<string>("0")
-    const [withdrawedRounds, setWithdrawedRounds] = useState<string[]>([])
-    const dispatch = useNotification()
     function str_pad_left(string: number, pad: string, length: number) {
         return (new Array(length + 1).join(pad) + string).slice(-length)
     }
     // @ts-ignore
-    const { runContractFunction: getWithdrawedRounds } = useWeb3Contract()
+    const { runContractFunction: getRequestersInfos } = useWeb3Contract()
+    // // @ts-ignore
+    // const { runContractFunction: getWithdrawedRounds } = useWeb3Contract()
     // @ts-ignore
-    const { runContractFunction: getRegisteredCount } = useWeb3Contract()
-    const { runContractFunction: getNextCryptoDiceRound } = useWeb3Contract({
-        abi: cryptoDiceConsumerAbi,
+    // const { runContractFunction: getNextCryptoDiceRound } = useWeb3Contract({
+    //     abi: cryptoDiceConsumerAbi,
+    //     contractAddress: consumerContractAddress!, //,
+    //     functionName: "getNextCryptoDiceRound", //,
+    //     params: {},
+    // })
+    const { runContractFunction: eventEndTime } = useWeb3Contract({
+        abi: randomDayAbi,
         contractAddress: consumerContractAddress!, //,
-        functionName: "getNextCryptoDiceRound", //,
+        functionName: "eventEndTime", //,
         params: {},
     })
-    const {
-        runContractFunction: getRegistrationTimeAndDuration, //
-    } = useWeb3Contract({
-        abi: cryptoDiceConsumerAbi,
+    const { runContractFunction: getThreeClosestToSevenHundred } = useWeb3Contract({
+        abi: randomDayAbi,
         contractAddress: consumerContractAddress!, //,
-        functionName: "getRegistrationTimeAndDuration", //,
+        functionName: "getThreeClosestToSevenHundred", //,
         params: {},
     })
-    // @ts-ignore
-    const { runContractFunction: getParticipatedRounds } = useWeb3Contract()
+
     useInterval(() => {
         let registrationDurationForNextRoundInt = parseInt(registrationDurationForNextRound)
-        if (registrationDurationForNextRoundInt > 0) {
+        if (parseInt(startRegistrationTimeForNextRound) > 0) {
             let _timeRemaing =
                 registrationDurationForNextRoundInt -
                 (Math.floor(Date.now() / 1000) - parseInt(startRegistrationTimeForNextRound))
@@ -89,9 +87,9 @@ export default function TempMain() {
                         ":" +
                         str_pad_left(seconds, "0", 2)
                 )
-                setIsRegistrationOpen(true)
+                setIsEventOpen(true)
             } else {
-                setIsRegistrationOpen(false)
+                setIsEventOpen(false)
             }
         }
     }, 1000)
@@ -99,24 +97,19 @@ export default function TempMain() {
         if (isWeb3Enabled) {
             updateUI()
         }
-    }, [isWeb3Enabled, round, account])
+    }, [isWeb3Enabled, account])
     useInterval(() => {
         updateUI()
     }, 11000)
 
     async function updateUI() {
         if (consumerContractAddress) {
-            let registrationTimeAndDurationfromCall: [BigNumberish, BigNumberish] =
-                (await getRegistrationTimeAndDuration()) as [BigNumberish, BigNumberish]
-            let registrationStartTime: BigNumberish = registrationTimeAndDurationfromCall[0]
-            let registrationDuration: BigNumberish = registrationTimeAndDurationfromCall[1]
-            let nextRoundFromCall = (await getNextCryptoDiceRound({
-                onError: (error) => console.log(error),
-            })) as BigNumberish
-            let currentRound: Number =
-                Number(nextRoundFromCall?.toString()) == 0
-                    ? 0
-                    : Number(nextRoundFromCall?.toString()) - 1
+            const eventDuration = 86400
+            let registrationStartTime: BigNumberish = (await eventEndTime()) as BigNumberish
+            if (Number(registrationStartTime) > 0)
+                registrationStartTime = (Number(registrationStartTime) -
+                    eventDuration) as BigNumberish
+            let registrationDuration: BigNumberish = eventDuration
             setRegistrationDurationForNextRound(registrationDuration.toString())
             const hours = Math.floor(parseInt(registrationDuration.toString()) / 3600)
             const minutes = Math.floor(
@@ -135,54 +128,31 @@ export default function TempMain() {
             setPrettyStartRegistrationTimeForNextRound(
                 new Date(Number(registrationStartTime.toString()) * 1000).toLocaleString().slice(5)
             )
-            setNextRound(currentRound.toString())
-            setRound(currentRound.toString())
-            const participantsLengthfromCallOptions = {
-                abi: cryptoDiceConsumerAbi,
+            const getRequestersInfosOptions = {
+                abi: randomDayAbi,
                 contractAddress: consumerContractAddress!,
-                functionName: "getRegisteredCount",
-                params: { round: currentRound },
+                functionName: "getRequestersInfos",
+                params: { requester: account },
             }
-            const participantsLengthfromCall = (await getRegisteredCount({
-                params: participantsLengthfromCallOptions,
+            const getRequestersInfosResult: any = await getRequestersInfos({
+                params: getRequestersInfosOptions,
                 onError: (error) => console.log(error),
-            })) as BigNumberish
-            setParticipatedRoundsLength(participantsLengthfromCall?.toString())
-            const participatedRoundsfromCallOptions = {
-                abi: cryptoDiceConsumerAbi,
-                contractAddress: consumerContractAddress!,
-                functionName: "getParticipatedRounds",
-                params: { participant: account },
-            }
-            const participatedRoundsfromCall = (await getParticipatedRounds({
-                params: participatedRoundsfromCallOptions,
-                onError: (error) => console.log(error),
-            })) as BigNumber[]
-            const getWithdrawedRoundsOptions = {
-                abi: cryptoDiceConsumerAbi,
-                contractAddress: consumerContractAddress!,
-                functionName: "getWithdrawedRounds",
-                params: { participant: account },
-            }
-            const getWithdrawedRoundsOptionsfromCall = (await getWithdrawedRounds({
-                params: getWithdrawedRoundsOptions,
-                onError: (error) => console.log(error),
-            })) as BigNumberish[]
-            let temp = []
-            let temp2 = []
-
-            if (participatedRoundsfromCall) {
-                for (let i = 0; i < participatedRoundsfromCall.length; i++) {
-                    temp.push(participatedRoundsfromCall[i].toString())
-                }
-                setParticipatedRounds(temp)
-            }
-            if (getWithdrawedRoundsOptionsfromCall) {
-                for (let i = 0; i < getWithdrawedRoundsOptionsfromCall.length; i++) {
-                    temp2.push(getWithdrawedRoundsOptionsfromCall[i].toString())
-                }
-                setWithdrawedRounds(temp2)
-            }
+            })
+            setAvgNumber(getRequestersInfosResult[0])
+            setRequestIds(getRequestersInfosResult[1])
+            setRandomNums(getRequestersInfosResult[2])
+            const getThreeClosestToSevenHundredResult = await getThreeClosestToSevenHundred()
+            setThreeClosestToSevenHundred(getThreeClosestToSevenHundredResult)
+            // const participantsLengthfromCallOptions = {
+            //     abi: cryptoDiceConsumerAbi,
+            //     contractAddress: consumerContractAddress!,
+            //     functionName: "getRegisteredCount",
+            //     params: { round: currentRound },
+            // }
+            // const participantsLengthfromCall = (await getRegisteredCount({
+            //     params: participantsLengthfromCallOptions,
+            //     onError: (error) => console.log(error),
+            // })) as BigNumberish
         }
     }
 
@@ -191,23 +161,28 @@ export default function TempMain() {
             {" "}
             <MainHeader />
             <Register
-                participatedRoundsLength={participatedRoundsLength}
                 timeRemaining={timeRemaining}
                 registrationDurationForNextRound={prettyRegistrationDurationForNextRound}
                 startRegistrationTimeForNextRound={prettyStartRegistrationTimeForNextRound}
-                round={nextRound}
                 updateUI={updateUI}
-                isRegistrationOpen={isRegistrationOpen}
-                isRegistered={participatedRounds.includes(nextRound)}
+                isEventOpen={isEventOpen}
+                averageNumber={avgNumber}
             />
             <div>
+                <RequestTables
+                    requestIds={requestIds}
+                    randomNums={randomNums}
+                    threeClosestToSevenHundred={threeClosestToSevenHundred}
+                />
+            </div>
+            {/* <div>
                 <RankOfEachParticipantsMain
                     round={round}
                     participatedRounds={participatedRounds}
                     withdrawedRounds={withdrawedRounds}
                     updateUI={updateUI}
                 />
-            </div>
+            </div>  */}
             <Footer />
         </>
     )
