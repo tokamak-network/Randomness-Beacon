@@ -14,6 +14,8 @@ from log_data import log_session_data
 
 from Pietrzak_VDF import VDF, gen_recursive_halving_proof, verify_recursive_halving_proof, get_exp
 
+from wesolowski import setup_with_verif_wesolowski
+
 from Commit_Reveal_Recover import setup_without_verif, recover_without_verif, setup, commit, reveal, recover, generate_divisor, GGen
 
 
@@ -100,18 +102,18 @@ def select_automatic_mode(round):
 def command_parser():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="Run the script based on the provided mode and configuration.")
-    parser.add_argument('-m', '--mode', choices=['auto', 'setup', 'test', 'fixedSetupRecover', 'testDiffCommitLen'], required=True, help="Mode of operation: auto, setup, or test.")
+    parser.add_argument('-m', '--mode', choices=['auto', 'setup', 'pietrzak', 'recover', 'wesolowski'], required=True, help="Mode of operation: auto, setup, or test.")
     parser.add_argument('-r', '--round', type=int, help="Round number for auto mode.")
     parser.add_argument('-b', '--bit_size', type=int, help="Modulo bit size for setup mode.")
     parser.add_argument('-d', '--time_delay', type=int, help="VDF time delay for setup mode.")
-    parser.add_argument('-cl', '--commit_len', type=int, help="Commit length for test mode.")
+    parser.add_argument('-cl', '--commit_len', type=int, help="Commit length for pietrzak mode.")
     args = parser.parse_args()
 
     # Read configuration file if mode is auto
     if args.mode == 'auto':
         return select_automatic_mode(args.round)
     
-    elif args.mode == 'fixedSetupRecover':
+    elif args.mode == 'recover':
         return select_fixed_setup_recover_mode(args.round)
 
     elif args.mode == 'setup':
@@ -128,31 +130,36 @@ def command_parser():
                 "g": g,
                 "T": args.time_delay,
             }
-    elif args.mode == 'test':
-        n = generate_divisor(2048) #1024, 2048, 3072
+    elif args.mode == 'pietrzak':
+        if not all([args.bit_size, args.time_delay]):
+            print("All setup mode arguments (-b, -d) are required.")
+            return
+        n = generate_divisor(args.bit_size)  #1024, 2048, 3072
         g = GGen(n)
-        T = 33554432 #1048576, 2097152, 4194304, 8388608, 16777216, 33554432
+        T = args.time_delay #1048576, 2097152, 4194304, 8388608, 16777216, 33554432
         member = 3
         return {
-                "mode": "test",
+                "mode": "pietrzak",
                 "n": n,
                 "g": g, 
                 "T": T,
                 "member": member
             }
-    elif args.mode == 'testDiffCommitLen':
-        n = 16787733290935122481437368133728328346576090632807129741527596642736905263844061000187347139315317854842649687790400123842298700426880474722304214883554816375292570757037140621378906385135613539582479043084244392163803829650051309553263880814324743421183907069761513779523295519767850770757782996347391782717727477920209304326136439376945841495526774917149836500875659771739375305606741462825529564666845086594751156082560955283183033943754755747751029228508120785017448871928365327311734007107017088983210531036030794782231712191306094543432182670132968253513609642276459210688739863575743598266362835007740972451509
-        g = 12543942723415074726965043504991922076121696907821570137511397704577331244629576103672491151224439340943004908229679369031717029621690273353987597803140646282617628831108275423342904110725502150362277771037719189200216177137767892855999953212790783564996680919349203815527997669865940950647441505927180094446092180376090792192854326534733972281624935103155199270807833250749049472729079797267656994138805514016533206241588951257796936214597710332091745495056825768914112252468642159294549416963625054717596085886516948142775845170467185469231731884552275770242388599901121679147636866203131493729464443405551467582277
-        T = 4194304
-        member = args.commit_len
+    elif args.mode == 'wesolowski':
+        if not all([args.bit_size, args.time_delay]):
+            print("All setup mode arguments (-b, -d) are required.")
+            return
+        n = generate_divisor(args.bit_size)
+        g = GGen(n)
+        T = args.time_delay
+        member = 3
         return {
-                "mode": "test",
-                "n": n,
-                "g": g, 
-                "T": T,
-                "member": member
-            }
-
+            "mode": "wesolowski",
+            "n": n,
+            "g": g, 
+            "T": T,
+            "member":member
+        }
     else:
         print("Invalid mode selected.")
         return
@@ -265,9 +272,12 @@ if __name__=='__main__':
         
         log_session_data(mode_info["mode"], sessionData)
         
+    elif mode_info["mode"] == "wesolowski":
+        n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
 
+        setup_with_verif_wesolowski(n, g, T)
     
-    elif mode_info["mode"] == "test":
+    elif mode_info["mode"] == "pietrzak":
         n, g, T, member = mode_info['n'], mode_info['g'], mode_info['T'], mode_info['member']
         
         h, setupProofs = setup_without_verif(n, g, T)
