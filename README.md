@@ -1,8 +1,9 @@
 # Rnadomness Beacon
 
-This repository is to construct a Distributd Randomness Beacon (DRB) using the Commit-Reveal scheme.
+This repository is to construct a Distributd Randomness Beacon (DRB) using the Commit-Reveal-Recover scheme using timed commitments.
 We used [Bicorn-RX](https://eprint.iacr.org/2023/221) mechanism for the overall protocol design.
 And now, we're currently working on efficient VDF verification for the Recovery phase.
+This [preprint](https://arxiv.org/abs/2405.06498) shows our interim rusults in on-chain Pietrzak VDF verification.
 
 
 ## Table of Contents
