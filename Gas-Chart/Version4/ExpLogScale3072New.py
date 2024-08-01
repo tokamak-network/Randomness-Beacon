@@ -12,50 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# x^( 2^2 )
-# exp_by_square_iterative_gasestimate 81245n
-# exp_by_square_and_multiply_gasestimate 45652n
-# precompileModExpGasEstimate 39362n
-# x^( 2^4 )
-# exp_by_square_iterative_gasestimate 88963n
-# exp_by_square_and_multiply_gasestimate 52030n
-# precompileModExpGasEstimate 40904n
-# x^( 2^8 )
-# exp_by_square_iterative_gasestimate 104501n
-# exp_by_square_and_multiply_gasestimate 65391n
-# precompileModExpGasEstimate 43988n
-# x^( 2^16 )
-# exp_by_square_iterative_gasestimate 135540n
-# exp_by_square_and_multiply_gasestimate 91705n
-# precompileModExpGasEstimate 50156n
-# x^( 2^32 )
-# exp_by_square_iterative_gasestimate 198847n
-# exp_by_square_and_multiply_gasestimate 144963n
-# precompileModExpGasEstimate 62735n
-# x^( 2^64 )
-# exp_by_square_iterative_gasestimate 328752n
-# exp_by_square_and_multiply_gasestimate 254002n
-# precompileModExpGasEstimate 87164n
-# x^( 2^128 )
-# exp_by_square_iterative_gasestimate 601384n
-# exp_by_square_and_multiply_gasestimate 482172n
-# precompileModExpGasEstimate 136508n
-# x^( 2^256 )
-# exp_by_square_iterative_gasestimate 1199250n
-# exp_by_square_and_multiply_gasestimate 979056n
-# precompileModExpGasEstimate 237165n
-# x^( 2^512 )
-# exp_by_square_iterative_gasestimate 2634720n
-# exp_by_square_and_multiply_gasestimate 2134154n
-# precompileModExpGasEstimate 437058n
-# x^( 2^1024 )
-# exp_by_square_iterative_gasestimate 6435140n
-# exp_by_square_and_multiply_gasestimate 5090449n
-# precompileModExpGasEstimate 836741n
-# x^( 2^2048 )
-# exp_by_square_iterative_gasestimate 17754157n
-# exp_by_square_and_multiply_gasestimate 13587274n
-# precompileModExpGasEstimate 1636849n
+#   Exponentiation by Squaring Square and Multiply Precompile ModExp
+#   x^2^2 43974 9553 4719
+#   x^2^4 50879 15125 6255
+#   x^2^8 64688 26865 9327
+#   x^2^16 92506 49946 15471
+#   x^2^32 148981 96738 27759
+#   x^2^64 265144 192845 52335
+#   x^2^128 510550 395151 101487
+#   x^2^256 1053881 840167 199800
+#   x^2^512 2380479 1891693 396418
+#   x^2^1024 5963116 4640808 789659
+#   x^2^2048 16846304 12723285 1576141
 
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
@@ -63,9 +31,10 @@ import numpy as np
 from matplotlib.ticker import FuncFormatter
 #x = ["$x^{2^2}$", "$x^{2^4}$", "$x^{2^8}$", "$x^{2^{16}}$", "$x^{2^{32}}$", "$x^{2^{64}}$", "$x^{2^{128}}$", "$x^{2^{256}}$", "$x^{2^{512}}$", "$x^{2^{1024}}$", "$x^{2^{2048}}$"]
 x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
-expBySquareIterative = [81245, 88963, 104501, 135540, 198847, 328752, 601384, 1199250, 2634720, 6435140, 17754157]
-expBySquareAndMultiply = [45652, 52030, 65391, 91705, 144963, 254002, 482172, 979056, 2134154, 5090449, 13587274]
-precompileModExp = [39362, 40904, 43988, 50156, 62735, 87164, 136508, 237165, 437058, 836741, 1636849]
+
+expBySquareIterative = [43974, 50879, 64688, 92506, 148981, 265144, 510550, 1053881, 2380479, 5963116, 16846304]
+expBySquareAndMultiply = [9553, 15125, 26865, 49946, 96738, 192845, 395151, 840167, 1891693, 4640808, 12723285]
+precompileModExp = [4719, 6255, 9327, 15471, 27759, 52335, 101487, 199800, 396418, 789659, 1576141]
 
 
 colors = ["tab:red", "tab:green", "tab:blue"]

@@ -12,39 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# x^( 2^2 ) * y^(2^1)
-# dimitrov estimateGasResult 167014n
-# precompile estimateGasResult 90802n
-# x^( 2^4 ) * y^(2^1)
-# dimitrov estimateGasResult 173439n
-# precompile estimateGasResult 92432n
-# x^( 2^8 ) * y^(2^1)
-# dimitrov estimateGasResult 186683n
-# precompile estimateGasResult 95460n
-# x^( 2^16 ) * y^(2^1)
-# dimitrov estimateGasResult 213340n
-# precompile estimateGasResult 101702n
-# x^( 2^32 ) * y^(2^1)
-# dimitrov estimateGasResult 267736n
-# precompile estimateGasResult 113892n
-# x^( 2^64 ) * y^(2^1)
-# dimitrov estimateGasResult 378915n
-# precompile estimateGasResult 138482n
-# x^( 2^128 ) * y^(2^1)
-# dimitrov estimateGasResult 611188n
-# precompile estimateGasResult 187600n
-# x^( 2^256 ) * y^(2^1)
-# dimitrov estimateGasResult 1116865n
-# precompile estimateGasResult 286065n
-# x^( 2^512 ) * y^(2^1)
-# dimitrov estimateGasResult 2288811n
-# precompile estimateGasResult 482855n
-# x^( 2^1024 ) * y^(2^1)
-# dimitrov estimateGasResult 5278736n
-# precompile estimateGasResult 876283n
-# x^( 2^2048 ) * y^(2^1)
-# dimitrov estimateGasResult 13842970n
-# precompile estimateGasResult 1663999n
+#   Dimitrov MultiExp Precompile MultiExp
+#   x^2^2 * y^(2^1) 120135 46026
+#   x^2^4 * y^(2^1) 125871 47551
+#   x^2^8 * y^(2^1) 137354 50674
+#   x^2^16 * y^(2^1) 161112 56831
+#   x^2^32 * y^(2^1) 209083 68974
+#   x^2^64 * y^(2^1) 307680 93522
+#   x^2^128 * y^(2^1) 514808 142876
+#   x^2^256 * y^(2^1) 969823 241101
+#   x^2^512 * y^(2^1) 2041066 437806
+#   x^2^1024 * y^(2^1) 4829818 830892
+#   x^2^2048 * y^(2^1) 12991295 1617331
 
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
@@ -54,8 +33,8 @@ from matplotlib.ticker import FuncFormatter
 # x = ["$x^{2^{32}}  y^{2}$", "$x^{2^{64}}  y^{2}$", "$x^{2^{128}}  y^{2}$", "$x^{2^{256}}  y^{2}$", "$x^{2^{512}}  y^{2}$", "$x^{2^{1024}}  y^{2}$", "$x^{2^{2048}}  y^{2}$"]
 x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
 
-dimitrov = [167014, 173439, 186683, 213340, 267736, 378915, 611188, 1116865, 2288811, 5278736, 13842970]
-precompile = [90802, 92432, 95460, 101702, 113892, 138482, 187600, 286065, 482855, 876283, 1663999]
+dimitrov = [120135, 125871, 137354, 161112, 209083, 307680, 514808, 969823, 2041066, 4829818, 12991295]
+precompile = [46026, 47551, 50674, 56831, 68974, 93522, 142876, 241101, 437806, 830892, 1617331]
 
 colors = ["tab:red", "tab:blue"]
 markers = ['o', 's']
