@@ -13,17 +13,17 @@
 # limitations under the License.
 
 #   Exponentiation by Squaring Square and Multiply Precompile ModExp
-#   x^2^2 43974 9553 4719
-#   x^2^4 50879 15125 6255
-#   x^2^8 64688 26865 9327
-#   x^2^16 92506 49946 15471
-#   x^2^32 148981 96738 27759
-#   x^2^64 265144 192845 52335
-#   x^2^128 510550 395151 101487
-#   x^2^256 1053881 840167 199800
-#   x^2^512 2380479 1891693 396418
-#   x^2^1024 5963116 4640808 789659
-#   x^2^2048 16846304 12723285 1576141
+#   x^2^2 42984 8561 3844
+#   x^2^4 49771 14063 5380
+#   x^2^8 63339 25433 8452
+#   x^2^16 90677 48004 14596
+#   x^2^32 146191 93776 26884
+#   x^2^64 260435 187843 51460
+#   x^2^128 501998 386069 100612
+#   x^2^256 1037650 822925 198925
+#   x^2^512 2348889 1858131 395543
+#   x^2^1024 5900805 4574606 788784
+#   x^2^2048 16722555 12591803 1575266
 
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
@@ -32,9 +32,9 @@ from matplotlib.ticker import FuncFormatter
 #x = ["$x^{2^2}$", "$x^{2^4}$", "$x^{2^8}$", "$x^{2^{16}}$", "$x^{2^{32}}$", "$x^{2^{64}}$", "$x^{2^{128}}$", "$x^{2^{256}}$", "$x^{2^{512}}$", "$x^{2^{1024}}$", "$x^{2^{2048}}$"]
 x = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']
 
-expBySquareIterative = [43974, 50879, 64688, 92506, 148981, 265144, 510550, 1053881, 2380479, 5963116, 16846304]
-expBySquareAndMultiply = [9553, 15125, 26865, 49946, 96738, 192845, 395151, 840167, 1891693, 4640808, 12723285]
-precompileModExp = [4719, 6255, 9327, 15471, 27759, 52335, 101487, 199800, 396418, 789659, 1576141]
+expBySquareIterative = [42984, 49771, 63339, 90677, 146191, 260435, 501998, 1037650, 2348889, 5900805, 16722555]
+expBySquareAndMultiply = [8561, 14063, 25433, 48004, 93776, 187843, 386069, 822925, 1858131, 4574606, 12591803]
+precompileModExp = [3844, 5380, 8452, 14596, 26884, 51460, 100612, 198925, 395543, 788784, 1575266]
 
 
 colors = ["tab:red", "tab:green", "tab:blue"]
@@ -62,5 +62,5 @@ plt.tight_layout()
 # x_coord = len(x) - 0.6  # Position at the end of the x-axis
 # y_coord = min(min(expBySquareIterative), min(expBySquareAndMultiply), min(precompileModExp)) * -150  # Adjust this as needed
 # plt.text(x_coord, y_coord, r'$x^{2^t}$', fontsize=15, ha='right', va='bottom')
-plt.savefig('2. modexp(log)3072.png', dpi=500)
+plt.savefig('modexp-3072.png', dpi=500)
 plt.show()
