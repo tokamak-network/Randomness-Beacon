@@ -1,4 +1,4 @@
-# Rnadomness Beacon
+# Randomness Beacon
 
 This repository is to construct a Distributd Randomness Beacon (DRB) using the Commit-Reveal-Recover scheme using timed commitments.
 We used [Bicorn-RX](https://eprint.iacr.org/2023/221) mechanism for the overall protocol design.
