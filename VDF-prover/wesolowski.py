@@ -41,7 +41,7 @@ def hash_eth(*strings):
 
 def generate_proof(N, g, y, T):
     print('\nProof Generation------------------------------------------------\n')
-    hM = hash_eth(g, y)
+    hM = hash_eth(g, y, T)
     print("H(m):",hM)
     mSB = 57896044618658097711785492504343953926634992332820282019728792003956564819968
     hM = hM | mSB
@@ -52,17 +52,11 @@ def generate_proof(N, g, y, T):
 
     return l, pi
 
-# return last 128 bit from keccack 256 hash function outputs int for strings 
-def hash_eth_128(*strings):
-  r = hash_eth(*strings)
-  #r = r % pow(2, 128)
-  r = r >> 128
-  return r
 
 def verification(x, T, pi, l, N):
     r = pow(2, T, l)
     y = (pow(pi, l, N) * pow(x, r, N)) % N
-    hM = hash_eth(x, y)
+    hM = hash_eth(x, y, T)
     mSB = 57896044618658097711785492504343953926634992332820282019728792003956564819968
     hM = hM | mSB
     if ( l == nextprime(hM) ):
